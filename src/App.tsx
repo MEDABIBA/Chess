@@ -1,8 +1,11 @@
+import Board from "./components/Board";
+import { useStore } from "./provider/context";
 
 function App() {
+  const store = useStore()
   return (
-    <div className="App">
-      hello world!
+    <div className="app">
+      <Board/>
     </div>
   );
 }

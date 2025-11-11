@@ -1,0 +1,41 @@
+/* Reset and base styles  */
+* {
+  padding: 0px;
+  margin: 0px;
+  border: none;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+body{
+    background-color: #333;
+    height: 100%;
+}
+.app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; 
+}
+
+.board{
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 480px;    
+    aspect-ratio: 1;
+}
+
+.square{
+    flex: 1 0 12.5%; 
+    aspect-ratio: 1;
+}
+.black{
+    background-color: #769656;
+}
+.white{
+    background-color: #eed2;
+}

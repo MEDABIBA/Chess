@@ -9,12 +9,12 @@ const Board = observer(() => {
     <div className="board">
       <div className="numeration">
         {[1, 2, 3, 4, 5, 6, 7, 8].map((e) => (
-          <span>{e}</span>
+          <span key={e}>{e}</span>
         ))}
       </div>
       <div className="alphanumeric-numbering">
         {["a", "b", "c", "d", "e", "f", "g", "h"].map((e) => (
-          <span>{e}</span>
+          <span key={e}>{e}</span>
         ))}
       </div>
       {board.map(({ color, position, piece }) => {

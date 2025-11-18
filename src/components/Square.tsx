@@ -60,13 +60,7 @@ const Square: React.FC<SquareProps> = observer(({ color, position, piece }) => {
       if (dropTarget?.closest(".square")) {
         const toRow = Number(square.dataset.row);
         const toCol = Number(square.dataset.col);
-        if (
-          boardStore.isValidMove(piece, position, { row: toRow, col: toCol })
-        ) {
-          boardStore.currentPlayer =
-            boardStore.currentPlayer === "black" ? "white" : "black";
-          movePiece(position, { row: toRow, col: toCol });
-        }
+        movePiece(position, { row: toRow, col: toCol });
       }
 
       clone.remove();

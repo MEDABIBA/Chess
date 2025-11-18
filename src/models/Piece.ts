@@ -1,7 +1,4 @@
-import { action } from "mobx";
 import { Color, PieceType, Position } from "../types/types";
-import React from "react";
-
 import pawnWhite from "../assets/figures/pawn-white.png";
 import pawnBlack from "../assets/figures/pawn-black.png";
 import rookWhite from "../assets/figures/rook-white.png";

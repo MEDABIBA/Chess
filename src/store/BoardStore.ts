@@ -77,17 +77,42 @@ class BoardStore {
     const boardSetPiece = this.board.find(
       (el) => el.position.col === to.col && el.position.row === to.row
     );
-    console.log(boardSetPiece);
     if (!boardSetPiece && boardSetPiece == null) return;
     boardSetPiece.piece = piece;
   };
 
   @action
   movePiece = (from: Position, to: Position): void => {
+    console.log("moving");
     const piece = this.getPiece(from);
     if (piece) {
       this.setPiece(to, piece);
       this.setPiece(from, null);
+    }
+  };
+
+  @action
+  isValidMove = (figure: Piece, from: Position, to: Position) => {
+    if (figure.color !== this.currentPlayer) return false;
+    if (figure.pieceType === "pawn") {
+      const dir = figure.color === "white" ? 1 : -1;
+      const startingPos = figure.color === "white" ? 2 : 7;
+      if (from.col === to.col) {
+        if (to.row === from.row + dir) {
+          return !this.getPiece(to);
+        } else if (from.row === startingPos && to.row === from.row + 2 * dir) {
+          const middlePos = { row: from.row + dir, col: from.col };
+          return !this.getPiece(middlePos) && !this.getPiece(to);
+        }
+      } else if (
+        to.row === from.row + dir &&
+        (from.col === to.col + 1 || from.col === to.col - 1)
+      ) {
+        return (
+          !!this.getPiece(to)?.color &&
+          this.getPiece(to)?.color !== figure.color
+        );
+      }
     }
   };
 }

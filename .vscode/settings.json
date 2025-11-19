@@ -1,0 +1,4 @@
+{
+  "editor.quickSuggestionsDelay": 5000,
+  "editor.suggest.selectionMode": "always"
+}

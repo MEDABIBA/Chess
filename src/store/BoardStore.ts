@@ -1,13 +1,16 @@
-import { action, makeAutoObservable } from "mobx";
+import { action, computed, makeAutoObservable } from "mobx";
 import { Color, PieceType, Position, SquareData } from "../types/types";
 import Piece from "../models/Piece";
 import { RootStore } from "./RootStore";
+import { simulateValidMove } from "../helpers/simulateMove";
 
 class BoardStore {
   store: RootStore;
   board: SquareData[] = [];
   currentPlayer: Color = "white";
   gameStatus: "playing" | "check" | "checkmate" = "playing";
+  activePiece: Piece | null = null;
+  availableMoves: Position[] = [];
 
   constructor(store: RootStore) {
     this.store = store;
@@ -68,9 +71,8 @@ class BoardStore {
 
   @action
   getPiece = (from: Position) => {
-    return this.board.find(
-      (el) => el.position.col === from.col && el.position.row === from.row
-    )?.piece;
+    return this.board.find((el) => el.position.col === from.col && el.position.row === from.row)
+      ?.piece;
   };
 
   @action
@@ -83,7 +85,17 @@ class BoardStore {
   };
 
   @action
-  movePiece = (from: Position, to: Position): void => {
+  getActivePiece = () => {
+    return this.activePiece;
+  };
+
+  @action
+  setActivePiece = (piece: Piece | null) => {
+    this.activePiece = piece;
+  };
+
+  @action
+  makeMove = (from: Position, to: Position): void => {
     const piece = this.getPiece(from);
 
     if (!piece) {
@@ -94,11 +106,53 @@ class BoardStore {
       console.warn("Invalid move");
       return;
     }
+    if (piece.pieceType !== "king" && this.store.chessMoveValidator.isKingUnderAttack()) {
+      if (
+        !simulateValidMove(
+          piece,
+          from,
+          to,
+          this.getPiece,
+          this.setPiece,
+          this.store.chessMoveValidator.isKingUnderAttack
+        )
+      ) {
+        return;
+      }
+    }
 
+    this.availableMoves = [];
     this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
     piece.position = to;
     this.setPiece(to, piece);
     this.setPiece(from, null);
+  };
+
+  @computed
+  get availableMovesSet(): Set<string> {
+    return new Set(this.availableMoves.map((pos) => `${pos.row}-${pos.col}`));
+  }
+
+  setAvailableMoves = (piece: Piece, position: Position) => {
+    this.availableMoves = [];
+    this.board.forEach((el) => {
+      if (
+        (this.store.chessMoveValidator.isValidMove(piece, position, el.position) &&
+          !this.store.chessMoveValidator.isKingUnderAttack()) ||
+        (this.store.chessMoveValidator.isKingUnderAttack() &&
+          simulateValidMove(
+            piece,
+            position,
+            el.position,
+            this.getPiece,
+            this.setPiece,
+            this.store.chessMoveValidator.isKingUnderAttack
+          ) &&
+          this.store.chessMoveValidator.isValidMove(piece, position, el.position))
+      ) {
+        this.availableMoves.push(el.position);
+      }
+    });
   };
 }
 export default BoardStore;

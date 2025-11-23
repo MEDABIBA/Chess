@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite";
 
 const Board = observer(() => {
   const { boardStore } = useStore();
-  const { board } = boardStore;
+  const { board, availableMovesSet } = boardStore;
   return (
     <div className="board">
       <div className="numeration">
@@ -18,12 +18,14 @@ const Board = observer(() => {
         ))}
       </div>
       {board.map(({ color, position, piece }) => {
+        const isActiveField = availableMovesSet.has(`${position.row}-${position.col}`);
         return (
           <Square
             key={`${position.row}-${position.col}`}
             color={color}
             position={position}
             piece={piece}
+            isActiveField={isActiveField}
           />
         );
       })}

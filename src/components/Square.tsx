@@ -1,22 +1,61 @@
-import React, { useRef } from "react";
+import React, { memo, useRef } from "react";
 import { useStore } from "../provider/context";
 import Piece from "../models/Piece";
-import { observer } from "mobx-react-lite";
 
 interface SquareProps {
   color: string;
   position: { row: number; col: number };
+  isActiveField: boolean;
   piece?: Piece | null;
 }
 
-const Square: React.FC<SquareProps> = observer(({ color, position, piece }) => {
+const SquareComponent: React.FC<SquareProps> = ({ color, position, piece, isActiveField }) => {
   const { row, col } = position;
   const imgRef = useRef<HTMLImageElement | null>(null);
   const { boardStore } = useStore();
-  const { movePiece } = boardStore;
+  const { makeMove, getActivePiece, setActivePiece, setAvailableMoves } = boardStore;
 
+  console.log("redraw");
   const handleMouseDown = (e: React.MouseEvent<HTMLImageElement>) => {
-    if (!piece || !imgRef.current) return;
+    const active = getActivePiece();
+    if (!piece || !imgRef.current) {
+      if (active) {
+        boardStore.availableMoves = [];
+        setActivePiece(null);
+      }
+      if (active !== null && active.position !== undefined) {
+        const position = active.position;
+        const dropTarget = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+        const square = dropTarget?.closest(".square") as HTMLElement | null;
+        if (!square) return;
+        if (dropTarget?.closest(".square")) {
+          const toRow = Number(square.dataset.row);
+          const toCol = Number(square.dataset.col);
+          makeMove(position, { row: toRow, col: toCol });
+        }
+      }
+      return;
+    } else if (piece && active !== null) {
+      const position = active.position;
+      const dropTarget = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+      const square = dropTarget?.closest(".square") as HTMLElement | null;
+      if (!square) return;
+      if (dropTarget?.closest(".square")) {
+        const toRow = Number(square.dataset.row);
+        const toCol = Number(square.dataset.col);
+        makeMove(position, { row: toRow, col: toCol });
+      }
+      if (boardStore?.activePiece?.color !== boardStore.currentPlayer) {
+        boardStore.availableMoves = [];
+        setActivePiece(null);
+        return;
+      }
+    }
+
+    if (piece.color === boardStore.currentPlayer) {
+      setAvailableMoves(piece, position);
+      setActivePiece(piece);
+    }
     e.preventDefault();
 
     const img = imgRef.current;
@@ -36,9 +75,8 @@ const Square: React.FC<SquareProps> = observer(({ color, position, piece }) => {
     clone.style.top = "0";
     clone.style.zIndex = "9999";
     clone.style.pointerEvents = "none";
-    clone.style.transform = `translate3d(${e.clientX - shiftX}px, ${
-      e.clientY - shiftY
-    }px, 0)`;
+    clone.style.transform = `translate3d(${e.clientX - shiftX}px, ${e.clientY - shiftY}px, 0)`;
+
     document.body.appendChild(clone);
 
     const handleMouseMove = (event: MouseEvent) => {
@@ -60,7 +98,7 @@ const Square: React.FC<SquareProps> = observer(({ color, position, piece }) => {
       if (dropTarget?.closest(".square")) {
         const toRow = Number(square.dataset.row);
         const toCol = Number(square.dataset.col);
-        movePiece(position, { row: toRow, col: toCol });
+        makeMove(position, { row: toRow, col: toCol });
       }
 
       clone.remove();
@@ -106,9 +144,7 @@ const Square: React.FC<SquareProps> = observer(({ color, position, piece }) => {
       if (!t) {
         return;
       }
-      clone.style.transform = `translate3d(${t.clientX - shiftX}px, ${
-        t.clientY - shiftY
-      }px, 0)`;
+      clone.style.transform = `translate3d(${t.clientX - shiftX}px, ${t.clientY - shiftY}px, 0)`;
     };
 
     const handleTouchEnd = (event: TouchEvent) => {
@@ -118,14 +154,11 @@ const Square: React.FC<SquareProps> = observer(({ color, position, piece }) => {
       if (!t) {
         return;
       }
-      const dropTarget = document.elementFromPoint(
-        t.clientX,
-        t.clientY
-      ) as HTMLElement | null;
+      const dropTarget = document.elementFromPoint(t.clientX, t.clientY) as HTMLElement | null;
       if (dropTarget?.classList.contains("square")) {
         const toRow = Number(dropTarget.dataset.row);
         const toCol = Number(dropTarget.dataset.col);
-        movePiece(position, { row: toRow, col: toCol });
+        makeMove(position, { row: toRow, col: toCol });
       }
 
       clone.remove();
@@ -139,9 +172,11 @@ const Square: React.FC<SquareProps> = observer(({ color, position, piece }) => {
 
   return (
     <div
-      className={`square ${color}`}
+      className={`square ${color} ${isActiveField ? "square-active" : ""}`}
       data-row={row}
       data-col={col}
+      onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
       style={{ position: "relative" }}>
       {piece && (
         <img
@@ -150,13 +185,20 @@ const Square: React.FC<SquareProps> = observer(({ color, position, piece }) => {
           src={piece.getPiece()}
           alt="#"
           draggable={false}
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
           style={{ cursor: "grab", userSelect: "none" }}
         />
       )}
     </div>
   );
-});
+};
 
+const Square = memo(SquareComponent, (prev, next) => {
+  return (
+    prev.piece === next.piece &&
+    prev.color === next.color &&
+    prev.position.row === next.position.row &&
+    prev.position.col === next.position.col &&
+    prev.isActiveField === next.isActiveField
+  );
+});
 export default Square;

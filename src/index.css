@@ -43,6 +43,9 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
 }
+.square-active {
+  background-color: green !important;
+}
 
 .black {
   background-color: #769656;

@@ -1,4 +1,5 @@
 {
   "editor.quickSuggestionsDelay": 5000,
-  "editor.suggest.selectionMode": "always"
+  "editor.suggest.selectionMode": "always",
+  "prettier.printWidth": 100
 }

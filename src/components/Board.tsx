@@ -3,8 +3,8 @@ import Square from "./Square";
 import { observer } from "mobx-react-lite";
 
 const Board = observer(() => {
-  const { boardStore } = useStore();
-  const { board, availableMovesSet } = boardStore;
+  const { board } = useStore();
+  const { availableMovesSet } = board;
   return (
     <div className="board">
       <div className="numeration">
@@ -17,8 +17,14 @@ const Board = observer(() => {
           <span key={e}>{e}</span>
         ))}
       </div>
-      {board.map(({ color, position, piece }) => {
-        const isActiveField = availableMovesSet.has(`${position.row}-${position.col}`);
+      {board.board.map(({ color, position, piece }) => {
+        const isActiveField =
+          availableMovesSet.has(`${position.row}-${position.col}`) &&
+          board.board.find((el) => el.position === position)?.piece !== null
+            ? "square-attack"
+            : availableMovesSet.has(`${position.row}-${position.col}`)
+            ? "square-active"
+            : "";
         return (
           <Square
             key={`${position.row}-${position.col}`}

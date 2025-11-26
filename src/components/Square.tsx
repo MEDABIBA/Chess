@@ -5,22 +5,22 @@ import Piece from "../models/Piece";
 interface SquareProps {
   color: string;
   position: { row: number; col: number };
-  isActiveField: boolean;
+  isActiveField: "" | "square-active" | "square-attack";
   piece?: Piece | null;
 }
 
 const SquareComponent: React.FC<SquareProps> = ({ color, position, piece, isActiveField }) => {
   const { row, col } = position;
   const imgRef = useRef<HTMLImageElement | null>(null);
-  const { boardStore } = useStore();
-  const { makeMove, getActivePiece, setActivePiece, setAvailableMoves } = boardStore;
+  const { board } = useStore();
+  const { makeMove, getActivePiece, setActivePiece, setAvailableMoves } = board;
 
   console.log("redraw");
   const handleMouseDown = (e: React.MouseEvent<HTMLImageElement>) => {
     const active = getActivePiece();
     if (!piece || !imgRef.current) {
       if (active) {
-        boardStore.availableMoves = [];
+        board.availableMoves = [];
         setActivePiece(null);
       }
       if (active !== null && active.position !== undefined) {
@@ -45,14 +45,14 @@ const SquareComponent: React.FC<SquareProps> = ({ color, position, piece, isActi
         const toCol = Number(square.dataset.col);
         makeMove(position, { row: toRow, col: toCol });
       }
-      if (boardStore?.activePiece?.color !== boardStore.currentPlayer) {
-        boardStore.availableMoves = [];
+      if (board?.activePiece?.color !== board.currentPlayer) {
+        board.availableMoves = [];
         setActivePiece(null);
         return;
       }
     }
 
-    if (piece.color === boardStore.currentPlayer) {
+    if (piece.color === board.currentPlayer) {
       setAvailableMoves(piece, position);
       setActivePiece(piece);
     }
@@ -172,7 +172,7 @@ const SquareComponent: React.FC<SquareProps> = ({ color, position, piece, isActi
 
   return (
     <div
-      className={`square ${color} ${isActiveField ? "square-active" : ""}`}
+      className={`square ${color} ${isActiveField}`}
       data-row={row}
       data-col={col}
       onMouseDown={handleMouseDown}

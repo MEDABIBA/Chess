@@ -1,12 +1,12 @@
 import Board from "./components/Board";
-import { useStore } from "./provider/context";
 import { observer } from "mobx-react-lite";
+import Timer from "./components/Timer";
 
 const App = observer(() => {
-  const store = useStore();
   return (
     <div className="app">
       <Board />
+      <Timer />
     </div>
   );
 });

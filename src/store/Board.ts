@@ -4,7 +4,7 @@ import Piece from "../models/Piece";
 import { RootStore } from "./RootStore";
 import { simulateValidMove } from "../helpers/simulateMove";
 
-class BoardStore {
+class Board {
   store: RootStore;
   board: SquareData[] = [];
   currentPlayer: Color = "white";
@@ -121,6 +121,15 @@ class BoardStore {
       }
     }
 
+    if (piece.color === "white") {
+      const timer = this.store.timer;
+      timer.deactiveTimer();
+      timer.activateTimer("p2");
+    } else if (piece.color === "black") {
+      const timer = this.store.timer;
+      timer.deactiveTimer();
+      timer.activateTimer("p1");
+    }
     this.availableMoves = [];
     this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
     piece.position = to;
@@ -155,4 +164,4 @@ class BoardStore {
     });
   };
 }
-export default BoardStore;
+export default Board;

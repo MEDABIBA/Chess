@@ -14,8 +14,8 @@ class ChessMoveValidator {
 
   @action
   isValidMove = (piece: Piece, from: Position, to: Position) => {
-    if (piece.color !== this.store.boardStore.currentPlayer) return false;
-    if (piece.color === this.store.boardStore.getPiece(to)?.color) return false;
+    if (piece.color !== this.store.board.currentPlayer) return false;
+    if (piece.color === this.store.board.getPiece(to)?.color) return false;
     if (from.col === to.col && from.row === to.row) return false;
 
     let valid = false;
@@ -46,15 +46,15 @@ class ChessMoveValidator {
         piece,
         from,
         to,
-        this.store.boardStore.getPiece,
-        this.store.boardStore.setPiece,
+        this.store.board.getPiece,
+        this.store.board.setPiece,
         this.isKingUnderAttack
       );
     }
   };
 
   private isAttackedField = (position: Position, byColor: Color) => {
-    for (const square of this.store.boardStore.board) {
+    for (const square of this.store.board.board) {
       if (square.piece === null || square.piece.color === byColor) continue;
       const piece = square.piece;
       if (this.canPieceAttack(piece, piece?.position, position)) {
@@ -70,7 +70,7 @@ class ChessMoveValidator {
       const start = Math.min(from.col, to.col) + 1;
       const end = Math.max(from.col, to.col);
       for (let r = start; r < end; r++) {
-        if (this.store.boardStore.getPiece({ row: from.row, col: r })) return false;
+        if (this.store.board.getPiece({ row: from.row, col: r })) return false;
       }
       return true;
       // col horizontal --
@@ -78,7 +78,7 @@ class ChessMoveValidator {
       const start = Math.min(from.row, to.row) + 1;
       const end = Math.max(from.row, to.row);
       for (let r = start; r < end; r++) {
-        if (this.store.boardStore.getPiece({ row: r, col: from.col })) return false;
+        if (this.store.board.getPiece({ row: r, col: from.col })) return false;
       }
       return true;
     }
@@ -89,7 +89,7 @@ class ChessMoveValidator {
       const colDir = from.col < to.col ? 1 : -1;
       for (let i = 1; i < steps; i++) {
         if (
-          this.store.boardStore.getPiece({
+          this.store.board.getPiece({
             row: from.row + i * rowDir,
             col: from.col + i * colDir,
           })
@@ -107,15 +107,15 @@ class ChessMoveValidator {
     const startingPos = figure.color === "white" ? 2 : 7;
     if (from.col === to.col) {
       if (to.row === from.row + dir) {
-        return !this.store.boardStore.getPiece(to);
+        return !this.store.board.getPiece(to);
       } else if (from.row === startingPos && to.row === from.row + 2 * dir) {
         const middlePos = { row: from.row + dir, col: from.col };
-        return !this.store.boardStore.getPiece(middlePos) && !this.store.boardStore.getPiece(to);
+        return !this.store.board.getPiece(middlePos) && !this.store.board.getPiece(to);
       } else return false;
     } else if (to.row === from.row + dir && (from.col === to.col + 1 || from.col === to.col - 1)) {
       return (
-        !!this.store.boardStore.getPiece(to)?.color &&
-        this.store.boardStore.getPiece(to)?.color !== figure.color
+        !!this.store.board.getPiece(to)?.color &&
+        this.store.board.getPiece(to)?.color !== figure.color
       );
     } else return false;
   };
@@ -148,16 +148,16 @@ class ChessMoveValidator {
   private isValidKingMove = (piece: Piece, from: Position, to: Position) => {
     const rowDiff = Math.abs(from.row - to.row);
     const colDiff = Math.abs(from.col - to.col);
-    const originalToPiece = this.store.boardStore.getPiece(to);
+    const originalToPiece = this.store.board.getPiece(to);
     const originalPosition = piece.position;
     piece.position = to;
-    this.store.boardStore.setPiece(to, piece);
-    this.store.boardStore.setPiece(from, null);
+    this.store.board.setPiece(to, piece);
+    this.store.board.setPiece(from, null);
 
-    const stillUnderAttack = this.isAttackedField(to, this.store.boardStore.currentPlayer);
+    const stillUnderAttack = this.isAttackedField(to, this.store.board.currentPlayer);
 
-    this.store.boardStore.setPiece(from, piece);
-    this.store.boardStore.setPiece(to, originalToPiece ?? null);
+    this.store.board.setPiece(from, piece);
+    this.store.board.setPiece(to, originalToPiece ?? null);
     piece.position = originalPosition;
     return rowDiff <= 1 && colDiff <= 1 && !stillUnderAttack;
   };
@@ -198,9 +198,9 @@ class ChessMoveValidator {
   };
 
   isKingUnderAttack = () => {
-    const currColPlayer = this.store.boardStore.currentPlayer;
-    const king: SquareData | undefined = this.store.boardStore.board.find(
-      (e) => e.piece?.pieceType === "king" && e.piece?.color === currColPlayer
+    const currColPlayer = this.store.board.currentPlayer;
+    const king: SquareData | undefined = this.store.board.board.find(
+      (e: any) => e.piece?.pieceType === "king" && e.piece?.color === currColPlayer
     );
     if (!king) return false;
     return this.isAttackedField(king.position, currColPlayer);

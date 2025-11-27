@@ -3,8 +3,10 @@ import Square from "./Square";
 import { observer } from "mobx-react-lite";
 
 const Board = observer(() => {
-  const { board } = useStore();
+  const { board, chessMoveValidator } = useStore();
   const { availableMovesSet } = board;
+  const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack("white");
+  const blackKingUnerAttack = chessMoveValidator.isKingUnderAttack("black");
   return (
     <div className="board">
       <div className="numeration">
@@ -18,6 +20,15 @@ const Board = observer(() => {
         ))}
       </div>
       {board.board.map(({ color, position, piece }) => {
+        const isLastMove =
+          "from" in board.highlightLastMoves &&
+          "to" in board.highlightLastMoves &&
+          ((board.highlightLastMoves?.from.col === position.col &&
+            board.highlightLastMoves?.from.row === position.row) ||
+            (board.highlightLastMoves?.to.col === position.col &&
+              board.highlightLastMoves?.to.row === position.row))
+            ? "last-move"
+            : "";
         const isActiveField =
           availableMovesSet.has(`${position.row}-${position.col}`) &&
           board.board.find((el) => el.position === position)?.piece !== null
@@ -31,7 +42,15 @@ const Board = observer(() => {
             color={color}
             position={position}
             piece={piece}
+            isLastMove={isLastMove}
             isActiveField={isActiveField}
+            hightlightKingAttacked={
+              piece?.color === "white" && piece.pieceType === "king"
+                ? whiteKingUnerAttack
+                : piece?.color === "black" && piece.pieceType === "king"
+                ? blackKingUnerAttack
+                : false
+            }
           />
         );
       })}

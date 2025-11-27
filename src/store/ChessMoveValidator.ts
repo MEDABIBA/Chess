@@ -197,8 +197,7 @@ class ChessMoveValidator {
     return rowDiff <= 1 && colDiff <= 1;
   };
 
-  isKingUnderAttack = () => {
-    const currColPlayer = this.store.board.currentPlayer;
+  isKingUnderAttack = (currColPlayer: Color = this.store.board.currentPlayer) => {
     const king: SquareData | undefined = this.store.board.board.find(
       (e: any) => e.piece?.pieceType === "king" && e.piece?.color === currColPlayer
     );

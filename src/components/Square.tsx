@@ -7,15 +7,24 @@ interface SquareProps {
   position: { row: number; col: number };
   isActiveField: "" | "square-active" | "square-attack";
   piece?: Piece | null;
+  isLastMove: "last-move" | "";
+  hightlightKingAttacked: boolean;
 }
-
-const SquareComponent: React.FC<SquareProps> = ({ color, position, piece, isActiveField }) => {
+const SquareComponent: React.FC<SquareProps> = ({
+  color,
+  position,
+  piece,
+  isLastMove,
+  isActiveField,
+  hightlightKingAttacked,
+}) => {
   const { row, col } = position;
   const imgRef = useRef<HTMLImageElement | null>(null);
   const { board } = useStore();
   const { makeMove, getActivePiece, setActivePiece, setAvailableMoves } = board;
+  if ("from" in board.highlightLastMoves) {
+  }
 
-  console.log("redraw");
   const handleMouseDown = (e: React.MouseEvent<HTMLImageElement>) => {
     const active = getActivePiece();
     if (!piece || !imgRef.current) {
@@ -172,7 +181,7 @@ const SquareComponent: React.FC<SquareProps> = ({ color, position, piece, isActi
 
   return (
     <div
-      className={`square ${color} ${isActiveField}`}
+      className={`square ${color} ${isLastMove} ${isActiveField}`}
       data-row={row}
       data-col={col}
       onMouseDown={handleMouseDown}
@@ -181,7 +190,7 @@ const SquareComponent: React.FC<SquareProps> = ({ color, position, piece, isActi
       {piece && (
         <img
           ref={imgRef}
-          className="piece-img"
+          className={`piece-img  ${hightlightKingAttacked ? "king-hightlight" : ""}`}
           src={piece.getPiece()}
           alt="#"
           draggable={false}
@@ -198,7 +207,9 @@ const Square = memo(SquareComponent, (prev, next) => {
     prev.color === next.color &&
     prev.position.row === next.position.row &&
     prev.position.col === next.position.col &&
-    prev.isActiveField === next.isActiveField
+    prev.isLastMove === next.isLastMove &&
+    prev.isActiveField === next.isActiveField &&
+    prev.hightlightKingAttacked === next.hightlightKingAttacked
   );
 });
 export default Square;

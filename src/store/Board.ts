@@ -10,6 +10,7 @@ class Board {
   currentPlayer: Color = "white";
   gameStatus: "playing" | "check" | "checkmate" = "playing";
   activePiece: Piece | null = null;
+  highlightLastMoves: { from: Position; to: Position } | {} = {};
   availableMoves: Position[] = [];
 
   constructor(store: RootStore) {
@@ -130,6 +131,7 @@ class Board {
       timer.deactiveTimer();
       timer.activateTimer("p1");
     }
+    this.highlightLastMoves = { from, to };
     this.availableMoves = [];
     this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
     piece.position = to;

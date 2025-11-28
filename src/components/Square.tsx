@@ -1,6 +1,9 @@
-import React, { memo, useRef } from "react";
+import React, { memo, useEffect, useRef } from "react";
 import { useStore } from "../provider/context";
 import Piece from "../models/Piece";
+import { Position } from "../types/types";
+import getTargetSquare from "../helpers/getTargetSquare";
+import tryMove from "../helpers/tryMove";
 
 interface SquareProps {
   color: string;
@@ -9,6 +12,8 @@ interface SquareProps {
   piece?: Piece | null;
   isLastMove: "last-move" | "";
   hightlightKingAttacked: boolean;
+  grabbed: boolean;
+  animationTarget: { from: Position; to: Position } | null;
 }
 const SquareComponent: React.FC<SquareProps> = ({
   color,
@@ -17,54 +22,54 @@ const SquareComponent: React.FC<SquareProps> = ({
   isLastMove,
   isActiveField,
   hightlightKingAttacked,
+  grabbed,
+  animationTarget,
 }) => {
   const { row, col } = position;
   const imgRef = useRef<HTMLImageElement | null>(null);
   const { board } = useStore();
-  const { makeMove, getActivePiece, setActivePiece, setAvailableMoves } = board;
-  if ("from" in board.highlightLastMoves) {
-  }
+  const { makeMove, getActivePiece, setActivePiece, setAvailableMoves, setGrab } = board;
+
+  useEffect(() => {
+    if (animationTarget) {
+      const movingFrom = animationTarget?.from;
+      const movingTo = animationTarget?.to;
+      const isMovingPiece = movingFrom?.row === position.row && movingFrom?.col === position.col;
+      if (!isMovingPiece) return;
+      const fromSquare = document.querySelector(
+        `.square[data-row="${movingFrom.row}"][data-col="${movingFrom.col}"]`
+      );
+      const toSquare = document.querySelector(
+        `.square[data-row="${movingTo.row}"][data-col="${movingTo.col}"]`
+      );
+      if (!fromSquare || !toSquare || !imgRef.current) return;
+      const fromRect = fromSquare.getBoundingClientRect();
+      const toRect = toSquare.getBoundingClientRect();
+      const deltaX = toRect.left - fromRect.left;
+      const deltaY = toRect.top - fromRect.top;
+      imgRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+      imgRef.current.style.transition = "transform 0.2s ease-out";
+    }
+  }, [animationTarget]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLImageElement>) => {
     const active = getActivePiece();
-    if (!piece || !imgRef.current) {
-      if (active) {
-        board.availableMoves = [];
-        setActivePiece(null);
-      }
-      if (active !== null && active.position !== undefined) {
-        const position = active.position;
-        const dropTarget = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
-        const square = dropTarget?.closest(".square") as HTMLElement | null;
-        if (!square) return;
-        if (dropTarget?.closest(".square")) {
-          const toRow = Number(square.dataset.row);
-          const toCol = Number(square.dataset.col);
-          makeMove(position, { row: toRow, col: toCol });
-        }
-      }
-      return;
-    } else if (piece && active !== null) {
-      const position = active.position;
-      const dropTarget = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
-      const square = dropTarget?.closest(".square") as HTMLElement | null;
+    if (active?.position) {
+      const square = getTargetSquare(e);
       if (!square) return;
-      if (dropTarget?.closest(".square")) {
-        const toRow = Number(square.dataset.row);
-        const toCol = Number(square.dataset.col);
-        makeMove(position, { row: toRow, col: toCol });
-      }
-      if (board?.activePiece?.color !== board.currentPlayer) {
-        board.availableMoves = [];
-        setActivePiece(null);
-        return;
-      }
+      tryMove(square, active.position, makeMove);
+      setActivePiece(null);
+      setAvailableMoves(null);
+      if (!piece) return;
     }
+    if (!piece || !imgRef.current) return;
 
-    if (piece.color === board.currentPlayer) {
-      setAvailableMoves(piece, position);
-      setActivePiece(piece);
-    }
+    if (piece.color !== board.currentPlayer) return;
+
+    e.preventDefault();
+    setAvailableMoves([piece, position]);
+    setActivePiece(piece);
+
     e.preventDefault();
 
     const img = imgRef.current;
@@ -89,26 +94,27 @@ const SquareComponent: React.FC<SquareProps> = ({
     document.body.appendChild(clone);
 
     const handleMouseMove = (event: MouseEvent) => {
+      const dropTarget = getTargetSquare(event);
+      if (dropTarget) {
+        const toRow = Number(dropTarget.dataset.row);
+        const toCol = Number(dropTarget.dataset.col);
+        console.log(toRow, toCol);
+        setGrab({ row: toRow, col: toCol });
+      }
       clone.style.transform = `translate3d(${event.clientX - shiftX}px, ${
         event.clientY - shiftY
       }px, 0)`;
     };
-
     const handleMouseUp = (event: MouseEvent) => {
+      setGrab(null);
       document.body.style.cursor = "default";
       img.style.opacity = "1";
 
-      const dropTarget = document.elementFromPoint(
-        event.clientX,
-        event.clientY
-      ) as HTMLElement | null;
-      const square = dropTarget?.closest(".square") as HTMLElement | null;
+      const square = getTargetSquare(event);
       if (!square) return;
-      if (dropTarget?.closest(".square")) {
-        const toRow = Number(square.dataset.row);
-        const toCol = Number(square.dataset.col);
-        makeMove(position, { row: toRow, col: toCol });
-      }
+      const toRow = Number(square.dataset.row);
+      const toCol = Number(square.dataset.col);
+      makeMove(position, { row: toRow, col: toCol });
 
       clone.remove();
       document.removeEventListener("mousemove", handleMouseMove);
@@ -181,7 +187,7 @@ const SquareComponent: React.FC<SquareProps> = ({
 
   return (
     <div
-      className={`square ${color} ${isLastMove} ${isActiveField}`}
+      className={`square ${color} ${isLastMove} ${isActiveField} ${grabbed ? "grabbed" : ""}`}
       data-row={row}
       data-col={col}
       onMouseDown={handleMouseDown}
@@ -209,7 +215,9 @@ const Square = memo(SquareComponent, (prev, next) => {
     prev.position.col === next.position.col &&
     prev.isLastMove === next.isLastMove &&
     prev.isActiveField === next.isActiveField &&
-    prev.hightlightKingAttacked === next.hightlightKingAttacked
+    prev.hightlightKingAttacked === next.hightlightKingAttacked &&
+    prev.grabbed === next.grabbed &&
+    prev.animationTarget === next.animationTarget
   );
 });
 export default Square;

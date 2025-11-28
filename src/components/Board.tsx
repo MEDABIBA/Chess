@@ -7,6 +7,7 @@ const Board = observer(() => {
   const { availableMovesSet } = board;
   const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack("white");
   const blackKingUnerAttack = chessMoveValidator.isKingUnderAttack("black");
+  const grab = board.getGrab();
   return (
     <div className="board">
       <div className="numeration">
@@ -20,6 +21,7 @@ const Board = observer(() => {
         ))}
       </div>
       {board.board.map(({ color, position, piece }) => {
+        const grabbed = grab?.col === position.col && grab.row === position.row;
         const isLastMove =
           "from" in board.highlightLastMoves &&
           "to" in board.highlightLastMoves &&
@@ -50,6 +52,14 @@ const Board = observer(() => {
                 : piece?.color === "black" && piece.pieceType === "king"
                 ? blackKingUnerAttack
                 : false
+            }
+            grabbed={grabbed}
+            animationTarget={
+              board.animateMove &&
+              board.animateMove.from.col === position.col &&
+              board.animateMove.from.row === position.row
+                ? board.animateMove
+                : null
             }
           />
         );

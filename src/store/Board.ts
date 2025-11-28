@@ -12,6 +12,8 @@ class Board {
   activePiece: Piece | null = null;
   highlightLastMoves: { from: Position; to: Position } | {} = {};
   availableMoves: Position[] = [];
+  grab: Position | null = null;
+  animateMove: { from: Position; to: Position } | null = null;
 
   constructor(store: RootStore) {
     this.store = store;
@@ -96,9 +98,20 @@ class Board {
   };
 
   @action
-  makeMove = (from: Position, to: Position): void => {
-    const piece = this.getPiece(from);
+  getGrab = () => {
+    return this.grab;
+  };
 
+  @action
+  setGrab = (position: Position | null) => {
+    if (position !== this.grab) {
+      this.grab = position;
+    }
+  };
+
+  @action
+  makeMove = (from: Position, to: Position, animation = false): void => {
+    const piece = this.getPiece(from);
     if (!piece) {
       console.warn("No piece at this position");
       return;
@@ -132,11 +145,28 @@ class Board {
       timer.activateTimer("p1");
     }
     this.highlightLastMoves = { from, to };
-    this.availableMoves = [];
-    this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
-    piece.position = to;
-    this.setPiece(to, piece);
-    this.setPiece(from, null);
+
+    if (animation) {
+      this.animateMove = { from, to };
+      setTimeout(() => {
+        piece.position = to;
+        this.setPiece(to, piece);
+        this.setPiece(from, null);
+
+        this.setActivePiece(null);
+        this.availableMoves = [];
+        this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
+        this.animateMove = null;
+      }, 200);
+    } else {
+      piece.position = to;
+      this.setPiece(to, piece);
+      this.setPiece(from, null);
+
+      this.setActivePiece(null);
+      this.availableMoves = [];
+      this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
+    }
   };
 
   @computed
@@ -144,8 +174,10 @@ class Board {
     return new Set(this.availableMoves.map((pos) => `${pos.row}-${pos.col}`));
   }
 
-  setAvailableMoves = (piece: Piece, position: Position) => {
+  setAvailableMoves = (args: [Piece, Position] | null) => {
     this.availableMoves = [];
+    if (!args) return;
+    const [piece, position] = args;
     this.board.forEach((el) => {
       if (
         (this.store.chessMoveValidator.isValidMove(piece, position, el.position) &&

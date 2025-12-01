@@ -204,6 +204,62 @@ class ChessMoveValidator {
     if (!king) return false;
     return this.isAttackedField(king.position, currColPlayer);
   };
+
+  isCheckmate = (currColPlayer: Color) => {
+    const allPieces = this.store.board.getAllPieces(currColPlayer);
+    for (let i = 0; i < allPieces.length; i++) {
+      const piece = allPieces[i];
+      if (piece === undefined) continue;
+      for (let i = 1; i <= 8; i++) {
+        for (let j = 1; j <= 8; j++) {
+          if (this.canMakeMove(piece, piece?.position, { row: i, col: j })) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  };
+
+  private canMakeMove = (piece: Piece, from: Position, to: Position) => {
+    if (piece.color !== this.store.board.currentPlayer) return false;
+    if (piece.color === this.store.board.getPiece(to)?.color) return false;
+    if (from.col === to.col && from.row === to.row) return false;
+    let valid = false;
+
+    switch (piece.pieceType) {
+      case "pawn":
+        valid = this.isValidPawnMove(piece, from, to);
+        break;
+      case "rook":
+        valid = this.isValidRookMove(from, to);
+        break;
+      case "knight":
+        valid = this.isValidKnightMove(from, to);
+        break;
+      case "bishop":
+        valid = this.isValidBishopMove(from, to);
+        break;
+      case "queen":
+        valid = this.isValidQueenMove(from, to);
+        break;
+      case "king":
+        valid = this.isValidKingMove(piece, from, to);
+        break;
+      default:
+        return false;
+    }
+    if (!valid) return false;
+
+    return simulateValidMove(
+      piece,
+      from,
+      to,
+      this.store.board.getPiece,
+      this.store.board.setPiece,
+      this.isKingUnderAttack
+    );
+  };
 }
 
 export default ChessMoveValidator;

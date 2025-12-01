@@ -1,4 +1,5 @@
 import { useStore } from "../provider/context";
+import Modal from "./modalWindow";
 import Square from "./Square";
 import { observer } from "mobx-react-lite";
 
@@ -8,63 +9,66 @@ const Board = observer(() => {
   const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack("white");
   const blackKingUnerAttack = chessMoveValidator.isKingUnderAttack("black");
   const grab = board.getGrab();
+
   return (
-    <div className="board">
-      <div className="numeration">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((e) => (
-          <span key={e}>{e}</span>
-        ))}
+    <>
+      <div className="board">
+        <div className="numeration">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((e) => (
+            <span key={e}>{e}</span>
+          ))}
+        </div>
+        <div className="alphanumeric-numbering">
+          {["a", "b", "c", "d", "e", "f", "g", "h"].map((e) => (
+            <span key={e}>{e}</span>
+          ))}
+        </div>
+        {board.board.map(({ color, position, piece }) => {
+          const grabbed = grab?.col === position.col && grab.row === position.row;
+          const isLastMove =
+            "from" in board.highlightLastMoves &&
+            "to" in board.highlightLastMoves &&
+            ((board.highlightLastMoves?.from.col === position.col &&
+              board.highlightLastMoves?.from.row === position.row) ||
+              (board.highlightLastMoves?.to.col === position.col &&
+                board.highlightLastMoves?.to.row === position.row))
+              ? "last-move"
+              : "";
+          const isActiveField =
+            availableMovesSet.has(`${position.row}-${position.col}`) &&
+            board.board.find((el) => el.position === position)?.piece !== null
+              ? "square-attack"
+              : availableMovesSet.has(`${position.row}-${position.col}`)
+              ? "square-active"
+              : "";
+          return (
+            <Square
+              key={`${position.row}-${position.col}`}
+              color={color}
+              position={position}
+              piece={piece}
+              isLastMove={isLastMove}
+              isActiveField={isActiveField}
+              hightlightKingAttacked={
+                piece?.color === "white" && piece.pieceType === "king"
+                  ? whiteKingUnerAttack
+                  : piece?.color === "black" && piece.pieceType === "king"
+                  ? blackKingUnerAttack
+                  : false
+              }
+              grabbed={grabbed}
+              animationTarget={
+                board.animateMove &&
+                board.animateMove.from.col === position.col &&
+                board.animateMove.from.row === position.row
+                  ? board.animateMove
+                  : null
+              }
+            />
+          );
+        })}
       </div>
-      <div className="alphanumeric-numbering">
-        {["a", "b", "c", "d", "e", "f", "g", "h"].map((e) => (
-          <span key={e}>{e}</span>
-        ))}
-      </div>
-      {board.board.map(({ color, position, piece }) => {
-        const grabbed = grab?.col === position.col && grab.row === position.row;
-        const isLastMove =
-          "from" in board.highlightLastMoves &&
-          "to" in board.highlightLastMoves &&
-          ((board.highlightLastMoves?.from.col === position.col &&
-            board.highlightLastMoves?.from.row === position.row) ||
-            (board.highlightLastMoves?.to.col === position.col &&
-              board.highlightLastMoves?.to.row === position.row))
-            ? "last-move"
-            : "";
-        const isActiveField =
-          availableMovesSet.has(`${position.row}-${position.col}`) &&
-          board.board.find((el) => el.position === position)?.piece !== null
-            ? "square-attack"
-            : availableMovesSet.has(`${position.row}-${position.col}`)
-            ? "square-active"
-            : "";
-        return (
-          <Square
-            key={`${position.row}-${position.col}`}
-            color={color}
-            position={position}
-            piece={piece}
-            isLastMove={isLastMove}
-            isActiveField={isActiveField}
-            hightlightKingAttacked={
-              piece?.color === "white" && piece.pieceType === "king"
-                ? whiteKingUnerAttack
-                : piece?.color === "black" && piece.pieceType === "king"
-                ? blackKingUnerAttack
-                : false
-            }
-            grabbed={grabbed}
-            animationTarget={
-              board.animateMove &&
-              board.animateMove.from.col === position.col &&
-              board.animateMove.from.row === position.row
-                ? board.animateMove
-                : null
-            }
-          />
-        );
-      })}
-    </div>
+    </>
   );
 });
 

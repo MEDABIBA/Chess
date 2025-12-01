@@ -14,6 +14,7 @@ class Board {
   availableMoves: Position[] = [];
   grab: Position | null = null;
   animateMove: { from: Position; to: Position } | null = null;
+  modalActive: boolean = false;
 
   constructor(store: RootStore) {
     this.store = store;
@@ -88,6 +89,19 @@ class Board {
   };
 
   @action
+  getAllPieces = (currCol: Color) => {
+    const res: Piece[] = [];
+    for (let i = 0; i < this.board.length; i++) {
+      const piece = this.board[i]?.piece;
+      if (!piece || piece === null || piece === undefined) continue;
+      if (piece.color === currCol) {
+        res.push(piece);
+      }
+    }
+    return res;
+  };
+
+  @action
   getActivePiece = () => {
     return this.activePiece;
   };
@@ -147,6 +161,7 @@ class Board {
     this.highlightLastMoves = { from, to };
 
     if (animation) {
+      console.log("animation");
       this.animateMove = { from, to };
       setTimeout(() => {
         piece.position = to;
@@ -157,6 +172,11 @@ class Board {
         this.availableMoves = [];
         this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
         this.animateMove = null;
+        if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
+          this.store.timer.deactiveTimer();
+          this.gameStatus = "checkmate";
+          this.setModalActive(true);
+        }
       }, 200);
     } else {
       piece.position = to;
@@ -166,6 +186,11 @@ class Board {
       this.setActivePiece(null);
       this.availableMoves = [];
       this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
+      if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
+        this.store.timer.deactiveTimer();
+        this.gameStatus = "checkmate";
+        this.setModalActive(true);
+      }
     }
   };
 
@@ -196,6 +221,29 @@ class Board {
         this.availableMoves.push(el.position);
       }
     });
+  };
+
+  @action
+  getModalActive = () => {
+    return this.modalActive;
+  };
+
+  @action
+  setModalActive = (value: boolean) => {
+    this.modalActive = value;
+  };
+
+  reloadGame = () => {
+    this.board = [];
+    this.initializeBoard();
+    this.currentPlayer = "white";
+    this.gameStatus = "playing";
+    this.activePiece = null;
+    this.highlightLastMoves = {};
+    this.availableMoves = [];
+    this.grab = null;
+    this.animateMove = null;
+    this.store.timer.resetTimer(1800);
   };
 }
 export default Board;

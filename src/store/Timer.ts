@@ -40,6 +40,11 @@ class Timer {
   deactiveTimer = () => {
     clearInterval(this.interval);
   };
+
+  resetTimer = (time: number) => {
+    this.p1 = time;
+    this.p2 = time;
+  };
 }
 
 export default Timer;

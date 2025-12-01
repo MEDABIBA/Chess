@@ -15,10 +15,30 @@ body {
   height: 100%;
 }
 .app {
+  /* display: flex; */
+  /* position: absolute; */
+  width: 100%;
+  /* justify-content: center; */
+  align-items: center;
+  height: 100vh;
+}
+.main-content {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  position: absolute;
+  transform: translateY(-50%);
+  top: 50%;
+  width: 100%;
+}
+
+.btn-lg {
+  z-index: 9;
+  margin: auto 50%;
+  position: absolute;
+  transform: translateY(-20%);
+  top: 20%;
 }
 
 .board {
@@ -189,4 +209,21 @@ body {
   padding: 10px 5px;
   background-color: #444;
   color: #f5f5f5;
+}
+
+.modal {
+  display: block;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  overflow: visible;
+  outline: 0;
+}
+
+.modal-dialog {
+  display: flex;
+  align-items: center;
+  height: 85%;
 }

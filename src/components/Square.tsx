@@ -50,7 +50,7 @@ const SquareComponent: React.FC<SquareProps> = ({
       imgRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
       imgRef.current.style.transition = "transform 0.2s ease-out";
     }
-  }, [animationTarget]);
+  }, [animationTarget, position]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLImageElement>) => {
     const active = getActivePiece();
@@ -98,7 +98,6 @@ const SquareComponent: React.FC<SquareProps> = ({
       if (dropTarget) {
         const toRow = Number(dropTarget.dataset.row);
         const toCol = Number(dropTarget.dataset.col);
-        console.log(toRow, toCol);
         setGrab({ row: toRow, col: toCol });
       }
       clone.style.transform = `translate3d(${event.clientX - shiftX}px, ${

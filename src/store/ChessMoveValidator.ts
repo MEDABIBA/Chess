@@ -146,6 +146,8 @@ class ChessMoveValidator {
   };
 
   private isValidKingMove = (piece: Piece, from: Position, to: Position) => {
+    const side = from.col < to.col ? "right" : "left";
+    if (this.isCastlingAvailable(side, piece, from, to)) return true;
     const rowDiff = Math.abs(from.row - to.row);
     const colDiff = Math.abs(from.col - to.col);
     const originalToPiece = this.store.board.getPiece(to);
@@ -160,6 +162,58 @@ class ChessMoveValidator {
     this.store.board.setPiece(to, originalToPiece ?? null);
     piece.position = originalPosition;
     return rowDiff <= 1 && colDiff <= 1 && !stillUnderAttack;
+  };
+
+  isCastlingAvailable = (side: "right" | "left", piece: Piece, from: Position, to: Position) => {
+    const diff = Math.abs(from.col - to.col);
+    const rookColPos = side === "left" ? 1 : 8;
+    const rook = this.store.board.board.find(
+      (el) => el.position.col === rookColPos && el.position.row === from.row
+    )?.piece;
+    if (
+      from.row !== to.row ||
+      piece.hasMoved ||
+      !rook ||
+      rook.hasMoved ||
+      diff !== 2 ||
+      !this.isPathClear(from, { row: to.row, col: rookColPos })
+    )
+      return false;
+    if (side === "right" && rook.hasMoved ? false : true) {
+      for (let i = from.col; i < to.col + 1; i++) {
+        if (this.isAttackedField({ row: from.row, col: i }, piece.color)) {
+          return false;
+        } else continue;
+      }
+    } else if (side === "left" && rook.hasMoved ? false : true) {
+      for (let i = from.col; i < to.col + 1; i++) {
+        if (this.isAttackedField({ row: from.row, col: i }, piece.color)) {
+          return false;
+        } else continue;
+      }
+    } else return false;
+    return true;
+  };
+
+  executeCastling = async (
+    side: "left" | "right",
+    king: Piece,
+    from: Position,
+    to: Position
+  ): Promise<void> => {
+    const rookFromCol = side === "left" ? 1 : 8;
+    const rookToCol = side === "left" ? to.col + 1 : to.col - 1;
+    const rook = this.store.board.getPiece({ row: from.row, col: rookFromCol });
+    if (!rook) return;
+    this.store.board.animateMove = {
+      from: { row: from.row, col: rookFromCol },
+      to: { row: to.row, col: rookToCol },
+    };
+    setTimeout(() => {
+      rook.position = { row: to.row, col: rookToCol };
+      this.store.board.setPiece({ row: to.row, col: rookToCol }, rook);
+      this.store.board.setPiece({ row: from.row, col: rookFromCol }, null);
+    }, 200);
   };
 
   private canPieceAttack = (piece: Piece, from: Position, to: Position) => {

@@ -53,6 +53,7 @@ const SquareComponent: React.FC<SquareProps> = ({
   }, [animationTarget, position]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLImageElement>) => {
+    console.log("row", row, ", col", col);
     const active = getActivePiece();
     if (active?.position) {
       const square = getTargetSquare(e);
@@ -99,25 +100,23 @@ const SquareComponent: React.FC<SquareProps> = ({
         const toRow = Number(dropTarget.dataset.row);
         const toCol = Number(dropTarget.dataset.col);
         setGrab({ row: toRow, col: toCol });
+        clone.style.transform = `translate3d(${event.clientX - shiftX}px, ${
+          event.clientY - shiftY
+        }px, 0)`;
       }
-      clone.style.transform = `translate3d(${event.clientX - shiftX}px, ${
-        event.clientY - shiftY
-      }px, 0)`;
     };
     const handleMouseUp = (event: MouseEvent) => {
       setGrab(null);
       document.body.style.cursor = "default";
       img.style.opacity = "1";
-
+      clone.remove();
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
       const square = getTargetSquare(event);
       if (!square) return;
       const toRow = Number(square.dataset.row);
       const toCol = Number(square.dataset.col);
       makeMove(position, { row: toRow, col: toCol });
-
-      clone.remove();
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
     };
 
     document.addEventListener("mousemove", handleMouseMove);

@@ -124,8 +124,9 @@ class Board {
   };
 
   @action
-  makeMove = (from: Position, to: Position, animation = false): void => {
+  makeMove = async (from: Position, to: Position, animation = false): Promise<void> => {
     const piece = this.getPiece(from);
+    const side = from.col < to.col ? "right" : "left";
     if (!piece) {
       console.warn("No piece at this position");
       return;
@@ -147,6 +148,11 @@ class Board {
       ) {
         return;
       }
+    } else if (
+      piece.pieceType === "king" &&
+      (await this.store.chessMoveValidator.isCastlingAvailable(side, piece, from, to))
+    ) {
+      this.store.chessMoveValidator.executeCastling(side, piece, from, to);
     }
 
     if (piece.color === "white") {
@@ -158,16 +164,14 @@ class Board {
       timer.deactiveTimer();
       timer.activateTimer("p1");
     }
-    this.highlightLastMoves = { from, to };
-
     if (animation) {
-      console.log("animation");
       this.animateMove = { from, to };
-      setTimeout(() => {
+      await setTimeout(() => {
         piece.position = to;
         this.setPiece(to, piece);
         this.setPiece(from, null);
 
+        piece.hasMoved = true;
         this.setActivePiece(null);
         this.availableMoves = [];
         this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
@@ -183,6 +187,7 @@ class Board {
       this.setPiece(to, piece);
       this.setPiece(from, null);
 
+      piece.hasMoved = true;
       this.setActivePiece(null);
       this.availableMoves = [];
       this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";

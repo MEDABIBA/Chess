@@ -105,18 +105,28 @@ class ChessMoveValidator {
   private isValidPawnMove = (figure: Piece, from: Position, to: Position) => {
     const dir = figure.color === "white" ? 1 : -1;
     const startingPos = figure.color === "white" ? 2 : 7;
+    const attackedPiece = this.store.board.getPiece(to);
+    const isEnPassant = this.store.board.getPiece({ row: to.row - dir, col: to.col });
+    const lastDoubleStepPawn = this.store.board.lastDoubleStepPawn;
     if (from.col === to.col) {
       if (to.row === from.row + dir) {
-        return !this.store.board.getPiece(to);
+        return !attackedPiece;
       } else if (from.row === startingPos && to.row === from.row + 2 * dir) {
         const middlePos = { row: from.row + dir, col: from.col };
-        return !this.store.board.getPiece(middlePos) && !this.store.board.getPiece(to);
+        return !this.store.board.getPiece(middlePos) && !attackedPiece;
       } else return false;
     } else if (to.row === from.row + dir && (from.col === to.col + 1 || from.col === to.col - 1)) {
-      return (
-        !!this.store.board.getPiece(to)?.color &&
-        this.store.board.getPiece(to)?.color !== figure.color
-      );
+      if (!!attackedPiece?.color && attackedPiece?.color !== figure.color) {
+        return true;
+      } else if (
+        lastDoubleStepPawn &&
+        isEnPassant?.position.col === lastDoubleStepPawn.position.col &&
+        isEnPassant?.position.row === lastDoubleStepPawn.position.row &&
+        isEnPassant?.color !== figure.color
+      ) {
+        return true;
+      }
+      return false;
     } else return false;
   };
 

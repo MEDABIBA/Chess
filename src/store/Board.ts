@@ -3,6 +3,7 @@ import { Color, PieceType, Position, SquareData } from "../types/types";
 import Piece from "../models/Piece";
 import { RootStore } from "./RootStore";
 import { simulateValidMove } from "../helpers/simulateMove";
+import soundMove from "../assets/sounds/move.mp3";
 
 class Board {
   store: RootStore;
@@ -15,6 +16,7 @@ class Board {
   grab: Position | null = null;
   animateMove: { from: Position; to: Position } | null = null;
   modalActive: boolean = false;
+  lastDoubleStepPawn: null | { color: Color; position: Position } = null;
 
   constructor(store: RootStore) {
     this.store = store;
@@ -125,6 +127,7 @@ class Board {
 
   @action
   makeMove = async (from: Position, to: Position, animation = false): Promise<void> => {
+    console.log(this.lastDoubleStepPawn);
     const piece = this.getPiece(from);
     const side = from.col < to.col ? "right" : "left";
     if (!piece) {
@@ -168,14 +171,27 @@ class Board {
       this.animateMove = { from, to };
       await setTimeout(() => {
         piece.position = to;
+        if (
+          piece.pieceType === "pawn" &&
+          from.col !== to.col &&
+          !this.getPiece(to) &&
+          this.lastDoubleStepPawn
+        ) {
+          this.setPiece(this.lastDoubleStepPawn.position, null);
+        }
         this.setPiece(to, piece);
         this.setPiece(from, null);
+        new Audio(soundMove).play();
 
         piece.hasMoved = true;
         this.setActivePiece(null);
         this.availableMoves = [];
         this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
         this.animateMove = null;
+        this.lastDoubleStepPawn = null;
+        if (piece.pieceType === "pawn" && Math.abs(from.row - to.row) === 2) {
+          this.lastDoubleStepPawn = { color: piece.color, position: to };
+        }
         if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
           this.store.timer.deactiveTimer();
           this.gameStatus = "checkmate";
@@ -184,13 +200,26 @@ class Board {
       }, 200);
     } else {
       piece.position = to;
+      if (
+        piece.pieceType === "pawn" &&
+        from.col !== to.col &&
+        !this.getPiece(to) &&
+        this.lastDoubleStepPawn
+      ) {
+        this.setPiece(this.lastDoubleStepPawn.position, null);
+      }
       this.setPiece(to, piece);
       this.setPiece(from, null);
+      new Audio(soundMove).play();
 
       piece.hasMoved = true;
       this.setActivePiece(null);
       this.availableMoves = [];
       this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
+      this.lastDoubleStepPawn = null;
+      if (piece.pieceType === "pawn" && Math.abs(from.row - to.row) === 2) {
+        this.lastDoubleStepPawn = { color: piece.color, position: to };
+      }
       if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
         this.store.timer.deactiveTimer();
         this.gameStatus = "checkmate";

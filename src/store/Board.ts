@@ -240,6 +240,7 @@ class Board {
     this.setPiece(from, null);
     new Audio(soundMove).play();
 
+    this.highlightLastMoves = { from, to };
     piece.hasMoved = true;
     this.setActivePiece(null);
     this.availableMoves = [];

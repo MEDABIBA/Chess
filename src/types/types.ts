@@ -16,6 +16,13 @@ export enum PieceType {
   KING = "king",
 }
 
+export const PropotionPieceType: PieceType[] = [
+  PieceType.QUEEN,
+  PieceType.BISHOP,
+  PieceType.KNIGHT,
+  PieceType.ROOK,
+];
+
 export type SquareData = {
   color: Color;
   position: Position;

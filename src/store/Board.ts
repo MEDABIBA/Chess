@@ -9,7 +9,7 @@ class Board {
   store: RootStore;
   board: SquareData[] = [];
   currentPlayer: Color = "white";
-  gameStatus: "playing" | "check" | "checkmate" = "playing";
+  gameStatus: "playing" | "check" | "checkmate" | "timeout" = "playing";
   activePiece: Piece | null = null;
   highlightLastMoves: { from: Position; to: Position } | {} = {};
   availableMoves: Position[] = [];
@@ -17,6 +17,7 @@ class Board {
   animateMove: { from: Position; to: Position } | null = null;
   modalActive: boolean = false;
   lastDoubleStepPawn: null | { color: Color; position: Position } = null;
+  pendingPromotion: { piece: Piece; position: Position; color: Color } | null = null;
 
   constructor(store: RootStore) {
     this.store = store;
@@ -127,104 +128,31 @@ class Board {
 
   @action
   makeMove = async (from: Position, to: Position, animation = false): Promise<void> => {
-    console.log(this.lastDoubleStepPawn);
     const piece = this.getPiece(from);
     const side = from.col < to.col ? "right" : "left";
     if (!piece) {
       console.warn("No piece at this position");
       return;
     }
-    if (!this.store.chessMoveValidator.isValidMove(piece, from, to)) {
+    if (!this.isValidMove(piece, from, to, side)) {
       console.warn("Invalid move");
       return;
     }
-    if (piece.pieceType !== "king" && this.store.chessMoveValidator.isKingUnderAttack()) {
-      if (
-        !simulateValidMove(
-          piece,
-          from,
-          to,
-          this.getPiece,
-          this.setPiece,
-          this.store.chessMoveValidator.isKingUnderAttack
-        )
-      ) {
-        return;
-      }
-    } else if (
-      piece.pieceType === "king" &&
-      (await this.store.chessMoveValidator.isCastlingAvailable(side, piece, from, to))
-    ) {
-      this.store.chessMoveValidator.executeCastling(side, piece, from, to);
+    if (this.isPromotion(piece, to)) {
+      this.setPendingPromotion({ piece: piece, position: to, color: piece.color });
+      return;
     }
 
-    if (piece.color === "white") {
-      const timer = this.store.timer;
-      timer.deactiveTimer();
-      timer.activateTimer("p2");
-    } else if (piece.color === "black") {
-      const timer = this.store.timer;
-      timer.deactiveTimer();
-      timer.activateTimer("p1");
-    }
+    this.updateTimer(piece.color);
+
     if (animation) {
       this.animateMove = { from, to };
       await setTimeout(() => {
-        piece.position = to;
-        if (
-          piece.pieceType === "pawn" &&
-          from.col !== to.col &&
-          !this.getPiece(to) &&
-          this.lastDoubleStepPawn
-        ) {
-          this.setPiece(this.lastDoubleStepPawn.position, null);
-        }
-        this.setPiece(to, piece);
-        this.setPiece(from, null);
-        new Audio(soundMove).play();
-
-        piece.hasMoved = true;
-        this.setActivePiece(null);
-        this.availableMoves = [];
-        this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
+        this.finalizeMove(piece, from, to);
         this.animateMove = null;
-        this.lastDoubleStepPawn = null;
-        if (piece.pieceType === "pawn" && Math.abs(from.row - to.row) === 2) {
-          this.lastDoubleStepPawn = { color: piece.color, position: to };
-        }
-        if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
-          this.store.timer.deactiveTimer();
-          this.gameStatus = "checkmate";
-          this.setModalActive(true);
-        }
       }, 200);
     } else {
-      piece.position = to;
-      if (
-        piece.pieceType === "pawn" &&
-        from.col !== to.col &&
-        !this.getPiece(to) &&
-        this.lastDoubleStepPawn
-      ) {
-        this.setPiece(this.lastDoubleStepPawn.position, null);
-      }
-      this.setPiece(to, piece);
-      this.setPiece(from, null);
-      new Audio(soundMove).play();
-
-      piece.hasMoved = true;
-      this.setActivePiece(null);
-      this.availableMoves = [];
-      this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
-      this.lastDoubleStepPawn = null;
-      if (piece.pieceType === "pawn" && Math.abs(from.row - to.row) === 2) {
-        this.lastDoubleStepPawn = { color: piece.color, position: to };
-      }
-      if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
-        this.store.timer.deactiveTimer();
-        this.gameStatus = "checkmate";
-        this.setModalActive(true);
-      }
+      this.finalizeMove(piece, from, to);
     }
   };
 
@@ -236,6 +164,7 @@ class Board {
   setAvailableMoves = (args: [Piece, Position] | null) => {
     this.availableMoves = [];
     if (!args) return;
+    if (this.gameStatus === "checkmate" || this.gameStatus === "timeout") return;
     const [piece, position] = args;
     this.board.forEach((el) => {
       if (
@@ -255,6 +184,113 @@ class Board {
         this.availableMoves.push(el.position);
       }
     });
+  };
+
+  updateTimer = (color: Color) => {
+    if (color === "white") {
+      const timer = this.store.timer;
+      timer.deactiveTimer();
+      timer.activateTimer("p2");
+    } else if (color === "black") {
+      const timer = this.store.timer;
+      timer.deactiveTimer();
+      timer.activateTimer("p1");
+    }
+  };
+
+  isValidMove = (piece: Piece, from: Position, to: Position, side: "right" | "left") => {
+    if (!this.store.chessMoveValidator.isValidMove(piece, from, to)) {
+      return false;
+    }
+    if (this.gameStatus === "checkmate" || this.gameStatus === "timeout") return false;
+    if (piece.pieceType !== "king" && this.store.chessMoveValidator.isKingUnderAttack()) {
+      if (
+        !simulateValidMove(
+          piece,
+          from,
+          to,
+          this.getPiece,
+          this.setPiece,
+          this.store.chessMoveValidator.isKingUnderAttack
+        )
+      ) {
+        return false;
+      }
+    } else if (
+      piece.pieceType === "king" &&
+      this.store.chessMoveValidator.isCastlingAvailable(side, piece, from, to)
+    ) {
+      this.store.chessMoveValidator.executeCastling(side, piece, from, to);
+      return false;
+    }
+    return true;
+  };
+
+  finalizeMove = (piece: Piece, from: Position, to: Position) => {
+    piece.position = to;
+    if (
+      piece.pieceType === "pawn" &&
+      from.col !== to.col &&
+      !this.getPiece(to) &&
+      this.lastDoubleStepPawn
+    ) {
+      this.setPiece(this.lastDoubleStepPawn.position, null);
+    }
+    this.setPiece(to, piece);
+    this.setPiece(from, null);
+    new Audio(soundMove).play();
+
+    piece.hasMoved = true;
+    this.setActivePiece(null);
+    this.availableMoves = [];
+    this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
+    this.animateMove = null;
+    this.lastDoubleStepPawn = null;
+    if (piece.pieceType === "pawn" && Math.abs(from.row - to.row) === 2) {
+      this.lastDoubleStepPawn = { color: piece.color, position: to };
+    }
+    if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
+      this.store.timer.deactiveTimer();
+      this.gameStatus = "checkmate";
+      this.setModalActive(true);
+    }
+  };
+
+  isPromotion = (piece: Piece, to: Position) => {
+    return this.store.chessMoveValidator.isLastRow(piece, to);
+  };
+
+  @action
+  promotePiece = (oldPiece: Piece, piece: Piece) => {
+    const square = this.board.find(
+      (el) => el.position.col === piece.position.col && el.position.row === piece.position.row
+    );
+    if (square) {
+      square.piece = piece;
+      this.updateTimer(piece.color);
+      new Audio(soundMove).play();
+
+      this.setPendingPromotion(null);
+      this.setActivePiece(null);
+      this.availableMoves = [];
+      this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
+      this.setPiece(oldPiece.position, null);
+      if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
+        this.store.timer.deactiveTimer();
+        this.gameStatus = "checkmate";
+        this.setModalActive(true);
+      }
+    }
+  };
+
+  @computed
+  get pendingPromotionValue() {
+    return this.pendingPromotion;
+  }
+
+  @action
+  setPendingPromotion = (value: { piece: Piece; position: Position; color: Color } | null) => {
+    this.pendingPromotion = value;
   };
 
   @action

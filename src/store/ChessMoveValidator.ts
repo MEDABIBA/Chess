@@ -324,6 +324,11 @@ class ChessMoveValidator {
       this.isKingUnderAttack
     );
   };
+  isLastRow = (piece: Piece, position: Position) => {
+    const row = piece.color === "white" ? 8 : 1;
+    if (position.row === row && piece.pieceType === "pawn") return true;
+    return false;
+  };
 }
 
 export default ChessMoveValidator;

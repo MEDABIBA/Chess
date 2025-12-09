@@ -1,15 +1,14 @@
 import { useStore } from "../provider/context";
-import Modal from "./modalWindow";
+import PromotionPicker from "./PromotionPicker";
 import Square from "./Square";
 import { observer } from "mobx-react-lite";
 
 const Board = observer(() => {
   const { board, chessMoveValidator } = useStore();
-  const { availableMovesSet } = board;
+  const { availableMovesSet, pendingPromotionValue } = board;
   const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack("white");
   const blackKingUnerAttack = chessMoveValidator.isKingUnderAttack("black");
   const grab = board.getGrab();
-
   return (
     <>
       <div className="board">
@@ -23,6 +22,13 @@ const Board = observer(() => {
             <span key={e}>{e}</span>
           ))}
         </div>
+        {pendingPromotionValue && (
+          <PromotionPicker
+            oldPiece={pendingPromotionValue.piece}
+            color={pendingPromotionValue.color}
+            position={pendingPromotionValue.position}
+          />
+        )}
         {board.board.map(({ color, position, piece }) => {
           const grabbed = grab?.col === position.col && grab.row === position.row;
           const isLastMove =

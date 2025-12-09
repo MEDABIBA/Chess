@@ -7,28 +7,35 @@ import tryMove from "../helpers/tryMove";
 
 interface SquareProps {
   color: string;
-  position: { row: number; col: number };
-  isActiveField: "" | "square-active" | "square-attack";
+  position: Position;
+  isActiveField?: "" | "square-active" | "square-attack";
   piece?: Piece | null;
-  isLastMove: "last-move" | "";
-  hightlightKingAttacked: boolean;
-  grabbed: boolean;
-  animationTarget: { from: Position; to: Position } | null;
+  isLastMove?: "last-move" | "";
+  hightlightKingAttacked?: boolean;
+  grabbed?: boolean;
+  animationTarget?: { from: Position; to: Position } | null;
 }
 const SquareComponent: React.FC<SquareProps> = ({
   color,
   position,
   piece,
-  isLastMove,
-  isActiveField,
-  hightlightKingAttacked,
-  grabbed,
-  animationTarget,
+  isLastMove = "",
+  isActiveField = "",
+  hightlightKingAttacked = false,
+  grabbed = false,
+  animationTarget = null,
 }) => {
   const { row, col } = position;
   const imgRef = useRef<HTMLImageElement | null>(null);
   const { board } = useStore();
-  const { makeMove, getActivePiece, setActivePiece, setAvailableMoves, setGrab } = board;
+  const {
+    makeMove,
+    getActivePiece,
+    setActivePiece,
+    setAvailableMoves,
+    setGrab,
+    setPendingPromotion,
+  } = board;
 
   useEffect(() => {
     if (animationTarget) {
@@ -51,10 +58,15 @@ const SquareComponent: React.FC<SquareProps> = ({
       imgRef.current.style.transition = "transform 0.2s ease-out";
     }
   }, [animationTarget, position]);
-
   const handleMouseDown = (e: React.MouseEvent<HTMLImageElement>) => {
     console.log("row", row, ", col", col);
     const active = getActivePiece();
+    if (
+      board.pendingPromotionValue &&
+      (!piece || piece.color === board.pendingPromotionValue.piece.color)
+    ) {
+      setPendingPromotion(null);
+    }
     if (active?.position) {
       const square = getTargetSquare(e);
       if (!square) return;
@@ -70,8 +82,6 @@ const SquareComponent: React.FC<SquareProps> = ({
     e.preventDefault();
     setAvailableMoves([piece, position]);
     setActivePiece(piece);
-
-    e.preventDefault();
 
     const img = imgRef.current;
     const rect = img.getBoundingClientRect();
@@ -124,8 +134,31 @@ const SquareComponent: React.FC<SquareProps> = ({
   };
 
   const handleTouchStart = (e: React.TouchEvent<HTMLImageElement>) => {
+    const active = getActivePiece();
+    if (
+      board.pendingPromotionValue &&
+      (!piece || piece.color === board.pendingPromotionValue.piece.color)
+    ) {
+      setPendingPromotion(null);
+    }
+    if (active?.position) {
+      if (!e.changedTouches[0]?.clientX || !e.changedTouches[0]?.clientY) return null;
+      const dropTarget = document.elementFromPoint(
+        e.changedTouches[0]?.clientX,
+        e.changedTouches[0]?.clientY
+      ) as HTMLElement | null;
+      const square = dropTarget?.closest(".square") as HTMLElement | null;
+      if (!square) return;
+      tryMove(square, active.position, makeMove);
+      setActivePiece(null);
+      setAvailableMoves(null);
+      if (!piece) return;
+    }
     if (!piece || !imgRef.current) return;
-    e.preventDefault();
+    if (piece.color !== board.currentPlayer) return;
+
+    setAvailableMoves([piece, position]);
+    setActivePiece(piece);
 
     const img = imgRef.current;
     const rect = img.getBoundingClientRect();
@@ -153,6 +186,7 @@ const SquareComponent: React.FC<SquareProps> = ({
     document.body.appendChild(clone);
 
     const handleTouchMove = (event: TouchEvent) => {
+      event.preventDefault();
       const t = event.touches[0];
       if (!t) {
         return;
@@ -162,15 +196,15 @@ const SquareComponent: React.FC<SquareProps> = ({
 
     const handleTouchEnd = (event: TouchEvent) => {
       img.style.opacity = "1";
-
       const t = event.changedTouches[0];
       if (!t) {
         return;
       }
       const dropTarget = document.elementFromPoint(t.clientX, t.clientY) as HTMLElement | null;
-      if (dropTarget?.classList.contains("square")) {
-        const toRow = Number(dropTarget.dataset.row);
-        const toCol = Number(dropTarget.dataset.col);
+      const square = dropTarget?.closest(".square") as HTMLElement | null;
+      if (square) {
+        const toRow = Number(square.dataset.row);
+        const toCol = Number(square.dataset.col);
         makeMove(position, { row: toRow, col: toCol });
       }
 
@@ -178,9 +212,8 @@ const SquareComponent: React.FC<SquareProps> = ({
       document.removeEventListener("touchmove", handleTouchMove);
       document.removeEventListener("touchend", handleTouchEnd);
     };
-
     document.addEventListener("touchmove", handleTouchMove, { passive: false });
-    document.addEventListener("touchend", handleTouchEnd);
+    document.addEventListener("touchend", handleTouchEnd, { passive: false });
   };
 
   return (

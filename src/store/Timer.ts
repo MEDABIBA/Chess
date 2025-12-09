@@ -1,10 +1,10 @@
-import { action, computed, makeAutoObservable } from "mobx";
+import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "./RootStore";
 
 class Timer {
   store: RootStore;
-  p1: number = 1800;
-  p2: number = 1800;
+  p2: number = 180; // in seconds
+  p1: number = 180; // in seconds
   interval: number = 0;
   constructor(store: RootStore) {
     makeAutoObservable(this);
@@ -35,6 +35,11 @@ class Timer {
     } else if (player === "p2") {
       this.p2 -= 1;
     }
+  };
+
+  checkIfTimesUp = () => {
+    if (this.p1 <= 0 || this.p2 <= 0) return true;
+    return false;
   };
 
   deactiveTimer = () => {

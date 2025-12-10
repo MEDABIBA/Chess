@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 README.md
 # dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.js
 
@@ -18,7 +18,7 @@ README.md
 .env.test.local
 .env.production.local
 
-/yarn.lock
+yarn.lock
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

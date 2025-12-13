@@ -2,6 +2,9 @@
 README.md
 # dependencies
 node_modules/
+# env
+dist
+generated
 /.pnp
 .pnp.js
 

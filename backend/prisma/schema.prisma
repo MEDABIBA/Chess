@@ -1,0 +1,35 @@
+
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model Game {
+  id Int @id @default(autoincrement())
+  gameId String @unique
+  status String @default("waiting")
+
+  boardState Json
+  currentPlayer String @default("white")
+  gameStatus String @default("playing")
+ 
+  whitePlayerId String //socketId или временный ID
+  blackPlayerId String //socketId или временный ID
+
+  whiteTimeLeft Int @default(180)
+  blackTimeLeft Int @default(180)
+
+  lastDoubleStepPawn Json
+  highlightLastMove Json
+
+  winner String?
+  
+  // createdAt DateTime @default(now())
+  // updatedAt DateTime @updatedAt
+}

@@ -12,21 +12,19 @@ datasource db {
 
 model Game {
   id Int @id @default(autoincrement())
-  gameId String @unique
-  status String @default("waiting")
 
   boardState Json
   currentPlayer String @default("white")
-  gameStatus String @default("playing")
+  gameStatus String @default("waiting")
  
   whitePlayerId String //socketId или временный ID
-  blackPlayerId String //socketId или временный ID
+  blackPlayerId String? //socketId или временный ID
 
   whiteTimeLeft Int @default(180)
   blackTimeLeft Int @default(180)
 
-  lastDoubleStepPawn Json
-  highlightLastMove Json
+  lastDoubleStepPawn Json?
+  highlightLastMove Json?
 
   winner String?
   

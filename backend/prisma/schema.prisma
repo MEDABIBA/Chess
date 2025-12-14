@@ -9,13 +9,23 @@ datasource db {
   provider = "postgresql"
 }
 
-
+enum PlayerColor {
+  white
+  black
+}
+enum gameStatus {
+  waiting
+  playing
+  check
+  checkmate
+  timeout
+}
 model Game {
   id Int @id @default(autoincrement())
 
   boardState Json
-  currentPlayer String @default("white")
-  gameStatus String @default("waiting")
+  currentPlayer PlayerColor @default(white)
+  gameStatus gameStatus @default(waiting)
  
   whitePlayerId String //socketId или временный ID
   blackPlayerId String? //socketId или временный ID
@@ -28,6 +38,10 @@ model Game {
 
   winner String?
   
-  // createdAt DateTime @default(now())
-  // updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([whitePlayerId])
+  @@index([blackPlayerId])
+  @@index([gameStatus])
 }

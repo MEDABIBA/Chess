@@ -1,7 +1,12 @@
-import { IsString } from "class-validator";
+import { IsInt, IsString } from "class-validator";
+import { Position } from "types/board";
 
 export class MakeMoveDto {
   @IsString()
-  from: string;
-  to: string;
+  from: Position;
+  to: Position;
+
+  @IsInt()
+  whiteTimeLeft: number;
+  blackTimeLeft: number;
 }

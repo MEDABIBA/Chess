@@ -13,20 +13,20 @@ export class AppController {
     @Body()
     createGameOptions: CreateGameDto
   ) {
-    await this.appService.createGame(createGameOptions);
+    return await this.appService.createGame(createGameOptions);
   }
 
   @Patch("games/:id/join")
-  joinGame(@Param("id", ParseIntPipe) id: number, @Body() joinGameOptions: JoinGameDto) {
-    return this.appService.joinGame(id, joinGameOptions);
+  async joinGame(@Param("id", ParseIntPipe) id: number, @Body() joinGameOptions: JoinGameDto) {
+    return await this.appService.joinGame(id, joinGameOptions);
   }
 
   @Get("games/:id")
-  getGame(@Param("id", ParseIntPipe) id: number) {
-    return this.appService.getGame(id);
+  async getGame(@Param("id", ParseIntPipe) id: number) {
+    return await this.appService.getGame(id);
   }
   @Post("games/:id/move")
-  makeMove(@Param("id", ParseIntPipe) id: number, @Body() moveData: MakeMoveDto) {
-    return this.appService.makeMove(id, moveData);
+  async makeMove(@Param("id", ParseIntPipe) id: number, @Body() moveData: MakeMoveDto) {
+    return await this.appService.makeMove(id, moveData);
   }
 }

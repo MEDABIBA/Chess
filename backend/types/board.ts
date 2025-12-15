@@ -11,15 +11,15 @@ export interface Position {
   row: number;
   col: number;
 }
-export type Piece = {
+export interface Piece {
   pieceType: PieceType;
   color: Color;
   position: Position;
   hasMoved: boolean;
-};
+}
 
-export type SquareData = {
+export interface SquareData {
   color: Color;
   position: Position;
   piece: Piece | null;
-};
+}

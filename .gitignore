@@ -1,10 +1,11 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-README.md
 # dependencies
 node_modules/
+migrations
 # env
 dist
 generated
+migrate
 /.pnp
 .pnp.js
 

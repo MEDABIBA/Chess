@@ -1,10 +1,11 @@
-import { IsInt, IsObject, IsString, Min } from "class-validator";
+import { IsEnum, IsInt, IsObject, IsString, Min } from "class-validator";
 
 export class CreateGameDto {
   @IsObject()
   boardState: object;
 
-  currentPLayer: "white" | "black";
+  @IsEnum(["white", "black"])
+  currentPlayer: "white" | "black";
 
   @IsString()
   whitePlayerId: string;
@@ -12,5 +13,8 @@ export class CreateGameDto {
   @IsInt()
   @Min(0)
   whiteTimeLeft: number;
+
+  @IsInt()
+  @Min(0)
   blackTimeLeft: number;
 }

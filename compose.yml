@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  frontend:
+    container_name: chess-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/src
+
+  backend:
+    container_name: chess-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 3030:3030
+    volumes:
+      - ./backend:/src
+      - /src/node_modules
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@postgresql:5432/chess"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+
+  postgresql:
+    image: postgres:16.0
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: chess
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

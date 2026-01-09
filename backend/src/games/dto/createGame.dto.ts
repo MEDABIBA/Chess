@@ -4,8 +4,8 @@ export class CreateGameDto {
   @IsObject()
   boardState: object;
 
-  @IsEnum(["white", "black"])
-  currentPlayer: "white" | "black";
+  // @IsEnum(["white", "black"])
+  // currentPlayer: "white" | "black";
 
   @IsString()
   whitePlayerId: string;

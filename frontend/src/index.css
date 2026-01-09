@@ -242,3 +242,162 @@ body {
 .propotion-square {
   z-index: 2;
 }
+
+.modal-window-page {
+  position: relative;
+  z-index: 2;
+  background-image: url(./assets/chess-pieces-black-5120x2880-16661.png);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.modal-window-page::before {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.modal-window {
+  display: flex;
+  flex-direction: column;
+  height: 60%;
+  width: 420px;
+  max-width: 90vw;
+  max-height: 90vh;
+  background-color: #1e1e1e;
+  border-radius: 3%;
+  padding: 3%;
+  align-items: center;
+  text-align: center;
+}
+@media (max-width: 768px) {
+  .modal-window {
+    width: 90vw;
+    padding: 24px;
+  }
+}
+
+.timer-button {
+  cursor: pointer;
+  width: 80%;
+  height: 14%;
+  border-radius: 12px;
+  background: #555;
+  color: #e0e0e0;
+  font-size: 24px;
+  font-weight: 600;
+  border: none;
+  outline: none;
+  margin-bottom: 20px;
+}
+.timer-button:hover,
+.timer-button:hover {
+  border: none;
+  background: #666;
+}
+.timer-button:focus {
+  outline: none;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 300px;
+  }
+}
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 300px;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+  }
+}
+.timer-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  gap: 8%;
+  padding: 1% 0%;
+  margin: 1% 0;
+  background: #555;
+  border-radius: 12px;
+  width: 100%;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.timer-list-active {
+  animation: slideDown 0.3s ease-out forwards;
+}
+.timer-list-hidden {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.timer-element {
+  min-width: 100px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 12px;
+  width: 40%;
+  background-color: #2f2f2f;
+  color: #fff;
+  margin: 5% 0;
+}
+.timer-element-active,
+.timer-element:hover {
+  background-color: #d8d2c6;
+  color: #000;
+}
+.timer-element-button {
+  cursor: pointer;
+  background-color: inherit;
+}
+
+.nickname-input {
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 12px;
+  background-color: #333;
+  width: 80%;
+  margin-bottom: 20px;
+}
+.nickname-error {
+  color: rgb(220, 38, 38);
+}
+
+.create-game-button {
+  background-color: #e6e1d8;
+  color: #1c1c1c;
+  margin-top: auto;
+  height: 14%;
+  width: 80%;
+  border-radius: 15px;
+  cursor: pointer;
+}
+.create-game-button:hover {
+  background-color: #cfc8ba;
+}
+.create-game-button:disabled {
+  background-color: #555;
+}
+.create-game-button:disabled:hover {
+  background-color: #555;
+}

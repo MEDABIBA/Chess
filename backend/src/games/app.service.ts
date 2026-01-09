@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "prisma/prisma.service";
 import { CreateGameDto } from "./dto/createGame.dto";
 import { JoinGameDto } from "./dto/joinGame.dto";
@@ -14,7 +14,7 @@ export class AppService {
     const { boardState, whitePlayerId, whiteTimeLeft, blackTimeLeft } = dto;
     return this.prisma.game.create({
       data: {
-        boardState: boardState,
+        boardState: boardState as any,
         currentPlayer: "white",
         whitePlayerId: whitePlayerId,
         whiteTimeLeft: whiteTimeLeft,
@@ -32,9 +32,14 @@ export class AppService {
   }
 
   async getGame(id: number) {
-    return await this.prisma.game.findUnique({
+    const game = await this.prisma.game.findUnique({
       where: { id: id },
     });
+    if (game) {
+      return game;
+    } else {
+      throw new NotFoundException("game not found");
+    }
   }
 
   async makeMove(id: number, dto: MakeMoveDto) {

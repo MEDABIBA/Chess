@@ -1,14 +1,14 @@
 FROM node:lts-alpine
 
-WORKDIR /src
+WORKDIR /app
 
 COPY package.json yarn.lock ./
+
 RUN yarn install
 
-COPY . .
-
+COPY prisma ./prisma
 RUN npx prisma generate
 
 EXPOSE 3030
 
-CMD sh -c "npx prisma migrate deploy && yarn start"
+# CMD sh -c "npx prisma migrate deploy && yarn start"

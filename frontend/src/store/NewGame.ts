@@ -12,6 +12,7 @@ class NewGame {
 
   @action
   createNewGame = async (time: number, nickname: string) => {
+    this.store.board.initializeBoard();
     const board = this.store.board.board;
     if (!checkValidNickname(nickname)) throw new Error("Enter a valid nickname");
     try {
@@ -27,9 +28,14 @@ class NewGame {
           blackTimeLeft: time,
         }),
       });
+      const data = await response.json();
       if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
+        throw new Error(
+          data.message ? JSON.stringify(data.message) : `Server error: ${response.status}`
+        );
       }
+      console.log(data);
+      return data;
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(error.message);

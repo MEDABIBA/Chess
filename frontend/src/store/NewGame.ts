@@ -1,7 +1,6 @@
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "./RootStore";
 import checkValidNickname from "../helpers/checkValidNickname";
-
 class NewGame {
   store: RootStore;
 
@@ -34,8 +33,9 @@ class NewGame {
           data.message ? JSON.stringify(data.message) : `Server error: ${response.status}`
         );
       }
-      console.log(data);
-      return data;
+      this.store.setNickname(nickname);
+      console.log("Id created game: ", data.id);
+      return data.id;
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(error.message);

@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import arrowUp from "../assets/up-arrow.png";
 import downArrow from "../assets/down-arrow.png";
 import { useStore } from "../provider/context";
+import { useNavigate } from "react-router-dom";
 
 const CreateGame = () => {
+  const navigate = useNavigate();
   const { newGame } = useStore();
   const { createNewGame } = newGame;
   const timerValues = ["3 min", "5 min", "10 min", "15 min"] as const;
@@ -24,6 +26,11 @@ const CreateGame = () => {
     if (nickname.length === 0 || /^[A-Za-z0-9 ]{1,30}$/.test(nickname)) setNicknameError(false);
     else setNicknameError(true);
   }, [nickname]);
+
+  const handleCreate = async (time: number, nickname: string) => {
+    const gameId = await createNewGame(time, nickname);
+    navigate(`/game/${gameId}`);
+  };
   return (
     <div className="modal-window-page">
       <div className="modal-window">
@@ -41,9 +48,10 @@ const CreateGame = () => {
         </button>
         {isVisible && (
           <ul className={`timer-list ${activeTimer ? "timer-list-active" : "timer-list-hidden"}`}>
-            {timerValues.map((el) => {
+            {timerValues.map((el, i) => {
               return (
                 <li
+                  key={i}
                   className={`timer-element ${el === timerValue ? "timer-element-active" : null}`}
                   onClick={() => setTimerValue(el)}>
                   {el}
@@ -63,7 +71,7 @@ const CreateGame = () => {
           <div className="nickname-error">Maximum 30 characters (Latin letters only)</div>
         )}
         <button
-          onClick={async () => await createNewGame(selectTime, nickname)}
+          onClick={async () => await handleCreate(selectTime, nickname)}
           className="create-game-button"
           disabled={nicknameError || nickname.length < 1}>
           Create game

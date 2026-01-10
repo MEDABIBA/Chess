@@ -1,5 +1,5 @@
 import { action, computed, makeAutoObservable } from "mobx";
-import { Color, PieceType, Position, SquareData } from "../types/types";
+import { Color, GameInterface, GameStatus, PieceType, Position, SquareData } from "../types/types";
 import Piece from "../models/Piece";
 import { RootStore } from "./RootStore";
 import { simulateValidMove } from "../helpers/simulateMove";
@@ -9,7 +9,7 @@ class Board {
   store: RootStore;
   board: SquareData[] = [];
   currentPlayer: Color = "white";
-  gameStatus: "playing" | "check" | "checkmate" | "timeout" = "playing";
+  gameStatus: GameStatus = "playing";
   activePiece: Piece | null = null;
   highlightLastMoves: { from: Position; to: Position } | {} = {};
   availableMoves: Position[] = [];
@@ -42,6 +42,37 @@ class Board {
       }
     }
   };
+
+  @action
+  async setBoard(id: string) {
+    try {
+      const res = await fetch(`http://localhost:3030/games/${id}`);
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status}`);
+      }
+      const game = (await res.json()) as unknown as GameInterface;
+      if (game.boardState) {
+        this.board = game.boardState.flat();
+        this.hydratePieceClassesFromServer(this.board);
+      }
+      console.log(...game.boardState);
+      return game;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error(String(error));
+      }
+    }
+  }
+
+  @action
+  hydratePieceClassesFromServer(board: SquareData[]) {
+    board.forEach((el) => {
+      if (!el.piece?.pieceType) return;
+      el.piece = new Piece(el.piece?.pieceType, el.piece?.position, el.piece?.color);
+    });
+  }
 
   @action
   createInitialPiece = (position: Position, color: Color): Piece | null => {

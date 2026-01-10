@@ -1,5 +1,7 @@
 import Piece from "../models/Piece";
 
+export type GameStatus = "playing" | "check" | "checkmate" | "timeout";
+
 export interface Position {
   row: number;
   col: number;
@@ -28,3 +30,19 @@ export type SquareData = {
   position: Position;
   piece: Piece | null;
 };
+
+export interface GameInterface {
+  blackPlayerId: string | null;
+  blackTimeLeft: number;
+  boardState: SquareData[][];
+  createdAt: string;
+  currentPlayer: "white" | "black";
+  gameStatus: GameStatus;
+  highlightLastMove: { from: Position; to: Position } | null;
+  id: number;
+  lastDoubleStepPawn: null | { color: Color; position: Position };
+  updatedAt: string;
+  whitePlayerId: string;
+  whiteTimeLeft: number;
+  winner: string | number;
+}

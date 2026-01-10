@@ -7,7 +7,7 @@ const App = observer(() => {
   return (
     <div className="app">
       <Routes>
-        <Route path="/board" element={<Board />} />
+        <Route path="/game/:id" element={<Board />} />
         <Route path="/create-game" element={<CreateGame />} />
       </Routes>
     </div>

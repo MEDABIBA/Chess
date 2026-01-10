@@ -2,6 +2,7 @@ import BoardComponent from "../components/Board";
 import Timer from "../components/Timer";
 import { useStore } from "../provider/context";
 import Modal from "../components/modalWindow";
+import { observer } from "mobx-react-lite";
 
 const Board = () => {
   const { board } = useStore();
@@ -34,4 +35,4 @@ const Board = () => {
     </div>
   );
 };
-export default Board;
+export default observer(Board);

@@ -1,14 +1,25 @@
+import { useParams } from "react-router-dom";
 import { useStore } from "../provider/context";
 import PromotionPicker from "./PromotionPicker";
 import Square from "./Square";
 import { observer } from "mobx-react-lite";
+import { GameInterface } from "../types/types";
+import { useEffect, useState } from "react";
 
 const Board = observer(() => {
+  const { id } = useParams();
+  const [loading, setLoading] = useState(true);
   const { board, chessMoveValidator } = useStore();
   const { availableMovesSet, pendingPromotionValue } = board;
   const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack("white");
   const blackKingUnerAttack = chessMoveValidator.isKingUnderAttack("black");
   const grab = board.getGrab();
+  console.log(id);
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    const res = board.setBoard(id);
+  }, [id]);
   return (
     <>
       <div className="board">

@@ -9,6 +9,7 @@ export class RootStore {
   chessMoveValidator: ChessMoveValidator;
   timer: Timer;
   newGame: NewGame;
+  nickname: string | null = null;
 
   constructor() {
     makeAutoObservable(this);
@@ -16,6 +17,17 @@ export class RootStore {
     this.board = new Board(this);
     this.timer = new Timer(this);
     this.newGame = new NewGame(this);
+
+    this.getNickname();
+  }
+
+  getNickname() {
+    this.nickname = localStorage.getItem("nickname");
+    console.log("Nickname is: ", this.nickname);
+  }
+  setNickname(nickname: string) {
+    localStorage.setItem("nickname", nickname);
+    console.log("Nickname was changed to: ", this.nickname);
   }
 }
 

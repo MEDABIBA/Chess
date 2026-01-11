@@ -26,7 +26,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
-    command: sh -c "npx prisma migrate deploy && npm run start:dev"
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && npm run start:dev"
     environment:
       DATABASE_URL: "postgresql://postgres:postgres@postgresql:5432/chess"
       CHOKIDAR_USEPOLLING: "true"

@@ -11,4 +11,4 @@ RUN npx prisma generate
 
 EXPOSE 3030
 
-# CMD sh -c "npx prisma migrate deploy && yarn start"
+CMD sh -c "npx prisma migrate deploy && yarn start"

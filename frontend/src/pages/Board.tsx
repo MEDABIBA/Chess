@@ -3,9 +3,10 @@ import Timer from "../components/Timer";
 import { useStore } from "../provider/context";
 import Modal from "../components/modalWindow";
 import { observer } from "mobx-react-lite";
+import PlayerCard from "../components/PlayerCard";
 
 const Board = () => {
-  const { board } = useStore();
+  const { board, timer } = useStore();
   const { setModalActive, reloadGame, getModalActive } = board;
   const isModalActive = getModalActive();
   return (
@@ -28,8 +29,9 @@ const Board = () => {
           </button>
         )}
         <div className="board-container">
+          <PlayerCard playerName={board.whitePlayerId} getPlayerTime={timer.getFirstPlayerTime} />
           <BoardComponent />
-          <Timer />
+          <PlayerCard playerName={board.blackPlayerId} getPlayerTime={timer.getSecondPlayerTime} />
         </div>
       </div>
     </div>

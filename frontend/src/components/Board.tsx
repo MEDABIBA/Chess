@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 
 const Board = observer(() => {
   const { id } = useParams();
-  const [loading, setLoading] = useState(true);
   const { board, chessMoveValidator } = useStore();
   const { availableMovesSet, pendingPromotionValue } = board;
   const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack("white");
@@ -17,8 +16,7 @@ const Board = observer(() => {
   console.log(id);
   useEffect(() => {
     if (!id) return;
-    setLoading(true);
-    const res = board.setBoard(id);
+    board.setBoard(id);
   }, [id]);
   return (
     <>

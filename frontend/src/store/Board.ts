@@ -8,6 +8,8 @@ import soundMove from "../assets/sounds/move.mp3";
 class Board {
   store: RootStore;
   board: SquareData[] = [];
+  whitePlayerId: string | null = null
+  blackPlayerId: string | null = null
   currentPlayer: Color = "white";
   gameStatus: GameStatus = "playing";
   activePiece: Piece | null = null;
@@ -27,6 +29,7 @@ class Board {
 
   @action
   initializeBoard = () => {
+    this.board = []
     for (let row = 8; row > 0; row--) {
       for (let col = 1; col < 9; col++) {
         const color = (row + col) % 2 === 0 ? "black" : "white";
@@ -54,8 +57,17 @@ class Board {
       if (game.boardState) {
         this.board = game.boardState.flat();
         this.hydratePieceClassesFromServer(this.board);
+        this.store.timer.setFirstPlayerTime(game.whiteTimeLeft * 60); // in seconds
+        this.store.timer.setSecondPlayerTime(game.blackTimeLeft * 60); // in seconds
+        this.currentPlayer = game.currentPlayer;
+        this.gameStatus = game.gameStatus;
+        this.highlightLastMoves = game.highlightLastMove || {};
+        this.lastDoubleStepPawn = game.lastDoubleStepPawn || null;
+        this.whitePlayerId = game.whitePlayerId;
+        this.blackPlayerId = game.blackPlayerId;
+
       }
-      console.log(...game.boardState);
+      console.log(game);
       return game;
     } catch (error: unknown) {
       if (error instanceof Error) {

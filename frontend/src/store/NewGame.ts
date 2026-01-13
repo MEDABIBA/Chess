@@ -11,7 +11,6 @@ class NewGame {
 
   @action
   createNewGame = async (time: number, nickname: string) => {
-    this.store.board.initializeBoard();
     const board = this.store.board.board;
     if (!checkValidNickname(nickname)) throw new Error("Enter a valid nickname");
     try {

@@ -44,7 +44,7 @@ class SquareDto {
   position: PositionDto;
 
   @Type(() => PieceDto)
-  @IsOptional() // потому что piece может быть null
+  @IsOptional()
   piece?: PieceDto | null;
 }
 

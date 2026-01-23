@@ -39,3 +39,6 @@ Broadcast обновлений в комнату
 Тестирование на разных устройствах
 Vercel для Next.js + Supabase/Neon для PostgreSQL
 Environment variables для production
+
+-- зделать конвертацию boardToFen && fenToBoard
+-- зделать FEN в БД

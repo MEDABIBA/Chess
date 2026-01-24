@@ -52,7 +52,7 @@ export class CreateGameDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => SquareDto)
-  boardState: SquareDto[][];
+  boardState: SquareDto[];
 
   // @IsEnum(["white", "black"])
   // currentPlayer: "white" | "black";

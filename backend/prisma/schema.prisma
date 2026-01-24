@@ -24,7 +24,7 @@ enum gameStatus {
 model Game {
   id Int @id @default(autoincrement())
 
-  boardState Json
+  fen String
   currentPlayer PlayerColor @default(white)
   gameStatus gameStatus @default(waiting)
  

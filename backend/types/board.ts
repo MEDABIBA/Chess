@@ -1,12 +1,5 @@
 export type Color = "white" | "black";
-export enum PieceType {
-  PAWN = "pawn",
-  ROOK = "rook",
-  KNIGHT = "knight",
-  BISHOP = "bishop",
-  QUEEN = "queen",
-  KING = "king",
-}
+export type PieceType = "pawn" | "rook" | "knight" | "bishop" | "queen" | "king";
 export interface Position {
   row: number;
   col: number;

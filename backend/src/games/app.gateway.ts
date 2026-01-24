@@ -11,6 +11,7 @@ import { CreateGameDto } from "./dto/createGame.dto";
 import { JoinGameDto } from "./dto/joinGame.dto";
 import { MakeMoveDto } from "./dto/makeMove.dto";
 import { Server, Socket } from "socket.io";
+import { fenToBoard } from "src/helpers";
 
 @WebSocketGateway({ cors: true })
 export class GameGateway {
@@ -28,7 +29,7 @@ export class GameGateway {
       const game = await this.appService.createGame(createGameOptions);
 
       client.join(`game/${game.id}`);
-      client.emit("game-created");
+      client.emit("game-created", { id: game.id });
     } catch (err) {
       client.emit("error", { message: err.message });
     }
@@ -38,9 +39,10 @@ export class GameGateway {
   async joinGame(@MessageBody() dto: JoinGameDto, @ConnectedSocket() client: Socket) {
     try {
       const game = await this.appService.joinGame(dto.id, dto);
+      const boardState = fenToBoard(game.fen); // ← зберігаємо результат
 
       client.join(`game/${dto.id}`);
-      this.server.to(`game/${dto.id}`).emit("guest-joined", game);
+      this.server.to(`game/${dto.id}`).emit("guest-joined", { ...game, boardState });
     } catch (err) {
       client.emit("error", { message: err.message });
     }
@@ -50,7 +52,9 @@ export class GameGateway {
   async getGame(@MessageBody() dto: { id: number }, @ConnectedSocket() client: Socket) {
     try {
       const game = await this.appService.getGame(dto.id);
-      client.emit("game-state", game);
+      const boardState = fenToBoard(game.fen); // ← зберігаємо результат
+
+      client.emit("game-state", { ...game, boardState });
     } catch (err) {
       client.emit("error", { message: err.message });
     }
@@ -61,9 +65,10 @@ export class GameGateway {
     @ConnectedSocket() client: Socket, // ДОБАВЬ это
   ) {
     try {
-      const fen = await this.appService.makeMove(dto.id, dto.moveData);
+      const game = await this.appService.makeMove(dto.id, dto.moveData);
+      const boardState = fenToBoard(game.fen); // ← зберігаємо результат
 
-      this.server.to(`game/${dto.id}`).emit("state", fen);
+      this.server.to(`game/${dto.id}`).emit("state", { ...game, boardState });
     } catch (err) {
       client.emit("error", { message: err.message });
     }

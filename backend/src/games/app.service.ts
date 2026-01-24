@@ -5,6 +5,9 @@ import { JoinGameDto } from "./dto/joinGame.dto";
 import { MakeMoveDto } from "./dto/makeMove.dto";
 import { SquareData } from "types/board";
 import { Prisma } from "generated/prisma/browser";
+import { boardToFen } from "src/helpers";
+import { Chess } from "chess.js";
+import { validateMove } from "src/helpers/validateMove";
 
 @Injectable()
 export class AppService {
@@ -12,9 +15,17 @@ export class AppService {
 
   async createGame(dto: CreateGameDto) {
     const { boardState, whitePlayerId, whiteTimeLeft, blackTimeLeft } = dto;
+    const fen = boardToFen(
+      boardState.map((square) => ({
+        color: square.color,
+        position: square.position,
+        piece: square.piece ? square.piece : null,
+      })),
+      "white",
+    );
     return this.prisma.game.create({
       data: {
-        boardState: boardState as any,
+        fen: fen,
         currentPlayer: "white",
         whitePlayerId: whitePlayerId,
         whiteTimeLeft: whiteTimeLeft,
@@ -51,23 +62,17 @@ export class AppService {
         },
       });
       if (!game) throw new Error("game not found");
-      const raw = game.boardState as unknown;
-      if (!Array.isArray(raw)) throw new Error("invalid board state");
-      const squares = raw as SquareData[];
-      const prevSquare = squares.find(
-        (el) => el.position.row === from.row && el.position.col === from.col
-      );
-      const square = squares.find((el) => el.position.row === to.row && el.position.col === to.col);
-      if (!prevSquare || !square) throw new Error("invalid move positions");
-      const piece = prevSquare.piece;
-      if (!piece) throw new Error(`no piece at col ${from.col}-row ${from.row} position`);
-      piece.position = to;
-      prevSquare.piece = null;
-      square.piece = piece;
+      const fen = new Chess(game.fen);
+      const res = validateMove(fen, from, to);
+
+      if (!res.valid) {
+        throw new Error("Invalid move");
+      }
+
       return await prisma.game.update({
         where: { id: id },
         data: {
-          boardState: squares as unknown as Prisma.InputJsonValue,
+          fen: res.newFen,
           currentPlayer: game.currentPlayer === "white" ? "black" : "white",
           whiteTimeLeft,
           blackTimeLeft,

@@ -21,6 +21,15 @@ enum gameStatus {
   checkmate
   timeout
 }
+
+model User {
+  id Int @id @default(autoincrement())
+  username String @unique
+  password String
+  refreshTokens String[] // Refresh tokens array
+  createdAt DateTime @default(now())
+}
+
 model Game {
   id Int @id @default(autoincrement())
 
@@ -28,8 +37,8 @@ model Game {
   currentPlayer PlayerColor @default(white)
   gameStatus gameStatus @default(waiting)
  
-  whitePlayerId String //socketId или временный ID
-  blackPlayerId String? //socketId или временный ID
+  whitePlayerId String //socketId or temporary ID
+  blackPlayerId String? //socketId or temporary ID
 
   whiteTimeLeft Int @default(180)
   blackTimeLeft Int @default(180)

@@ -8,8 +8,8 @@ import soundMove from "../assets/sounds/move.mp3";
 class Board {
   store: RootStore;
   board: SquareData[] = [];
-  whitePlayerId: string | null = null
-  blackPlayerId: string | null = null
+  whitePlayerId: string | null = null;
+  blackPlayerId: string | null = null;
   currentPlayer: Color = "white";
   gameStatus: GameStatus = "playing";
   activePiece: Piece | null = null;
@@ -29,7 +29,7 @@ class Board {
 
   @action
   initializeBoard = () => {
-    this.board = []
+    this.board = [];
     for (let row = 8; row > 0; row--) {
       for (let col = 1; col < 9; col++) {
         const color = (row + col) % 2 === 0 ? "black" : "white";
@@ -65,7 +65,6 @@ class Board {
         this.lastDoubleStepPawn = game.lastDoubleStepPawn || null;
         this.whitePlayerId = game.whitePlayerId;
         this.blackPlayerId = game.blackPlayerId;
-
       }
       console.log(game);
       return game;
@@ -93,14 +92,14 @@ class Board {
       col === 1 || col === 8
         ? PieceType.ROOK
         : col === 2 || col === 7
-        ? PieceType.KNIGHT
-        : col === 3 || col === 6
-        ? PieceType.BISHOP
-        : col === 4
-        ? PieceType.QUEEN
-        : col === 5
-        ? PieceType.KING
-        : null;
+          ? PieceType.KNIGHT
+          : col === 3 || col === 6
+            ? PieceType.BISHOP
+            : col === 4
+              ? PieceType.QUEEN
+              : col === 5
+                ? PieceType.KING
+                : null;
     if (pieceType === null) {
       return null;
     }
@@ -128,7 +127,7 @@ class Board {
   @action
   setPiece = (to: Position, piece: Piece | null) => {
     const boardSetPiece = this.board.find(
-      (el) => el.position.col === to.col && el.position.row === to.row
+      (el) => el.position.col === to.col && el.position.row === to.row,
     );
     if (!boardSetPiece) return;
     boardSetPiece.piece = piece;
@@ -220,7 +219,7 @@ class Board {
             el.position,
             this.getPiece,
             this.setPiece,
-            this.store.chessMoveValidator.isKingUnderAttack
+            this.store.chessMoveValidator.isKingUnderAttack,
           ) &&
           this.store.chessMoveValidator.isValidMove(piece, position, el.position))
       ) {
@@ -254,7 +253,7 @@ class Board {
           to,
           this.getPiece,
           this.setPiece,
-          this.store.chessMoveValidator.isKingUnderAttack
+          this.store.chessMoveValidator.isKingUnderAttack,
         )
       ) {
         return false;
@@ -307,7 +306,7 @@ class Board {
   @action
   promotePiece = (oldPiece: Piece, piece: Piece) => {
     const square = this.board.find(
-      (el) => el.position.col === piece.position.col && el.position.row === piece.position.row
+      (el) => el.position.col === piece.position.col && el.position.row === piece.position.row,
     );
     if (square) {
       square.piece = piece;

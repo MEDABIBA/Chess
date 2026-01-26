@@ -39,7 +39,7 @@ export class GameGateway {
   async joinGame(@MessageBody() dto: JoinGameDto, @ConnectedSocket() client: Socket) {
     try {
       const game = await this.appService.joinGame(dto.id, dto);
-      const boardState = fenToBoard(game.fen); // ← зберігаємо результат
+      const boardState = fenToBoard(game.fen);
 
       client.join(`game/${dto.id}`);
       this.server.to(`game/${dto.id}`).emit("guest-joined", { ...game, boardState });
@@ -52,7 +52,7 @@ export class GameGateway {
   async getGame(@MessageBody() dto: { id: number }, @ConnectedSocket() client: Socket) {
     try {
       const game = await this.appService.getGame(dto.id);
-      const boardState = fenToBoard(game.fen); // ← зберігаємо результат
+      const boardState = fenToBoard(game.fen);
 
       client.emit("game-state", { ...game, boardState });
     } catch (err) {
@@ -62,11 +62,11 @@ export class GameGateway {
   @SubscribeMessage("make-move")
   async makeMove(
     @MessageBody() dto: { id: number; moveData: MakeMoveDto },
-    @ConnectedSocket() client: Socket, // ДОБАВЬ это
+    @ConnectedSocket() client: Socket,
   ) {
     try {
       const game = await this.appService.makeMove(dto.id, dto.moveData);
-      const boardState = fenToBoard(game.fen); // ← зберігаємо результат
+      const boardState = fenToBoard(game.fen);
 
       this.server.to(`game/${dto.id}`).emit("state", { ...game, boardState });
     } catch (err) {

@@ -12,8 +12,11 @@ import { JoinGameDto } from "./dto/joinGame.dto";
 import { MakeMoveDto } from "./dto/makeMove.dto";
 import { Server, Socket } from "socket.io";
 import { fenToBoard } from "src/helpers";
+import { UseGuards } from "@nestjs/common";
+import { WsJwtGuard } from "src/auth/ws-gwt.guard";
 
 @WebSocketGateway({ cors: true })
+@UseGuards(WsJwtGuard)
 export class GameGateway {
   @WebSocketServer()
   server: Server;
@@ -26,7 +29,11 @@ export class GameGateway {
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      const game = await this.appService.createGame(createGameOptions);
+      const userId: number = client.data.user.userId;
+      const game = await this.appService.createGame({
+        ...createGameOptions,
+        whitePlayerId: String(userId),
+      });
 
       client.join(`game/${game.id}`);
       client.emit("game-created", { id: game.id });

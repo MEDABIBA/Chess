@@ -49,6 +49,7 @@ export class AppService {
     if (game) {
       return game;
     } else {
+      console.log("game not found");
       throw new NotFoundException("game not found");
     }
   }
@@ -61,11 +62,15 @@ export class AppService {
           id: id,
         },
       });
-      if (!game) throw new Error("game not found");
+      if (!game) {
+        console.log("game not found");
+        throw new Error("game not found");
+      }
       const fen = new Chess(game.fen);
       const res = validateMove(fen, from, to);
 
       if (!res.valid) {
+        console.log("Invalid move");
         throw new Error("Invalid move");
       }
 

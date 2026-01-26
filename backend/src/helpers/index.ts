@@ -50,6 +50,7 @@ export function boardToFen(board: SquareData[], currentPlayer: "white" | "black"
   fen += " 0 1";
 
   if (!new Chess(fen)) {
+    console.log("Generated FEN is invalid");
     throw new Error("Generated FEN is invalid");
   }
   return fen;

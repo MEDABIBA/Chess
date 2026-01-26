@@ -28,8 +28,11 @@ class NewGame {
       });
       const data = await response.json();
       if (!response.ok) {
+        console.log(
+          data.message ? JSON.stringify(data.message) : `Server error: ${response.status}`,
+        );
         throw new Error(
-          data.message ? JSON.stringify(data.message) : `Server error: ${response.status}`
+          data.message ? JSON.stringify(data.message) : `Server error: ${response.status}`,
         );
       }
       this.store.setNickname(nickname);
@@ -37,8 +40,10 @@ class NewGame {
       return data.id;
     } catch (error: unknown) {
       if (error instanceof Error) {
+        console.log(error.message);
         throw new Error(error.message);
       } else {
+        console.log(error);
         throw new Error(String(error));
       }
     }

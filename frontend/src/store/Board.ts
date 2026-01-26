@@ -51,6 +51,7 @@ class Board {
     try {
       const res = await fetch(`http://localhost:3030/games/${id}`);
       if (!res.ok) {
+        console.log(`Server error: ${res.status}`);
         throw new Error(`Server error: ${res.status}`);
       }
       const game = (await res.json()) as unknown as GameInterface;
@@ -70,8 +71,10 @@ class Board {
       return game;
     } catch (error: unknown) {
       if (error instanceof Error) {
+        console.log(error.message);
         throw new Error(error.message);
       } else {
+        console.log(String(error));
         throw new Error(String(error));
       }
     }

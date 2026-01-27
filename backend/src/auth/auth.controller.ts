@@ -1,6 +1,15 @@
-import { Body, ConflictException, Controller, Post, UnauthorizedException } from "@nestjs/common";
+import {
+  Body,
+  ConflictException,
+  Controller,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { PrismaService } from "../../prisma/prisma.service";
+import type { Request, Response } from "express";
 
 @Controller("auth")
 export class AuthController {
@@ -31,45 +40,47 @@ export class AuthController {
     return {
       message: "User created successfully",
       accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
     };
   }
 
   @Post("login")
-  async login(@Body() body: { password: string; username: string }) {
+  async login(
+    @Body() body: { password: string; username: string },
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const user = await this.prisma.user.findUnique({
       where: { username: body.username },
     });
 
     if (!user) {
       console.log("User not found");
-
       throw new UnauthorizedException("User not found");
     }
 
     const isPasswordValid = body.password === user.password;
     if (!isPasswordValid) {
       console.log("Invalid password");
-
       throw new UnauthorizedException("Invalid password");
     }
     const tokens = await this.authService.generateTokenPair(user.id, user.username);
-
+    response.cookie("refreshToken", tokens.refreshToken, {
+      httpOnly: true, // JS cant read
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    }); // 7 days
     return {
       accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
     };
   }
 
   @Post("refresh")
-  async refresh(@Body() body: { refreshToken: string }) {
-    if (!body.refreshToken) {
+  async refresh(@Req() requset: Request) {
+    const refreshToken = requset.cookies["refreshToken"];
+    if (!refreshToken) {
       console.log("Refresh token required");
-
       throw new UnauthorizedException("Refresh token required");
     }
 
-    const accessToken = await this.authService.refreshAccessToken(body.refreshToken);
+    const accessToken = await this.authService.refreshAccessToken(refreshToken);
 
     return {
       accessToken,

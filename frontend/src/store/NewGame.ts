@@ -35,7 +35,6 @@ class NewGame {
           data.message ? JSON.stringify(data.message) : `Server error: ${response.status}`,
         );
       }
-      this.store.setNickname(nickname);
       console.log("Id created game: ", data.id);
       return data.id;
     } catch (error: unknown) {

@@ -22,12 +22,12 @@ export class RootStore {
   }
 
   getNickname() {
-    this.nickname = localStorage.getItem("nickname");
+    // Take it from access token
     console.log("Nickname is: ", this.nickname);
   }
-  setNickname(nickname: string) {
-    localStorage.setItem("nickname", nickname);
-    console.log("Nickname was changed to: ", this.nickname);
+
+  handleAuthSubmit(auth: string, username: string, password: string) {
+    // here is logic
   }
 }
 

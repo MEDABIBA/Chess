@@ -32,7 +32,7 @@ const CreateGame = () => {
     navigate(`/game/${gameId}`);
   };
   return (
-    <div className="modal-window-page">
+    <div className="backgound-image">
       <div className="modal-window">
         <button
           className="timer-button"
@@ -65,14 +65,14 @@ const CreateGame = () => {
           placeholder="Enter your nickname"
           onChange={(e) => setNickname(e.target.value)}
           value={nickname}
-          className="nickname-input"
+          className="input"
         />
         {nicknameError && (
-          <div className="nickname-error">Maximum 30 characters (Latin letters only)</div>
+          <div className="input-error">Maximum 30 characters (Latin letters only)</div>
         )}
         <button
           onClick={async () => await handleCreate(selectTime, nickname)}
-          className="create-game-button"
+          className="submit-button"
           disabled={nicknameError || nickname.length < 1}>
           Create game
         </button>

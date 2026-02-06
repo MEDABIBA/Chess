@@ -22,6 +22,26 @@ body {
   align-items: center;
 }
 
+.backgound-image {
+  position: relative;
+  z-index: 2;
+  background-image: url(./assets/chess-pieces-black-5120x2880-16661.png);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.backgound-image::before {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
 .main-content {
   position: relative;
   width: 100%;
@@ -40,14 +60,13 @@ body {
 
 .board {
   width: 100%;
-  aspect-ratio: 1;      /* сохраняет квадрат */
+  aspect-ratio: 1; /* сохраняет квадрат */
   display: flex;
   flex-wrap: wrap;
   position: relative;
-  
-  min-height: 50vh;      /* минимум половина высоты экрана */
-}
 
+  min-height: 50vh; /* минимум половина высоты экрана */
+}
 
 .btn-lg {
   position: absolute;
@@ -245,36 +264,19 @@ body {
   z-index: 2;
 }
 
-.modal-window-page {
-  position: relative;
-  z-index: 2;
-  background-image: url(./assets/chess-pieces-black-5120x2880-16661.png);
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  height: 100%;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
-}
-.modal-window-page::before {
-  z-index: -1;
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-}
-
 .modal-window {
   display: flex;
   flex-direction: column;
   height: 60%;
   width: 420px;
-  max-width: 90vw;
+  min-height: min-content;
+  min-width: min-content;
   max-height: 90vh;
+  max-width: 90vw;
   background-color: #1e1e1e;
   border-radius: 3%;
   padding: 3%;
+  color: #e0e0e0;
   align-items: center;
   text-align: center;
 }
@@ -373,7 +375,7 @@ body {
   background-color: inherit;
 }
 
-.nickname-input {
+.input {
   color: #fff;
   padding: 5px 10px;
   border-radius: 12px;
@@ -381,42 +383,63 @@ body {
   width: 80%;
   margin-bottom: 20px;
 }
-.nickname-error {
+.input-error {
   color: rgb(220, 38, 38);
 }
 
-.create-game-button {
-  background-color: #e6e1d8;
-  color: #1c1c1c;
+.submit-button {
+  background-color: #555;
   margin-top: auto;
   height: 14%;
   width: 80%;
   border-radius: 15px;
   cursor: pointer;
+  color: #e0e0e0;
+  font-weight: 800;
+  font-size: large;
+  margin-bottom: 1rem;
 }
-.create-game-button:hover {
-  background-color: #cfc8ba;
+.submit-button:hover {
+  background-color: #666;
 }
-.create-game-button:disabled {
-  background-color: #555;
-}
-.create-game-button:disabled:hover {
-  background-color: #555;
+.submit-button:disabled {
+  background-color: #999;
 }
 
-.player-card{
-    background-color: #444;
-    color: #f5f5f5;
-    padding: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 10vh;
-    gap: 1vw;
+.player-card {
+  background-color: #444;
+  color: #f5f5f5;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 10vh;
+  gap: 1vw;
 }
 
 .player-name {
-    font-size: 2em;
-    /* margin-bottom: 10px; */
+  font-size: 2em;
+  /* margin-bottom: 10px; */
+}
+
+.auth-title {
+  width: 100%;
+  margin-bottom: 15%;
+}
+.auth-elem {
+  width: 100%;
+  list-style: none;
+}
+.auth-elem-input {
+  width: 100%;
+}
+.auth-button {
+  background: inherit;
+  color: cornflowerblue;
+}
+.auth-button:hover {
+  text-decoration: underline;
+  cursor: pointer;
+  color: royalblue !important;
 }

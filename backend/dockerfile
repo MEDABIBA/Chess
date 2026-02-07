@@ -4,11 +4,14 @@ WORKDIR /app
 
 COPY package.json yarn.lock ./
 
-RUN yarn install
-
 COPY prisma ./prisma
+
+RUN yarn install --frozen-lockfile
+
 RUN npx prisma generate
+
+COPY . .
 
 EXPOSE 3030
 
-CMD sh -c "npx prisma migrate deploy && yarn start"
+CMD ["sh", "-c", "npx prisma migrate deploy && yarn start"]

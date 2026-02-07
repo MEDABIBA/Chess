@@ -18,7 +18,7 @@ export class AuthController {
     private prisma: PrismaService,
   ) {}
 
-  @Post("register")
+  @Post("registration")
   async register(@Body() body: { username: string; password: string }) {
     const existingUser = await this.prisma.user.findUnique({
       where: { username: body.username },

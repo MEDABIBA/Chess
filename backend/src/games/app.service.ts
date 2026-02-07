@@ -3,8 +3,6 @@ import { PrismaService } from "prisma/prisma.service";
 import { CreateGameDto } from "./dto/createGame.dto";
 import { JoinGameDto } from "./dto/joinGame.dto";
 import { MakeMoveDto } from "./dto/makeMove.dto";
-import { SquareData } from "types/board";
-import { Prisma } from "generated/prisma/browser";
 import { boardToFen } from "src/helpers";
 import { Chess } from "chess.js";
 import { validateMove } from "src/helpers/validateMove";

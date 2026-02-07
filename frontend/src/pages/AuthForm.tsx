@@ -4,7 +4,7 @@ import checkValidValue from "../helpers/checkValidNickname";
 
 const AuthForm = () => {
   const { handleAuthSubmit } = useStore();
-  const [auth, setAuth] = useState<"login" | "registration">("login");
+  const [auth, setAuth] = useState<"login" | "registration">("registration");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isError, setIsError] = useState(false);

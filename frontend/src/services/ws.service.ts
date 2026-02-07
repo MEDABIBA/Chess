@@ -14,6 +14,7 @@ class WebSocketService {
       return this.socket;
     }
     if (!this.accessToken) {
+      console.log("Token unregistered");
       throw new Error("Invalid access token");
     }
     this.socket = io("https://localhost:3030", {
@@ -24,7 +25,7 @@ class WebSocketService {
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
     });
-    this.socket.on("connect_error", async (err) => {
+    this.socket.on("connect_error", async (err: Error) => {
       if (err.message.includes("Invalid or expired access token")) {
         const token = await this.refreshAccessToken();
         if (token && this.socket) {
@@ -37,7 +38,7 @@ class WebSocketService {
       console.log("WebSocket connected");
     });
 
-    this.socket.on("disconnect", (reason) => {
+    this.socket.on("disconnect", (reason: Socket.DisconnectReason) => {
       console.log("WebSocket disconnected:", reason);
     });
 

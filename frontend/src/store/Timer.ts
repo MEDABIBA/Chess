@@ -5,7 +5,7 @@ class Timer {
   store: RootStore;
   p2: number | null = null; // in seconds
   p1: number | null = null; // in seconds
-  interval: number = 0;
+  interval: NodeJS.Timeout | number = 0;
   constructor(store: RootStore) {
     makeAutoObservable(this);
     this.store = store;
@@ -13,29 +13,29 @@ class Timer {
 
   @action
   getFirstPlayerTime = () => {
-    if(this.p1 === null) return "00:00";
+    if (this.p1 === null) return "00:00";
     const minutes = Math.floor(this.p1 / 60);
     const seconds = this.p1 - minutes * 60;
     return `${minutes > 9 ? "" : 0}${minutes}:${seconds > 9 ? "" : 0}${seconds}`;
   };
 
   @action
-    setFirstPlayerTime = (time: number) => {
+  setFirstPlayerTime = (time: number) => {
     this.p1 = time;
-  }
+  };
 
   @action
   getSecondPlayerTime = () => {
-    if(this.p2 === null) return "00:00";
+    if (this.p2 === null) return "00:00";
     const minutes = Math.floor(this.p2 / 60);
     const seconds = this.p2 - minutes * 60;
     return `${minutes > 9 ? "" : 0}${minutes}:${seconds > 9 ? "" : 0}${seconds}`;
   };
 
-    @action
-    setSecondPlayerTime = (time: number) => {
+  @action
+  setSecondPlayerTime = (time: number) => {
     this.p2 = time;
-  }
+  };
 
   activateTimer = (player: "p1" | "p2") => {
     return (this.interval = setInterval(() => this.decrementTime(player), 1000));

@@ -1,6 +1,6 @@
 import { Chess } from "chess.js";
-import { Piece, SquareData } from "../../types/board.ts";
-import { getCastlingRights } from "./getCastlingRights.ts";
+import { Piece, SquareData } from "../../types/board";
+import { getCastlingRights } from "./getCastlingRights";
 
 const pieceTypeMap = {
   pawn: "p",

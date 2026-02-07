@@ -1,12 +1,13 @@
 class TokenService {
   constructor() {}
+
   public getAccessToken() {
     return localStorage.getItem("accessToken");
   }
   public isAuthenticated(): boolean {
     return !!this.getAccessToken();
   }
-  setAccessToken(token: string) {
+  public setAccessToken(token: string) {
     localStorage.setItem("accessToken", token);
   }
 }

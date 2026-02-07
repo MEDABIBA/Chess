@@ -7,10 +7,13 @@ export const useStore = () => useContext(StoreContext);
 export function StoreInitializer() {
   const navigate = useNavigate();
   const store = useStore();
-
   useEffect(() => {
-    store.initNavigate(navigate);
-  }, [navigate]);
+    const initApp = async () => {
+      store.initNavigate(navigate);
+      await store.initWs();
+    };
+    initApp();
+  }, [store]);
 
   return null;
 }

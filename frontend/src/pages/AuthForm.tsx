@@ -13,7 +13,7 @@ const AuthForm = () => {
     if (isError) {
       checkValidValue(username) && checkValidValue(password) ? setIsError(false) : setIsError(true);
     }
-  }, [username, password]);
+  }, [isError, username, password]);
 
   return (
     <div className="backgound-image">

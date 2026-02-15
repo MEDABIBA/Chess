@@ -11,9 +11,12 @@ export function StoreInitializer() {
     const initApp = async () => {
       store.initNavigate(navigate);
       await store.initWs();
+      if (!store.isAuthorized) {
+        store.navigate("registration-form");
+      }
     };
     initApp();
-  }, [store]);
+  }, [store, navigate]);
 
   return null;
 }

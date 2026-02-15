@@ -19,7 +19,10 @@ export class AuthController {
   ) {}
 
   @Post("registration")
-  async register(@Body() body: { username: string; password: string }) {
+  async register(
+    @Body() body: { username: string; password: string },
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const existingUser = await this.prisma.user.findUnique({
       where: { username: body.username },
     });
@@ -37,6 +40,10 @@ export class AuthController {
     });
 
     const tokens = await this.authService.generateTokenPair(user.id, user.username);
+    response.cookie("refreshToken", tokens.refreshToken, {
+      httpOnly: true, // JS cant read
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    }); // 7 days
     return {
       message: "User created successfully",
       accessToken: tokens.accessToken,
@@ -66,6 +73,8 @@ export class AuthController {
     response.cookie("refreshToken", tokens.refreshToken, {
       httpOnly: true, // JS cant read
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
+      sameSite: "lax",
     }); // 7 days
     return {
       accessToken: tokens.accessToken,
@@ -74,6 +83,9 @@ export class AuthController {
 
   @Post("refresh")
   async refresh(@Req() requset: Request) {
+    console.log("=== REFRESH ACCESS TOKEN CALLED ===");
+    console.log("All cookies:", requset.cookies);
+
     const refreshToken = requset.cookies["refreshToken"];
     if (!refreshToken) {
       console.log("Refresh token required");

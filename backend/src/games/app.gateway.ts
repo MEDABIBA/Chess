@@ -28,6 +28,7 @@ export class GameGateway {
     @MessageBody() createGameOptions: CreateGameDto,
     @ConnectedSocket() client: Socket,
   ) {
+    console.log("=== CREATE GAME CALLED ===");
     try {
       const userId: number = client.data.user.userId;
       const game = await this.appService.createGame({

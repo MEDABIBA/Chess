@@ -47,10 +47,14 @@ export class RootStore {
     console.log("Nickname is: ", this.nickname);
   }
 
+  get isAuthorized() {
+    return tokenService.isAuthenticated();
+  }
   handleAuthSubmit = async (auth: "login" | "registration", username: string, password: string) => {
     try {
       const res = await fetch(`http://localhost:3030/auth/${auth}`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },

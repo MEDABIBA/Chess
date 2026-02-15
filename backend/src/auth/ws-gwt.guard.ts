@@ -8,6 +8,7 @@ export class WsJwtGuard implements CanActivate {
   constructor(private authService: AuthService) {}
 
   async canActivate(context: ExecutionContext) {
+    console.log("=== GUARD CALLED ===");
     try {
       const client = context.switchToWs().getClient();
       const token = this.extractToken(client);
@@ -23,7 +24,9 @@ export class WsJwtGuard implements CanActivate {
       return true;
     } catch (error) {
       console.log("Unauthorized");
-      throw new WsException("Unauthorized");
+      const client = context.switchToWs().getClient();
+      client.emit("error", { message: "Unauthorized" });
+      return false;
     }
   }
 

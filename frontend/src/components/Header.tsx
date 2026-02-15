@@ -1,6 +1,7 @@
 import blackIcon from "../assets/icon-black.png";
 import { useStore } from "../provider/context";
-const Header = () => {
+import { observer } from "mobx-react-lite";
+const Header = observer(() => {
   const { navigate } = useStore();
   return (
     <section className="header">
@@ -15,5 +16,5 @@ const Header = () => {
       <div>nickname</div>
     </section>
   );
-};
+});
 export default Header;

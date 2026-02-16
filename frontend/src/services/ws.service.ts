@@ -10,9 +10,14 @@ class WebSocketService {
   }
 
   public async connect() {
-    if (this.socket) {
+    if (this.socket?.connected) {
       return this.socket;
     }
+    if (this.socket) {
+      this.socket.removeAllListeners();
+      this.socket = null;
+    }
+
     if (!this.accessToken) {
       console.log("Token unregistered");
       throw new Error("Invalid access token");
@@ -24,6 +29,8 @@ class WebSocketService {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
+      timeout: 5000,
     });
 
     this.socket.on("connect", () => {
@@ -37,6 +44,7 @@ class WebSocketService {
       console.log("error", err);
       if (err.message.includes("Unauthorized")) {
         const token = await this.refreshAccessToken();
+        console.log("refreshed");
         if (token && this.socket) {
           this.socket.connect();
         }

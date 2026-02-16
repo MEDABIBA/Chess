@@ -6,13 +6,14 @@ import NewGame from "./NewGame";
 import { NavigateFunction } from "react-router-dom";
 import { socket } from "../services/ws.service";
 import tokenService from "../services/auth.service";
+import { jwtDecode } from "jwt-decode";
+import { MyJwtPayload } from "../types/types";
 
 export class RootStore {
   board: Board;
   chessMoveValidator: ChessMoveValidator;
   timer: Timer;
   newGame: NewGame;
-  nickname: string | null = null;
 
   @observable navigate!: NavigateFunction;
 
@@ -29,8 +30,6 @@ export class RootStore {
   async initWs() {
     try {
       await socket.connect();
-
-      this.getNickname();
     } catch (error) {
       console.error("Initialization failed:", error);
       this.navigate("registration-form");
@@ -42,9 +41,13 @@ export class RootStore {
     this.navigate = navigate;
   }
 
-  getNickname() {
-    // Take it from access token
-    console.log("Nickname is: ", this.nickname);
+  get getNickname() {
+    if (!socket.accessToken) {
+      console.error("There is no accessToken to exteract nickname!");
+      return null;
+    }
+    const decoded: MyJwtPayload = jwtDecode(socket.accessToken);
+    return decoded.username;
   }
 
   get isAuthorized() {

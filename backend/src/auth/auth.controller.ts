@@ -32,14 +32,18 @@ export class AuthController {
       throw new ConflictException("User already exists");
     }
     const user = await this.prisma.user.create({
+      data: { username: body.username, password: body.password, refreshTokensHash: [] },
+    });
+
+    const tokens = await this.authService.generateTokenPair(user.id, body.username);
+    const refreshHash = this.authService.hashToken(tokens.refreshToken);
+    await this.prisma.user.update({
+      where: { id: user.id },
       data: {
-        username: body.username,
-        password: body.password,
-        refreshTokensHash: [],
+        refreshTokensHash: { push: refreshHash },
       },
     });
 
-    const tokens = await this.authService.generateTokenPair(user.id, user.username);
     response.cookie("refreshToken", tokens.refreshToken, {
       httpOnly: true, // JS cant read
       maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -70,6 +74,13 @@ export class AuthController {
       throw new UnauthorizedException("Invalid password");
     }
     const tokens = await this.authService.generateTokenPair(user.id, user.username);
+    const refreshHash = this.authService.hashToken(tokens.refreshToken);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        refreshTokensHash: { push: refreshHash },
+      },
+    });
     response.cookie("refreshToken", tokens.refreshToken, {
       httpOnly: true, // JS cant read
       maxAge: 7 * 24 * 60 * 60 * 1000,

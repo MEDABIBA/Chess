@@ -2,7 +2,7 @@ import blackIcon from "../assets/icon-black.png";
 import { useStore } from "../provider/context";
 import { observer } from "mobx-react-lite";
 const Header = observer(() => {
-  const { navigate } = useStore();
+  const { navigate, getNickname } = useStore();
   return (
     <section className="header">
       <img
@@ -13,7 +13,7 @@ const Header = observer(() => {
           navigate("home");
         }}
       />
-      <div>nickname</div>
+      <div>Nickname: {getNickname ?? "Not set"}</div>
     </section>
   );
 });

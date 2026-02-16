@@ -1,4 +1,9 @@
+import { JwtPayload } from "jwt-decode";
 import Piece from "../models/Piece";
+
+export interface MyJwtPayload extends JwtPayload {
+  username: string;
+}
 
 export type GameStatus = "playing" | "check" | "checkmate" | "timeout";
 

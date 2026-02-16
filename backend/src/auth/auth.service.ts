@@ -17,15 +17,6 @@ export class AuthService {
       { userId: id, username, type: "access" },
       { expiresIn: "15m" },
     );
-    const refreshHash = this.hashToken(refreshToken);
-    await this.prisma.user.update({
-      where: { id },
-      data: {
-        refreshTokensHash: {
-          push: refreshHash,
-        },
-      },
-    });
 
     return { refreshToken, accessToken };
   }
@@ -81,7 +72,7 @@ export class AuthService {
     }
   }
 
-  private hashToken(refreshToken: string): string {
+  hashToken(refreshToken: string): string {
     return crypto.createHash("sha256").update(refreshToken).digest("hex");
   }
 }

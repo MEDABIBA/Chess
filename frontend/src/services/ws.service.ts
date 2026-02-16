@@ -76,6 +76,31 @@ class WebSocketService {
     });
   }
 
+  public createGame(data: any) {
+    if (!this.socket?.connected) {
+      throw new Error("Socket not connected");
+    }
+    this.socket.emit("create-game", data);
+  }
+  public joinGame(data: any) {
+    if (!this.socket?.connected) {
+      throw new Error("Socket not connected");
+    }
+    this.socket.emit("join-game", data);
+  }
+  public getGame(data: any) {
+    if (!this.socket?.connected) {
+      throw new Error("Socket not connected");
+    }
+    this.socket.emit("get-game", data);
+  }
+  public makeMove(data: any) {
+    if (!this.socket?.connected) {
+      throw new Error("Socket not connected");
+    }
+    this.socket.emit("make-move", data);
+  }
+
   startHeartbeat = () => {};
 
   public isConnected() {

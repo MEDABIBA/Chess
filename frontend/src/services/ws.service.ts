@@ -33,11 +33,31 @@ class WebSocketService {
       timeout: 5000,
     });
 
+    this.handleEvents();
+
+    return this.socket;
+  }
+
+  private handleEvents() {
+    if (!this.socket) return;
+
     this.socket.on("connect", () => {
       console.log("WebSocket connected");
-      this.socket?.emit("create-game", "", (res: any) => {
-        console.log(res);
-      });
+    });
+
+    this.socket?.on("game-created", (res: any) => {
+      console.log(res);
+    });
+    this.socket?.on("guest-joined", (res: any) => {
+      console.log(res);
+    });
+    this.socket?.on("game-state", (res: any) => {
+      // on get-game emit
+      console.log(res);
+    });
+    this.socket?.on("state", (res: any) => {
+      // makeMove logic
+      console.log(res);
     });
 
     this.socket.on("error", async (err) => {
@@ -54,8 +74,6 @@ class WebSocketService {
     this.socket.on("disconnect", (reason: Socket.DisconnectReason) => {
       console.log("WebSocket disconnected:", reason);
     });
-
-    return this.socket;
   }
 
   startHeartbeat = () => {};

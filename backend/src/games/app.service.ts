@@ -25,7 +25,7 @@ export class AppService {
       data: {
         fen: fen,
         currentPlayer: "white",
-        whitePlayerId: whitePlayerId,
+        whitePlayerId: Number(whitePlayerId),
         whiteTimeLeft: whiteTimeLeft,
         blackTimeLeft: blackTimeLeft,
       },
@@ -36,14 +36,19 @@ export class AppService {
     const { blackPlayerId } = dto;
     return await this.prisma.game.update({
       where: { id: id },
-      data: { blackPlayerId: blackPlayerId },
+      data: { blackPlayerId: Number(blackPlayerId) },
     });
   }
 
   async getGame(id: number) {
     const game = await this.prisma.game.findUnique({
-      where: { id: id },
+      where: { id },
+      include: {
+        whitePlayer: { select: { username: true } },
+        blackPlayer: { select: { username: true } },
+      },
     });
+
     if (game) {
       return game;
     } else {

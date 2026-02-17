@@ -36,7 +36,16 @@ export type SquareData = {
   piece: Piece | null;
 };
 
-export interface GameInterface {
+type Nicknames = {
+  whitePlayer: {
+    username: string;
+  };
+  blackPlayer: {
+    username: string;
+  } | null;
+};
+
+interface Game {
   blackPlayerId: string | null;
   blackTimeLeft: number;
   boardState: SquareData[][];
@@ -51,3 +60,5 @@ export interface GameInterface {
   whiteTimeLeft: number;
   winner: string | number;
 }
+
+export type GameInterface = Nicknames & Game;

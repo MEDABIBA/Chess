@@ -28,9 +28,15 @@ const Board = () => {
           </button>
         )}
         <div className="game-container">
-          <PlayerCard playerName={game.blackPlayerId} getPlayerTime={timer.getFirstPlayerTime} />
+          <PlayerCard
+            playerName={game.blackPlayerNickname}
+            getPlayerTime={timer.getFirstPlayerTime}
+          />
           <BoardComponent />
-          <PlayerCard playerName={game.whitePlayerId} getPlayerTime={timer.getSecondPlayerTime} />
+          <PlayerCard
+            playerName={game.whitePlayerNickname}
+            getPlayerTime={timer.getSecondPlayerTime}
+          />
         </div>
       </div>
     </div>

@@ -28,6 +28,9 @@ model User {
   password String
   refreshTokensHash String[] // Refresh tokens hash array
   createdAt DateTime @default(now())
+
+  whiteGames Game[] @relation("whitePlayer")
+  blackGames Game[] @relation("blackPlayer")
 }
 
 model Game {
@@ -37,8 +40,11 @@ model Game {
   currentPlayer PlayerColor @default(white)
   gameStatus gameStatus @default(waiting)
  
-  whitePlayerId String //socketId or temporary ID
-  blackPlayerId String? //socketId or temporary ID
+  whitePlayerId Int //socketId or temporary ID
+  blackPlayerId Int? //socketId or temporary ID
+
+  whitePlayer User  @relation("whitePlayer", fields: [whitePlayerId], references: [id])
+  blackPlayer User? @relation("blackPlayer", fields: [blackPlayerId], references: [id])
 
   whiteTimeLeft Int @default(180)
   blackTimeLeft Int @default(180)
@@ -50,8 +56,4 @@ model Game {
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@index([whitePlayerId])
-  @@index([blackPlayerId])
-  @@index([gameStatus])
 }

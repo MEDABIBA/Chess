@@ -61,6 +61,10 @@ export class RootStore {
   }
   handleAuthSubmit = async (auth: "login" | "registration", username: string, password: string) => {
     try {
+      if (!this.socket) {
+        console.error("Socket unucialized!");
+        return;
+      }
       const res = await fetch(`http://localhost:3030/auth/${auth}`, {
         method: "POST",
         credentials: "include",
@@ -75,6 +79,7 @@ export class RootStore {
         throw new Error(data.message || "Request failed");
       }
       tokenService.setAccessToken(data.accessToken);
+      this.socket.accessToken = data.accessToken;
       console.log("user created!");
       this.navigate("home");
     } catch (error) {

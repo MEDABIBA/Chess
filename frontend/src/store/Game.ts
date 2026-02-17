@@ -8,8 +8,8 @@ import soundMove from "../assets/sounds/move.mp3";
 class Board {
   store: RootStore;
   board: SquareData[] = [];
-  whitePlayerId: string | null = null;
-  blackPlayerId: string | null = null;
+  whitePlayerNickname: string | null = null;
+  blackPlayerNickname: string | null = null;
   currentPlayer: Color = "white";
   gameStatus: GameStatus = "playing";
   activePiece: Piece | null = null;
@@ -59,8 +59,8 @@ class Board {
         this.gameStatus = game.gameStatus;
         this.highlightLastMoves = game.highlightLastMove || {};
         this.lastDoubleStepPawn = game.lastDoubleStepPawn || null;
-        this.whitePlayerId = game.whitePlayerId;
-        this.blackPlayerId = game.blackPlayerId;
+        this.whitePlayerNickname = game.whitePlayer.username;
+        this.blackPlayerNickname = game?.blackPlayer?.username ?? null;
       }
       return game;
     } catch (error: unknown) {

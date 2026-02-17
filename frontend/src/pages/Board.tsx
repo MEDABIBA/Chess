@@ -1,37 +1,36 @@
 import BoardComponent from "../components/Board";
-import Timer from "../components/Timer";
 import { useStore } from "../provider/context";
 import Modal from "../components/modalWindow";
 import { observer } from "mobx-react-lite";
 import PlayerCard from "../components/PlayerCard";
 
 const Board = () => {
-  const { board, timer } = useStore();
-  const { setModalActive, reloadGame, getModalActive } = board;
+  const { game, timer } = useStore();
+  const { setModalActive, reloadGame, getModalActive } = game;
   const isModalActive = getModalActive();
   return (
     <div className="app">
-      {(board.gameStatus === "checkmate" || board.gameStatus === "timeout") &&
+      {(game.gameStatus === "checkmate" || game.gameStatus === "timeout") &&
         isModalActive === true && (
           <Modal
-            winColor={board.currentPlayer === "black" ? "White" : "Black"}
+            winColor={game.currentPlayer === "black" ? "White" : "Black"}
             reloadGame={reloadGame}
             setIsActive={setModalActive}
           />
         )}
       <div className="main-content">
-        {(board.gameStatus === "checkmate" || board.gameStatus === "timeout") && (
+        {(game.gameStatus === "checkmate" || game.gameStatus === "timeout") && (
           <button
             type="button"
-            onClick={() => board.setModalActive(true)}
+            onClick={() => game.setModalActive(true)}
             className="btn btn-primary btn-lg">
             Open modal
           </button>
         )}
-        <div className="board-container">
-          <PlayerCard playerName={board.whitePlayerId} getPlayerTime={timer.getFirstPlayerTime} />
+        <div className="game-container">
+          <PlayerCard playerName={game.blackPlayerId} getPlayerTime={timer.getFirstPlayerTime} />
           <BoardComponent />
-          <PlayerCard playerName={board.blackPlayerId} getPlayerTime={timer.getSecondPlayerTime} />
+          <PlayerCard playerName={game.whitePlayerId} getPlayerTime={timer.getSecondPlayerTime} />
         </div>
       </div>
     </div>

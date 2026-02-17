@@ -47,15 +47,10 @@ class Board {
   };
 
   @action
-  async setBoard(id: string) {
+  async setBoard(game: GameInterface) {
     try {
-      const res = await fetch(`http://localhost:3030/games/${id}`);
-      if (!res.ok) {
-        console.log(`Server error: ${res.status}`);
-        throw new Error(`Server error: ${res.status}`);
-      }
-      const game = (await res.json()) as unknown as GameInterface;
       if (game.boardState) {
+        console.log("game", game);
         this.board = game.boardState.flat();
         this.hydratePieceClassesFromServer(this.board);
         this.store.timer.setFirstPlayerTime(game.whiteTimeLeft * 60); // in seconds
@@ -67,7 +62,6 @@ class Board {
         this.whitePlayerId = game.whitePlayerId;
         this.blackPlayerId = game.blackPlayerId;
       }
-      console.log(game);
       return game;
     } catch (error: unknown) {
       if (error instanceof Error) {

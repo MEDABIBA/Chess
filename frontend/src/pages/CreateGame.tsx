@@ -12,8 +12,8 @@ const CreateGame = () => {
   const [timerValue, setTimerValue] = useState<(typeof timerValues)[number]>("3 min");
   const [activeTimer, setActiveTimer] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [nicknameError, setNicknameError] = useState(false);
-  const [nickname, setNickname] = useState("");
+  // const [nicknameError, setNicknameError] = useState(false);
+  // const [nickname, setNickname] = useState("");
   const selectTime = Number(timerValue.slice(0, 2));
   useEffect(() => {
     if (activeTimer) {
@@ -22,15 +22,10 @@ const CreateGame = () => {
       setTimeout(() => setIsVisible(false), 300);
     }
   }, [activeTimer]);
-  useEffect(() => {
-    if (nickname.length === 0 || /^[A-Za-z0-9 ]{1,30}$/.test(nickname)) setNicknameError(false);
-    else setNicknameError(true);
-  }, [nickname]);
-
-  const handleCreate = async (time: number, nickname: string) => {
-    const gameId = await createNewGame(time, nickname);
-    navigate(`/game/${gameId}`);
-  };
+  // useEffect(() => {
+  //   if (nickname.length === 0 || /^[A-Za-z0-9 ]{1,30}$/.test(nickname)) setNicknameError(false);
+  //   else setNicknameError(true);
+  // }, [nickname]);
   return (
     <div className="backgound-image">
       <div className="modal-window">
@@ -60,20 +55,17 @@ const CreateGame = () => {
             })}
           </ul>
         )}
-        <input
+        {/* <input
           type="text"
           placeholder="Enter your nickname"
           onChange={(e) => setNickname(e.target.value)}
           value={nickname}
           className="input"
-        />
-        {nicknameError && (
+        /> */}
+        {/* {nicknameError && (
           <div className="input-error">Maximum 30 characters (Latin letters only)</div>
-        )}
-        <button
-          onClick={async () => await handleCreate(selectTime, nickname)}
-          className="submit-button"
-          disabled={nicknameError || nickname.length < 1}>
+        )} */}
+        <button onClick={async () => await createNewGame(selectTime)} className="submit-button">
           Create game
         </button>
       </div>

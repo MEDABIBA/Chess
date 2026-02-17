@@ -1,5 +1,5 @@
 import { makeAutoObservable, observable } from "mobx";
-import Board from "./Board";
+import Game from "./Game";
 import ChessMoveValidator from "./ChessMoveValidator";
 import Timer from "./Timer";
 import NewGame from "./NewGame";
@@ -10,26 +10,33 @@ import { jwtDecode } from "jwt-decode";
 import { MyJwtPayload } from "../types/types";
 
 export class RootStore {
-  board: Board;
+  game: Game;
   chessMoveValidator: ChessMoveValidator;
   timer: Timer;
   newGame: NewGame;
+  socket: typeof socket | null;
 
   @observable navigate!: NavigateFunction;
 
   constructor() {
     makeAutoObservable(this);
     this.chessMoveValidator = new ChessMoveValidator(this);
-    this.board = new Board(this);
+    this.game = new Game(this);
     this.timer = new Timer(this);
     this.newGame = new NewGame(this);
+    this.socket = socket;
 
     // this.init();
   }
 
   async initWs() {
     try {
-      await socket.connect();
+      if (!this.socket) {
+        console.error("Socket unucialized!");
+        return;
+      }
+      this.socket.setStore(this); // ← передаём через метод, не импорт
+      await this.socket.connect();
     } catch (error) {
       console.error("Initialization failed:", error);
       this.navigate("registration-form");
@@ -37,16 +44,15 @@ export class RootStore {
   }
 
   initNavigate(navigate: NavigateFunction) {
-    console.log("init navigate", navigate);
     this.navigate = navigate;
   }
 
   get getNickname() {
-    if (!socket.accessToken) {
+    if (!this.socket?.accessToken) {
       console.error("There is no accessToken to exteract nickname!");
       return null;
     }
-    const decoded: MyJwtPayload = jwtDecode(socket.accessToken);
+    const decoded: MyJwtPayload = jwtDecode(this.socket.accessToken);
     return decoded.username;
   }
 
@@ -73,7 +79,7 @@ export class RootStore {
       this.navigate("home");
     } catch (error) {
       if (error instanceof Error) {
-        console.log("Error processed");
+        console.error("Error processed");
         throw new Error(error.message || "Request failed");
       }
     }

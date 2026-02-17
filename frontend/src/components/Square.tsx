@@ -27,7 +27,7 @@ const SquareComponent: React.FC<SquareProps> = ({
 }) => {
   const { row, col } = position;
   const imgRef = useRef<HTMLImageElement | null>(null);
-  const { board } = useStore();
+  const { game } = useStore();
   const {
     makeMove,
     getActivePiece,
@@ -35,7 +35,7 @@ const SquareComponent: React.FC<SquareProps> = ({
     setAvailableMoves,
     setGrab,
     setPendingPromotion,
-  } = board;
+  } = game;
 
   useEffect(() => {
     if (animationTarget) {
@@ -44,10 +44,10 @@ const SquareComponent: React.FC<SquareProps> = ({
       const isMovingPiece = movingFrom?.row === position.row && movingFrom?.col === position.col;
       if (!isMovingPiece) return;
       const fromSquare = document.querySelector(
-        `.square[data-row="${movingFrom.row}"][data-col="${movingFrom.col}"]`
+        `.square[data-row="${movingFrom.row}"][data-col="${movingFrom.col}"]`,
       );
       const toSquare = document.querySelector(
-        `.square[data-row="${movingTo.row}"][data-col="${movingTo.col}"]`
+        `.square[data-row="${movingTo.row}"][data-col="${movingTo.col}"]`,
       );
       if (!fromSquare || !toSquare || !imgRef.current) return;
       const fromRect = fromSquare.getBoundingClientRect();
@@ -62,8 +62,8 @@ const SquareComponent: React.FC<SquareProps> = ({
     console.log("row", row, ", col", col);
     const active = getActivePiece();
     if (
-      board.pendingPromotionValue &&
-      (!piece || piece.color === board.pendingPromotionValue.piece.color)
+      game.pendingPromotionValue &&
+      (!piece || piece.color === game.pendingPromotionValue.piece.color)
     ) {
       setPendingPromotion(null);
     }
@@ -77,7 +77,7 @@ const SquareComponent: React.FC<SquareProps> = ({
     }
     if (!piece || !imgRef.current) return;
 
-    if (piece.color !== board.currentPlayer) return;
+    if (piece.color !== game.currentPlayer) return;
 
     e.preventDefault();
     setAvailableMoves([piece, position]);
@@ -136,8 +136,8 @@ const SquareComponent: React.FC<SquareProps> = ({
   const handleTouchStart = (e: React.TouchEvent<HTMLImageElement>) => {
     const active = getActivePiece();
     if (
-      board.pendingPromotionValue &&
-      (!piece || piece.color === board.pendingPromotionValue.piece.color)
+      game.pendingPromotionValue &&
+      (!piece || piece.color === game.pendingPromotionValue.piece.color)
     ) {
       setPendingPromotion(null);
     }
@@ -145,7 +145,7 @@ const SquareComponent: React.FC<SquareProps> = ({
       if (!e.changedTouches[0]?.clientX || !e.changedTouches[0]?.clientY) return null;
       const dropTarget = document.elementFromPoint(
         e.changedTouches[0]?.clientX,
-        e.changedTouches[0]?.clientY
+        e.changedTouches[0]?.clientY,
       ) as HTMLElement | null;
       const square = dropTarget?.closest(".square") as HTMLElement | null;
       if (!square) return;
@@ -155,7 +155,7 @@ const SquareComponent: React.FC<SquareProps> = ({
       if (!piece) return;
     }
     if (!piece || !imgRef.current) return;
-    if (piece.color !== board.currentPlayer) return;
+    if (piece.color !== game.currentPlayer) return;
 
     setAvailableMoves([piece, position]);
     setActivePiece(piece);

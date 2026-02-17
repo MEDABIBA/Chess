@@ -8,16 +8,15 @@ import { useEffect, useState } from "react";
 
 const Board = observer(() => {
   const { id } = useParams();
-  const { board, chessMoveValidator } = useStore();
-  const { availableMovesSet, pendingPromotionValue } = board;
+  const { socket, game, chessMoveValidator } = useStore();
+  const { availableMovesSet, pendingPromotionValue } = game;
   const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack("white");
   const blackKingUnerAttack = chessMoveValidator.isKingUnderAttack("black");
-  const grab = board.getGrab();
-  console.log(id);
+  const grab = game.getGrab();
   useEffect(() => {
     if (!id) return;
-    board.setBoard(id);
-  }, [id]);
+    socket?.getGame({ id: Number(id) });
+  }, [id, socket, socket?.isConnected]);
   return (
     <>
       <div className="board">
@@ -38,24 +37,24 @@ const Board = observer(() => {
             position={pendingPromotionValue.position}
           />
         )}
-        {board.board.map(({ color, position, piece }) => {
+        {game.board.map(({ color, position, piece }) => {
           const grabbed = grab?.col === position.col && grab.row === position.row;
           const isLastMove =
-            "from" in board.highlightLastMoves &&
-            "to" in board.highlightLastMoves &&
-            ((board.highlightLastMoves?.from.col === position.col &&
-              board.highlightLastMoves?.from.row === position.row) ||
-              (board.highlightLastMoves?.to.col === position.col &&
-                board.highlightLastMoves?.to.row === position.row))
+            "from" in game.highlightLastMoves &&
+            "to" in game.highlightLastMoves &&
+            ((game.highlightLastMoves?.from.col === position.col &&
+              game.highlightLastMoves?.from.row === position.row) ||
+              (game.highlightLastMoves?.to.col === position.col &&
+                game.highlightLastMoves?.to.row === position.row))
               ? "last-move"
               : "";
           const isActiveField =
             availableMovesSet.has(`${position.row}-${position.col}`) &&
-            board.board.find((el) => el.position === position)?.piece !== null
+            game.board.find((el) => el.position === position)?.piece !== null
               ? "square-attack"
               : availableMovesSet.has(`${position.row}-${position.col}`)
-              ? "square-active"
-              : "";
+                ? "square-active"
+                : "";
           return (
             <Square
               key={`${position.row}-${position.col}`}
@@ -68,15 +67,15 @@ const Board = observer(() => {
                 piece?.color === "white" && piece.pieceType === "king"
                   ? whiteKingUnerAttack
                   : piece?.color === "black" && piece.pieceType === "king"
-                  ? blackKingUnerAttack
-                  : false
+                    ? blackKingUnerAttack
+                    : false
               }
               grabbed={grabbed}
               animationTarget={
-                board.animateMove &&
-                board.animateMove.from.col === position.col &&
-                board.animateMove.from.row === position.row
-                  ? board.animateMove
+                game.animateMove &&
+                game.animateMove.from.col === position.col &&
+                game.animateMove.from.row === position.row
+                  ? game.animateMove
                   : null
               }
             />

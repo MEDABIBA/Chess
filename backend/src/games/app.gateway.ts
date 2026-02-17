@@ -37,7 +37,8 @@ export class GameGateway {
       });
 
       client.join(`game/${game.id}`);
-      client.emit("game-created", { id: game.id });
+      this.server.emit("game-created", { id: game.id });
+      client.emit("game-created-you", { id: game.id });
     } catch (err) {
       client.emit("error", { message: err.message });
     }

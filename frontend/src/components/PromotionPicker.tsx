@@ -8,7 +8,7 @@ type Promotion = {
   position: Position;
 };
 const PromotionPiece = ({ oldPiece, piece }: { oldPiece: Piece; piece: Piece }) => {
-  const { board } = useStore();
+  const { game } = useStore();
   return (
     <img
       className={`piece-img`}
@@ -18,7 +18,7 @@ const PromotionPiece = ({ oldPiece, piece }: { oldPiece: Piece; piece: Piece }) 
       onPointerDown={(e) => {
         e.preventDefault();
         if (e.pointerType === "touch" || e.pointerType === "mouse") {
-          board.promotePiece(oldPiece, piece);
+          game.promotePiece(oldPiece, piece);
         }
       }}
       style={{ cursor: "pointer", userSelect: "none" }}

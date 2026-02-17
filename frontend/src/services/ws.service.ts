@@ -1,12 +1,22 @@
 import { io, Socket } from "socket.io-client";
 import apiService from "./api.service";
 import tokenService from "./auth.service";
+import { RootStore } from "../store/RootStore";
+import { GameInterface, SquareData } from "../types/types";
+import { makeAutoObservable } from "mobx";
 
 class WebSocketService {
+  store: RootStore | null = null;
   socket: Socket | null = null;
+  isConnected: boolean = false;
   accessToken: string | null = null;
   constructor() {
+    makeAutoObservable(this);
     this.accessToken = tokenService.getAccessToken();
+  }
+
+  public setStore(store: RootStore) {
+    this.store = store;
   }
 
   public async connect() {
@@ -42,17 +52,22 @@ class WebSocketService {
     if (!this.socket) return;
 
     this.socket.on("connect", () => {
+      this.isConnected = true;
       console.log("WebSocket connected");
     });
 
-    this.socket?.on("game-created", (res: any) => {
-      console.log(res);
+    this.socket?.on("game-created", (res: { id: number }) => {
+      console.log("game-created", res);
+    });
+    this.socket?.on("game-created-you", (res: { id: number }) => {
+      console.log("game-created-you", res);
+      this.store?.navigate(`game/${res.id}`);
     });
     this.socket?.on("guest-joined", (res: any) => {
       console.log(res);
     });
-    this.socket?.on("game-state", (res: any) => {
-      // on get-game emit
+    this.socket?.on("game-state", (res: GameInterface) => {
+      this.store?.game.setBoard(res);
       console.log(res);
     });
     this.socket?.on("state", (res: any) => {
@@ -61,6 +76,7 @@ class WebSocketService {
     });
 
     this.socket.on("error", async (err) => {
+      this.isConnected = false;
       console.log("error", err);
       if (err.message.includes("Unauthorized")) {
         const token = await this.refreshAccessToken();
@@ -72,45 +88,39 @@ class WebSocketService {
     });
 
     this.socket.on("disconnect", (reason: Socket.DisconnectReason) => {
+      this.isConnected = false;
       console.log("WebSocket disconnected:", reason);
     });
   }
 
   public createGame(data: any) {
-    if (!this.socket?.connected) {
-      throw new Error("Socket not connected");
-    }
+    if (!this.socket) throw new Error("Socket not initialized");
+    if (!this.socket?.connected) return;
     this.socket.emit("create-game", data);
   }
   public joinGame(data: any) {
-    if (!this.socket?.connected) {
-      throw new Error("Socket not connected");
-    }
+    if (!this.socket) throw new Error("Socket not initialized");
+    if (!this.socket?.connected) return;
     this.socket.emit("join-game", data);
   }
-  public getGame(data: any) {
-    if (!this.socket?.connected) {
-      throw new Error("Socket not connected");
-    }
-    this.socket.emit("get-game", data);
+  public getGame(data: { id: number }) {
+    if (!this.socket) throw new Error("Socket not initialized");
+    if (!this.socket?.connected) return;
+    this.socket?.emit("get-game", data);
   }
   public makeMove(data: any) {
-    if (!this.socket?.connected) {
-      throw new Error("Socket not connected");
-    }
+    if (!this.socket) throw new Error("Socket not initialized");
+    if (!this.socket?.connected) return;
     this.socket.emit("make-move", data);
   }
 
   startHeartbeat = () => {};
 
-  public isConnected() {
-    return this.socket?.connected ?? false;
-  }
-
   public async refreshAccessToken() {
     const token = await apiService.refreshAccessToken();
 
     tokenService.setAccessToken(token);
+    this.accessToken = token;
     return token;
   }
 }

@@ -8,8 +8,10 @@ import { socket } from "../services/ws.service";
 import tokenService from "../services/auth.service";
 import { jwtDecode } from "jwt-decode";
 import { MyJwtPayload } from "../types/types";
+import Games from "./Games";
 
 export class RootStore {
+  games: Games;
   game: Game;
   chessMoveValidator: ChessMoveValidator;
   timer: Timer;
@@ -21,6 +23,7 @@ export class RootStore {
   constructor() {
     makeAutoObservable(this);
     this.chessMoveValidator = new ChessMoveValidator(this);
+    this.games = new Games(this);
     this.game = new Game(this);
     this.timer = new Timer(this);
     this.newGame = new NewGame(this);

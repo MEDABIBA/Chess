@@ -2,10 +2,8 @@ import { useEffect, useState } from "react";
 import arrowUp from "../assets/up-arrow.png";
 import downArrow from "../assets/down-arrow.png";
 import { useStore } from "../provider/context";
-import { useNavigate } from "react-router-dom";
 
 const CreateGame = () => {
-  const navigate = useNavigate();
   const { newGame } = useStore();
   const { createNewGame } = newGame;
   const timerValues = ["3 min", "5 min", "10 min", "15 min"] as const;
@@ -27,49 +25,51 @@ const CreateGame = () => {
   //   else setNicknameError(true);
   // }, [nickname]);
   return (
-    <div className="backgound-image">
-      <div className="modal-window">
-        <button
-          className="timer-button"
-          onClick={() => {
-            activeTimer ? setActiveTimer(false) : setActiveTimer(true);
-          }}>
-          {timerValue} (Rapid){" "}
-          <img
-            src={activeTimer ? arrowUp : downArrow}
-            alt="arrow"
-            style={{ width: "16px", height: "16px", marginLeft: "5px" }}
-          />
-        </button>
-        {isVisible && (
-          <ul className={`timer-list ${activeTimer ? "timer-list-active" : "timer-list-hidden"}`}>
-            {timerValues.map((el, i) => {
-              return (
-                <li
-                  key={i}
-                  className={`timer-element ${el === timerValue ? "timer-element-active" : null}`}
-                  onClick={() => setTimerValue(el)}>
-                  {el}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        {/* <input
+    <>
+      <div className="backgound-image">
+        <div className="modal-window">
+          <button
+            className="timer-button"
+            onClick={() => {
+              activeTimer ? setActiveTimer(false) : setActiveTimer(true);
+            }}>
+            {timerValue} (Rapid){" "}
+            <img
+              src={activeTimer ? arrowUp : downArrow}
+              alt="arrow"
+              style={{ width: "16px", height: "16px", marginLeft: "5px" }}
+            />
+          </button>
+          {isVisible && (
+            <ul className={`timer-list ${activeTimer ? "timer-list-active" : "timer-list-hidden"}`}>
+              {timerValues.map((el, i) => {
+                return (
+                  <li
+                    key={i}
+                    className={`timer-element ${el === timerValue ? "timer-element-active" : null}`}
+                    onClick={() => setTimerValue(el)}>
+                    {el}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          {/* <input
           type="text"
           placeholder="Enter your nickname"
           onChange={(e) => setNickname(e.target.value)}
           value={nickname}
           className="input"
         /> */}
-        {/* {nicknameError && (
+          {/* {nicknameError && (
           <div className="input-error">Maximum 30 characters (Latin letters only)</div>
         )} */}
-        <button onClick={async () => await createNewGame(selectTime)} className="submit-button">
-          Create game
-        </button>
+          <button onClick={async () => await createNewGame(selectTime)} className="submit-button">
+            Create game
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 export default CreateGame;

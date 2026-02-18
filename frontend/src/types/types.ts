@@ -52,6 +52,7 @@ interface Game {
   createdAt: string;
   currentPlayer: "white" | "black";
   gameStatus: GameStatus;
+  initialTime: number;
   highlightLastMove: { from: Position; to: Position } | null;
   id: number;
   lastDoubleStepPawn: null | { color: Color; position: Position };

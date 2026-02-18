@@ -18,8 +18,7 @@ class NewGame {
       this.store.socket?.createGame({
         boardState: board,
         whitePlayerId: nickname,
-        whiteTimeLeft: time,
-        blackTimeLeft: time,
+        initialTime: time,
       });
     } catch (error: unknown) {
       if (error instanceof Error) {

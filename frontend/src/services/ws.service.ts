@@ -2,7 +2,7 @@ import { io, Socket } from "socket.io-client";
 import apiService from "./api.service";
 import tokenService from "./auth.service";
 import { RootStore } from "../store/RootStore";
-import { GameInterface, SquareData } from "../types/types";
+import { GameInterface } from "../types/types";
 import { makeAutoObservable } from "mobx";
 
 class WebSocketService {
@@ -33,7 +33,7 @@ class WebSocketService {
       throw new Error("Invalid access token");
     }
     this.socket = io("http://localhost:3030", {
-      query: {
+      auth: {
         token: this.accessToken,
       },
       reconnection: true,
@@ -56,8 +56,9 @@ class WebSocketService {
       console.log("WebSocket connected");
     });
 
-    this.socket?.on("game-created", (res: { id: number }) => {
-      console.log("game-created", res);
+    this.socket?.on("game-created", (game: GameInterface) => {
+      console.log("game-created, game id: ", game.id);
+      this.store?.games.addGame(game);
     });
     this.socket?.on("game-created-you", (res: { id: number }) => {
       console.log("game-created-you", res);
@@ -65,6 +66,10 @@ class WebSocketService {
     });
     this.socket?.on("guest-joined", (res: any) => {
       console.log(res);
+    });
+    this.socket?.on("get-games", (games: GameInterface[]) => {
+      this.store?.games.setAllGames(games);
+      console.log("get-games", games);
     });
     this.socket?.on("game-state", (res: GameInterface) => {
       this.store?.game.setBoard(res);
@@ -82,7 +87,7 @@ class WebSocketService {
         const token = await this.refreshAccessToken();
         console.log("refreshed");
         if (token && this.socket) {
-          this.socket.connect();
+          this.socket.auth = { token };
         }
       }
     });
@@ -102,6 +107,11 @@ class WebSocketService {
     if (!this.socket) throw new Error("Socket not initialized");
     if (!this.socket?.connected) return;
     this.socket.emit("join-game", data);
+  }
+  public getAllGames() {
+    if (!this.socket) throw new Error("Socket not initialized");
+    if (!this.socket?.connected) return;
+    this.socket?.emit("get-games");
   }
   public getGame(data: { id: number }) {
     if (!this.socket) throw new Error("Socket not initialized");

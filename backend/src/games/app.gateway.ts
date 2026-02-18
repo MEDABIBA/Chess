@@ -35,9 +35,9 @@ export class GameGateway {
         ...createGameOptions,
         whitePlayerId: String(userId),
       });
-
+      const gameWithNicknames = await this.appService.getGame(game.id);
       client.join(`game/${game.id}`);
-      this.server.emit("game-created", { id: game.id });
+      this.server.emit("game-created", gameWithNicknames);
       client.emit("game-created-you", { id: game.id });
     } catch (err) {
       client.emit("error", { message: err.message });
@@ -57,6 +57,20 @@ export class GameGateway {
     }
   }
 
+  @SubscribeMessage("get-games")
+  async getGames(@ConnectedSocket() client: Socket) {
+    try {
+      const games = await this.appService.getGames();
+      const gamesWithBoard = games.map((game) => ({
+        ...game,
+        boardState: fenToBoard(game.fen),
+      }));
+      client.emit("get-games", gamesWithBoard);
+    } catch (err) {
+      client.emit("error", { message: err.message });
+    }
+  }
+
   @SubscribeMessage("get-game")
   async getGame(@MessageBody() dto: { id: number }, @ConnectedSocket() client: Socket) {
     try {
@@ -68,6 +82,7 @@ export class GameGateway {
       client.emit("error", { message: err.message });
     }
   }
+
   @SubscribeMessage("make-move")
   async makeMove(
     @MessageBody() dto: { id: number; moveData: MakeMoveDto },

@@ -5,7 +5,7 @@ import { RootStore } from "./RootStore";
 import { simulateValidMove } from "../helpers/simulateMove";
 import soundMove from "../assets/sounds/move.mp3";
 
-class Board {
+class Game {
   store: RootStore;
   board: SquareData[] = [];
   whitePlayerNickname: string | null = null;
@@ -356,4 +356,4 @@ class Board {
     this.store.timer.resetTimer(1800);
   };
 }
-export default Board;
+export default Game;

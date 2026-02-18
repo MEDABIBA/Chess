@@ -25,7 +25,7 @@ body {
 
 .backgound-image {
   position: relative;
-  z-index: 2;
+  z-index: 0;
   background-image: url(./assets/chess-pieces-black-5120x2880-16661.png);
   background-size: cover;
   background-position: center;
@@ -44,8 +44,11 @@ body {
 }
 
 .header {
+  z-index: 1;
   color: #f5f5f5;
   display: flex;
+  position: absolute;
+  top: 0;
   width: 100%;
   max-height: 5rem;
   padding: 1.5rem 4rem;
@@ -58,6 +61,21 @@ body {
 }
 .header-icon:hover {
   cursor: pointer;
+}
+@media (max-width: 768px) {
+  .header {
+    padding: 18px 36px;
+  }
+  .nickname {
+    display: none;
+  }
+  .home {
+    width: 85% !important;
+  }
+  .home-buttons {
+    flex-direction: column;
+    gap: 15px;
+  }
 }
 
 .main-content {
@@ -461,4 +479,61 @@ body {
   text-decoration: underline;
   cursor: pointer;
   color: royalblue !important;
+}
+.home {
+  width: 60%;
+  overflow: auto;
+}
+.home-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.home-input-wrapper {
+  display: flex;
+}
+.home-button {
+  text-decoration: none;
+  color: inherit;
+  padding: 10px 15px;
+  color: #fff;
+  background: #444;
+  border-radius: 32px;
+  transition: all 0.2s;
+  max-width: max-content;
+}
+.home-button:hover {
+  color: #fff !important;
+  text-decoration: none;
+  color: inherit;
+  background-color: #777;
+}
+.home-table {
+  color: #fff;
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 462px;
+  background: #333;
+}
+td,
+th {
+  border: 1px solid #999;
+  text-align: left;
+  padding: 8px;
+}
+.connect-game-btn {
+  width: 100%;
+  height: 100%;
+  padding: 5px 2px;
+  border-radius: 32px;
+  color: #fff;
+  background: #444;
+  transition: all 0.2s;
+}
+.connect-game-btn:hover {
+  cursor: pointer;
+  background: #777;
+}
+
+@media (max-width: 768px) {
 }

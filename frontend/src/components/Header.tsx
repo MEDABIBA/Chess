@@ -13,7 +13,7 @@ const Header = observer(() => {
           navigate("home");
         }}
       />
-      <div>Nickname: {getNickname ?? "Not set"}</div>
+      <div className="nickname">Nickname: {getNickname ?? "Not set"}</div>
     </section>
   );
 });

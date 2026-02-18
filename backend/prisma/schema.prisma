@@ -39,6 +39,7 @@ model Game {
   fen String
   currentPlayer PlayerColor @default(white)
   gameStatus gameStatus @default(waiting)
+  initialTime Int
  
   whitePlayerId Int //socketId or temporary ID
   blackPlayerId Int? //socketId or temporary ID

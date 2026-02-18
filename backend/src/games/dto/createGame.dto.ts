@@ -62,9 +62,5 @@ export class CreateGameDto {
 
   @IsInt()
   @Min(0)
-  whiteTimeLeft: number;
-
-  @IsInt()
-  @Min(0)
-  blackTimeLeft: number;
+  initialTime: number;
 }

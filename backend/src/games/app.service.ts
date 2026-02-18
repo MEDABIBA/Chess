@@ -12,7 +12,7 @@ export class AppService {
   constructor(private prisma: PrismaService) {}
 
   async createGame(dto: CreateGameDto) {
-    const { boardState, whitePlayerId, whiteTimeLeft, blackTimeLeft } = dto;
+    const { boardState, whitePlayerId, initialTime } = dto;
     const fen = boardToFen(
       boardState.map((square) => ({
         color: square.color,
@@ -26,8 +26,9 @@ export class AppService {
         fen: fen,
         currentPlayer: "white",
         whitePlayerId: Number(whitePlayerId),
-        whiteTimeLeft: whiteTimeLeft,
-        blackTimeLeft: blackTimeLeft,
+        initialTime,
+        whiteTimeLeft: initialTime,
+        blackTimeLeft: initialTime,
       },
     });
   }
@@ -38,6 +39,20 @@ export class AppService {
       where: { id: id },
       data: { blackPlayerId: Number(blackPlayerId) },
     });
+  }
+
+  async getGames() {
+    const games = await this.prisma.game.findMany({
+      include: {
+        whitePlayer: { select: { username: true } },
+        blackPlayer: { select: { username: true } },
+      },
+    });
+    if (!games.length) {
+      console.log("Games not found");
+      throw new NotFoundException("Games not found");
+    }
+    return games;
   }
 
   async getGame(id: number) {

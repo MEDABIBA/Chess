@@ -12,7 +12,6 @@ import Games from "./Games";
 
 export class RootStore {
   games: Games;
-  game: Game;
   chessMoveValidator: ChessMoveValidator;
   timer: Timer;
   newGame: NewGame;
@@ -24,7 +23,6 @@ export class RootStore {
     makeAutoObservable(this);
     this.chessMoveValidator = new ChessMoveValidator(this);
     this.games = new Games(this);
-    this.game = new Game(this);
     this.timer = new Timer(this);
     this.newGame = new NewGame(this);
     this.socket = socket;

@@ -12,6 +12,7 @@ class Game {
   blackPlayerNickname: string | null = null;
   currentPlayer: Color = "white";
   gameStatus: GameStatus = "playing";
+  inviteCode: string | null = null;
   activePiece: Piece | null = null;
   highlightLastMoves: { from: Position; to: Position } | {} = {};
   availableMoves: Position[] = [];
@@ -21,10 +22,13 @@ class Game {
   lastDoubleStepPawn: null | { color: Color; position: Position } = null;
   pendingPromotion: { piece: Piece; position: Position; color: Color } | null = null;
 
-  constructor(store: RootStore) {
+  constructor(store: RootStore, game?: GameInterface) {
     this.store = store;
     makeAutoObservable(this);
     this.initializeBoard();
+    if (game) {
+      this.setBoard(game);
+    }
   }
 
   @action
@@ -57,6 +61,7 @@ class Game {
         this.store.timer.setSecondPlayerTime(game.blackTimeLeft * 60); // in seconds
         this.currentPlayer = game.currentPlayer;
         this.gameStatus = game.gameStatus;
+        this.inviteCode = game.inviteCode;
         this.highlightLastMoves = game.highlightLastMove || {};
         this.lastDoubleStepPawn = game.lastDoubleStepPawn || null;
         this.whitePlayerNickname = game.whitePlayer.username;

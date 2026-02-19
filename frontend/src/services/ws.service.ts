@@ -79,7 +79,7 @@ class WebSocketService {
       console.log("get-games", games);
     });
     this.socket?.on("game-state", (res: GameInterface) => {
-      this.store?.game.setBoard(res);
+      this.store?.games?.currentGame?.setBoard(res);
       console.log(res);
     });
     this.socket?.on("state", (res: any) => {

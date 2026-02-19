@@ -27,7 +27,8 @@ const SquareComponent: React.FC<SquareProps> = ({
 }) => {
   const { row, col } = position;
   const imgRef = useRef<HTMLImageElement | null>(null);
-  const { game } = useStore();
+  const { games } = useStore();
+  const { currentGame: game } = games;
   const {
     makeMove,
     getActivePiece,

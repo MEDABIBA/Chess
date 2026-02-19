@@ -5,36 +5,36 @@ import { observer } from "mobx-react-lite";
 import PlayerCard from "../components/PlayerCard";
 
 const Board = () => {
-  const { game, timer } = useStore();
-  const { setModalActive, reloadGame, getModalActive } = game;
-  const isModalActive = getModalActive();
+  const { games, timer } = useStore();
+  const { currentGame } = games;
+  const isModalActive = currentGame.getModalActive();
   return (
     <div className="app">
-      {(game.gameStatus === "checkmate" || game.gameStatus === "timeout") &&
+      {(currentGame.gameStatus === "checkmate" || currentGame.gameStatus === "timeout") &&
         isModalActive === true && (
           <Modal
-            winColor={game.currentPlayer === "black" ? "White" : "Black"}
-            reloadGame={reloadGame}
-            setIsActive={setModalActive}
+            winColor={currentGame.currentPlayer === "black" ? "White" : "Black"}
+            reloadGame={currentGame.reloadGame}
+            setIsActive={currentGame.setModalActive}
           />
         )}
       <div className="main-content">
-        {(game.gameStatus === "checkmate" || game.gameStatus === "timeout") && (
+        {(currentGame.gameStatus === "checkmate" || currentGame.gameStatus === "timeout") && (
           <button
             type="button"
-            onClick={() => game.setModalActive(true)}
+            onClick={() => currentGame.setModalActive(true)}
             className="btn btn-primary btn-lg">
             Open modal
           </button>
         )}
         <div className="game-container">
           <PlayerCard
-            playerName={game.blackPlayerNickname}
+            playerName={currentGame.blackPlayerNickname}
             getPlayerTime={timer.getFirstPlayerTime}
           />
           <BoardComponent />
           <PlayerCard
-            playerName={game.whitePlayerNickname}
+            playerName={currentGame.whitePlayerNickname}
             getPlayerTime={timer.getSecondPlayerTime}
           />
         </div>

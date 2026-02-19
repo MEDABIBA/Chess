@@ -3,16 +3,16 @@ import { useStore } from "../provider/context";
 import PromotionPicker from "./PromotionPicker";
 import Square from "./Square";
 import { observer } from "mobx-react-lite";
-import { GameInterface } from "../types/types";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const Board = observer(() => {
   const { id } = useParams();
-  const { socket, game, chessMoveValidator } = useStore();
+  const { socket, games, chessMoveValidator } = useStore();
+  const { currentGame: game } = games;
   const { availableMovesSet, pendingPromotionValue } = game;
   const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack("white");
   const blackKingUnerAttack = chessMoveValidator.isKingUnderAttack("black");
-  const grab = game.getGrab();
+  const grab = games.currentGame.getGrab();
   useEffect(() => {
     if (!id) return;
     socket?.getGame({ id: Number(id) });

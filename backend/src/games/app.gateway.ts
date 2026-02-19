@@ -14,6 +14,7 @@ import { Server, Socket } from "socket.io";
 import { fenToBoard } from "src/helpers";
 import { UseGuards } from "@nestjs/common";
 import { WsJwtGuard } from "src/auth/ws-gwt.guard";
+import { joinGameByCodeDto } from "./dto/joinGameByCode";
 
 @WebSocketGateway({ cors: true })
 @UseGuards(WsJwtGuard)
@@ -47,11 +48,26 @@ export class GameGateway {
   @SubscribeMessage("join-game")
   async joinGame(@MessageBody() dto: JoinGameDto, @ConnectedSocket() client: Socket) {
     try {
-      const game = await this.appService.joinGame(dto.id, dto);
+      console.log("=== JOIN GAME CALLED ===");
+      const game = await this.appService.joinGame(dto);
       const boardState = fenToBoard(game.fen);
 
-      client.join(`game/${dto.id}`);
-      this.server.to(`game/${dto.id}`).emit("guest-joined", { ...game, boardState });
+      client.join(`game/${game.id}`);
+      this.server.emit("guest-joined", { ...game, boardState });
+    } catch (err) {
+      client.emit("error", { message: err.message });
+    }
+  }
+  @SubscribeMessage("join-game-code")
+  async joinGameByCode(@MessageBody() dto: joinGameByCodeDto, @ConnectedSocket() client: Socket) {
+    try {
+      console.log("=== JOIN GAME By CODE CALLED ===");
+      const game = await this.appService.joinGameByCode(dto);
+      const boardState = fenToBoard(game.fen);
+
+      client.join(`game/${game.id}`);
+      client.emit('game-joined-by-code-you',{ id: game.id })
+      this.server.emit("guest-joined", { ...game, boardState });
     } catch (err) {
       client.emit("error", { message: err.message });
     }

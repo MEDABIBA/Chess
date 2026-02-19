@@ -67,8 +67,8 @@ export class AuthService {
       );
       return newAccessToken;
     } catch (err) {
-      console.log("Invalid token");
-      throw new UnauthorizedException("Invalid token");
+      console.log("Invalid token or not found");
+      throw new UnauthorizedException("Invalid token or not found");
     }
   }
 

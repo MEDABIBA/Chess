@@ -3,7 +3,7 @@ import apiService from "./api.service";
 import tokenService from "./auth.service";
 import { RootStore } from "../store/RootStore";
 import { GameInterface } from "../types/types";
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 
 class WebSocketService {
   store: RootStore | null = null;
@@ -52,7 +52,9 @@ class WebSocketService {
     if (!this.socket) return;
 
     this.socket.on("connect", () => {
-      this.isConnected = true;
+      runInAction(() => {
+        this.isConnected = true;
+      });
       console.log("WebSocket connected");
     });
 
@@ -64,8 +66,13 @@ class WebSocketService {
       console.log("game-created-you", res);
       this.store?.navigate(`game/${res.id}`);
     });
-    this.socket?.on("guest-joined", (res: any) => {
-      console.log(res);
+    this.socket?.on("guest-joined", (game: GameInterface) => {
+      console.log("guest-joined", game);
+      this.store?.games.updateGame(game);
+    });
+    this.socket?.on("game-joined-by-code-you", (res: { id: number }) => {
+      console.log("game-created-you", res);
+      this.store?.navigate(`game/${res.id}`);
     });
     this.socket?.on("get-games", (games: GameInterface[]) => {
       this.store?.games.setAllGames(games);
@@ -81,19 +88,24 @@ class WebSocketService {
     });
 
     this.socket.on("error", async (err) => {
-      this.isConnected = false;
+      runInAction(() => {
+        this.isConnected = false;
+      });
       console.log("error", err);
       if (err.message.includes("Unauthorized")) {
         const token = await this.refreshAccessToken();
         console.log("refreshed");
         if (token && this.socket) {
           this.socket.auth = { token };
+          this.socket.connect();
         }
       }
     });
 
     this.socket.on("disconnect", (reason: Socket.DisconnectReason) => {
-      this.isConnected = false;
+      runInAction(() => {
+        this.isConnected = false;
+      });
       console.log("WebSocket disconnected:", reason);
     });
   }
@@ -107,6 +119,11 @@ class WebSocketService {
     if (!this.socket) throw new Error("Socket not initialized");
     if (!this.socket?.connected) return;
     this.socket.emit("join-game", data);
+  }
+  public joinGameByCode(data: any) {
+    if (!this.socket) throw new Error("Socket not initialized");
+    if (!this.socket?.connected) return;
+    this.socket.emit("join-game-code", data);
   }
   public getAllGames() {
     if (!this.socket) throw new Error("Socket not initialized");
@@ -127,11 +144,20 @@ class WebSocketService {
   startHeartbeat = () => {};
 
   public async refreshAccessToken() {
-    const token = await apiService.refreshAccessToken();
+    try {
+      const token = await apiService.refreshAccessToken();
 
-    tokenService.setAccessToken(token);
-    this.accessToken = token;
-    return token;
+      tokenService.setAccessToken(token);
+      this.accessToken = token;
+      return token;
+    } catch (err) {
+      if (err instanceof Error) {
+        if (err.message.includes("Invalid token")) {
+          console.error("Refresh token not found");
+          this.store?.navigate("registration-form");
+        }
+      }
+    }
   }
 }
 export const socket = new WebSocketService();

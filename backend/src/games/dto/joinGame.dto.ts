@@ -5,5 +5,5 @@ export class JoinGameDto {
   id: number;
 
   @IsString()
-  blackPlayerId: string;
+  username: string;
 }

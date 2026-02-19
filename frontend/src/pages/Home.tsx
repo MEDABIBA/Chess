@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { useStore } from "../provider/context";
 import { observer } from "mobx-react-lite";
 
 const Home = () => {
   const store = useStore();
-  const { games } = store;
+  const { navigate, games } = store;
+  const [friendCode, setFriendCode] = useState("");
+  const [isError, setIsError] = useState(false);
   const allGames = games.getAllGames();
   return (
     <>
@@ -11,8 +14,29 @@ const Home = () => {
         <section className="home">
           <div className="home-buttons">
             <div className="home-input-wrapper">
-              <input type="text" placeholder="Enter friend code" />
-              <button>#</button>
+              <input
+                className="home-input"
+                type="text"
+                value={friendCode}
+                placeholder="Enter friend code"
+                onChange={(el) => {
+                  setFriendCode(el.target.value);
+                  setIsError(false);
+                }}
+              />
+              {isError && <div className="input-error">Error</div>}
+
+              <button
+                className="home-input-button"
+                onClick={() => {
+                  if (friendCode.length === 6) {
+                    games.joinGameByCode(friendCode);
+                  } else {
+                    setIsError(true);
+                  }
+                }}>
+                Find game!
+              </button>
             </div>
             <a href="create-game" className="home-button">
               Create game!
@@ -31,6 +55,7 @@ const Home = () => {
             <tbody>
               {allGames?.length ? (
                 allGames?.map((game, key) => {
+                  const isParticipant = games.isParticipant(game);
                   const date = Date.now() - new Date(game.createdAt).getTime();
                   const totalSeconds = Math.floor(date / 1000);
                   const minutes = Math.floor(totalSeconds / 60) % 60;
@@ -43,12 +68,20 @@ const Home = () => {
                       </td>
                       <td>{game.initialTime}</td>
                       <td>
-                        {game.whitePlayer.username} | {game.blackPlayer?.username ?? "..."}
+                        {game.whitePlayer?.username} | {game.blackPlayer?.username ?? "..."}
                       </td>
                       <td>{game.gameStatus}</td>
                       <td>
-                        <button className="connect-game-btn" onClick={() => {}}>
-                          Join game
+                        <button
+                          className="connect-game-btn"
+                          onClick={() => {
+                            if (isParticipant) {
+                              navigate(`game/${game.id}`);
+                            } else {
+                              games.joinGame(game);
+                            }
+                          }}>
+                          {isParticipant ? "Enter" : "Join game"}
                         </button>
                       </td>
                     </tr>

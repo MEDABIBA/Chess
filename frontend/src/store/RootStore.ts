@@ -50,7 +50,7 @@ export class RootStore {
     this.navigate = navigate;
   }
 
-  get getNickname() {
+  getNickname() {
     if (!this.socket?.accessToken) {
       console.error("There is no accessToken to exteract nickname!");
       return null;
@@ -59,7 +59,7 @@ export class RootStore {
     return decoded.username;
   }
 
-  get isAuthorized() {
+  isAuthorized() {
     return tokenService.isAuthenticated();
   }
   handleAuthSubmit = async (auth: "login" | "registration", username: string, password: string) => {

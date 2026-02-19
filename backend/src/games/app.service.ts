@@ -6,6 +6,8 @@ import { MakeMoveDto } from "./dto/makeMove.dto";
 import { boardToFen } from "src/helpers";
 import { Chess } from "chess.js";
 import { validateMove } from "src/helpers/validateMove";
+import { generateInviteCode } from "src/helpers/generateInviteCode";
+import { joinGameByCodeDto } from "./dto/joinGameByCode";
 
 @Injectable()
 export class AppService {
@@ -21,6 +23,7 @@ export class AppService {
       })),
       "white",
     );
+    const inviteCode = generateInviteCode()
     return this.prisma.game.create({
       data: {
         fen: fen,
@@ -29,15 +32,60 @@ export class AppService {
         initialTime,
         whiteTimeLeft: initialTime,
         blackTimeLeft: initialTime,
+        inviteCode
       },
     });
   }
 
-  async joinGame(id: number, dto: JoinGameDto) {
-    const { blackPlayerId } = dto;
+  async joinGame(dto: JoinGameDto) {
+    const { id, username } = dto;
+    const user = await this.prisma.user.findUnique({ where: { username: username } })
+    if (!user) {
+      throw new Error("User not found in database")
+    }
+    const game = await this.prisma.game.findUnique({
+      where: { id: id }
+    })
+    if (!game) {
+      console.log("Game with code not founded")
+      throw new Error("Game with code not founded ")
+    }
+    if (game.blackPlayerId) {
+      throw new Error("Game is already full")
+    }
+    if (game.whitePlayerId === user.id) {
+      throw new Error("You cannot join your own game")
+    }
     return await this.prisma.game.update({
       where: { id: id },
-      data: { blackPlayerId: Number(blackPlayerId) },
+      data: { blackPlayerId: Number(user.id) },
+      include: {whitePlayer: true, blackPlayer: true}
+    });
+  }
+
+  async joinGameByCode(dto: joinGameByCodeDto) {
+    const { username, code } = dto;
+    const user = await this.prisma.user.findUnique({ where: { username: username } })
+    if (!user) {
+      throw new Error("User not found in database")
+    }
+    const game = await this.prisma.game.findUnique({
+      where: { inviteCode: code }
+    })
+    if (!game) {
+      console.log("Game with code not founded")
+      throw new Error("Game with code not founded ")
+    }
+    if (game.blackPlayerId) {
+      throw new Error("Game is already full")
+    }
+    if (game.whitePlayerId === user.id) {
+      throw new Error("You cannot join your own game")
+    }
+    return await this.prisma.game.update({
+      where: { id: game.id },
+      data: { blackPlayerId: Number(user.id) },
+      include: {whitePlayer: true, blackPlayer: true}
     });
   }
 

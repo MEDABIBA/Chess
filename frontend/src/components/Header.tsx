@@ -2,7 +2,7 @@ import blackIcon from "../assets/icon-black.png";
 import { useStore } from "../provider/context";
 import { observer } from "mobx-react-lite";
 const Header = observer(() => {
-  const { navigate, getNickname } = useStore();
+  const store = useStore();
   return (
     <section className="header">
       <img
@@ -10,10 +10,10 @@ const Header = observer(() => {
         src={blackIcon}
         alt="icon"
         onClick={() => {
-          navigate("home");
+          store.navigate("home");
         }}
       />
-      <div className="nickname">Nickname: {getNickname ?? "Not set"}</div>
+      <div className="nickname">Nickname: {store.getNickname() ?? "Not set"}</div>
     </section>
   );
 });

@@ -11,7 +11,7 @@ class NewGame {
 
   @action
   createNewGame = async (time: number) => {
-    const nickname = this.store.getNickname;
+    const nickname = this.store.getNickname();
     if (!nickname) throw new Error("User not logged in");
     const board = this.store.game.board;
     try {

@@ -13,10 +13,16 @@ const Board = observer(() => {
   const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack("white");
   const blackKingUnerAttack = chessMoveValidator.isKingUnderAttack("black");
   const grab = games.currentGame.getGrab();
+
   useEffect(() => {
-    if (!id) return;
-    socket?.getGame({ id: Number(id) });
-  }, [id, socket, socket?.isConnected]);
+    if (!id || !socket || !socket.isConnected) return;
+    games.currentGame.id = Number(id);
+    socket.joinRoom({ gameId: Number(id) });
+    return () => {
+      socket.leaveRoom({ gameId: Number(id) });
+    };
+  }, [games.currentGame, id, socket, socket?.isConnected]);
+
   return (
     <>
       <div className="board">
@@ -40,12 +46,12 @@ const Board = observer(() => {
         {game.board.map(({ color, position, piece }) => {
           const grabbed = grab?.col === position.col && grab.row === position.row;
           const isLastMove =
-            "from" in game.highlightLastMoves &&
-            "to" in game.highlightLastMoves &&
-            ((game.highlightLastMoves?.from.col === position.col &&
-              game.highlightLastMoves?.from.row === position.row) ||
-              (game.highlightLastMoves?.to.col === position.col &&
-                game.highlightLastMoves?.to.row === position.row))
+            "from" in game.highlightLastMove &&
+            "to" in game.highlightLastMove &&
+            ((game.highlightLastMove?.from.col === position.col &&
+              game.highlightLastMove?.from.row === position.row) ||
+              (game.highlightLastMove?.to.col === position.col &&
+                game.highlightLastMove?.to.row === position.row))
               ? "last-move"
               : "";
           const isActiveField =

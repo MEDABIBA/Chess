@@ -1,5 +1,4 @@
 import { IsInt, IsString } from "class-validator";
-import { Position } from "types/board";
 
 class PositionDto {
   @IsInt()
@@ -13,6 +12,7 @@ export class MakeMoveDto {
   @IsString()
   from: PositionDto;
   to: PositionDto;
+  highlightLastMove: { from: PositionDto; to: PositionDto };
 
   @IsInt()
   whiteTimeLeft: number;

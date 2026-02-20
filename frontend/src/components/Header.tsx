@@ -12,7 +12,7 @@ const Header = observer(() => {
     game.inviteCode &&
     game.whitePlayerNickname === store.getNickname() &&
     game.blackPlayerNickname === null;
-  const { games } = store;
+  const { canNavigate } = store;
   return (
     <section className="header">
       <img
@@ -20,7 +20,9 @@ const Header = observer(() => {
         src={blackIcon}
         alt="icon"
         onClick={() => {
-          store.navigate("home");
+          if (canNavigate) {
+            store.navigate("home");
+          }
         }}
       />
       <div>

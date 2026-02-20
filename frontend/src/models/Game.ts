@@ -1,12 +1,13 @@
 import { action, computed, makeAutoObservable } from "mobx";
 import { Color, GameInterface, GameStatus, PieceType, Position, SquareData } from "../types/types";
-import Piece from "../models/Piece";
-import { RootStore } from "./RootStore";
+import Piece from "./Piece";
+import { RootStore } from "../store/RootStore";
 import { simulateValidMove } from "../helpers/simulateMove";
 import soundMove from "../assets/sounds/move.mp3";
 
 class Game {
-  store: RootStore;
+  private store: RootStore;
+  id: number | null = null;
   board: SquareData[] = [];
   whitePlayerNickname: string | null = null;
   blackPlayerNickname: string | null = null;
@@ -14,7 +15,7 @@ class Game {
   gameStatus: GameStatus = "playing";
   inviteCode: string | null = null;
   activePiece: Piece | null = null;
-  highlightLastMoves: { from: Position; to: Position } | {} = {};
+  highlightLastMove: { from: Position; to: Position } | {} = {};
   availableMoves: Position[] = [];
   grab: Position | null = null;
   animateMove: { from: Position; to: Position } | null = null;
@@ -56,13 +57,17 @@ class Game {
       if (game.boardState) {
         console.log("game", game);
         this.board = game.boardState.flat();
+        this.id = game.id;
         this.hydratePieceClassesFromServer(this.board);
-        this.store.timer.setFirstPlayerTime(game.whiteTimeLeft * 60); // in seconds
-        this.store.timer.setSecondPlayerTime(game.blackTimeLeft * 60); // in seconds
+        this.store.timer.setFirstPlayerTime(game.whiteTimeLeft);
+        this.store.timer.setSecondPlayerTime(game.blackTimeLeft);
         this.currentPlayer = game.currentPlayer;
         this.gameStatus = game.gameStatus;
         this.inviteCode = game.inviteCode;
-        this.highlightLastMoves = game.highlightLastMove || {};
+        this.highlightLastMove = {
+          from: { col: game.fromX, row: game.fromY },
+          to: { col: game.toX, row: game.toY },
+        };
         this.lastDoubleStepPawn = game.lastDoubleStepPawn || null;
         this.whitePlayerNickname = game.whitePlayer.username;
         this.blackPlayerNickname = game?.blackPlayer?.username ?? null;
@@ -159,6 +164,32 @@ class Game {
   };
 
   @action
+  isParticipant() {
+    const username = this.store.getNickname();
+    return this.whitePlayerNickname === username || this.blackPlayerNickname === username;
+  }
+
+  @action
+  isFinished() {
+    return this.gameStatus === "checkmate" || this.gameStatus === "timeout";
+  }
+
+  @action
+  get yourColor(): "white" | "black" | null {
+    const username = this.store.getNickname();
+    if (this.whitePlayerNickname === username) return "white";
+    if (this.blackPlayerNickname === username) return "black";
+    return null;
+  }
+
+  @action
+  moveAvailableForPiece(piece: Piece): boolean {
+    if (piece.color !== this.currentPlayer) return false;
+    if (this.currentPlayer !== this.yourColor) return false;
+    return true;
+  }
+
+  @action
   getGrab = () => {
     return this.grab;
   };
@@ -187,17 +218,23 @@ class Game {
       return;
     }
 
-    this.updateTimer(piece.color);
-
-    if (animation) {
-      this.animateMove = { from, to };
-      await setTimeout(() => {
-        this.finalizeMove(piece, from, to);
-        this.animateMove = null;
-      }, 200);
-    } else {
-      this.finalizeMove(piece, from, to);
-    }
+    const MakeMoveDto = {
+      from,
+      to,
+      whiteTimeLeft: this.store.timer.p1,
+      blackTimeLeft: this.store.timer.p2,
+      highlightLastMove: { from, to },
+    };
+    this.store.socket?.makeMove({ id: this.id, moveData: MakeMoveDto });
+    // if (animation) {
+    //   this.animateMove = { from, to };
+    //   await setTimeout(() => {
+    //     this.finalizeMove(piece, from, to);
+    //     this.animateMove = null;
+    //   }, 200);
+    // } else {
+    //   this.finalizeMove(piece, from, to);
+    // }
   };
 
   @computed
@@ -284,10 +321,10 @@ class Game {
     this.setPiece(from, null);
     new Audio(soundMove).play();
 
-    this.highlightLastMoves = { from, to };
     piece.hasMoved = true;
     this.setActivePiece(null);
     this.availableMoves = [];
+    this.highlightLastMove = { from, to };
     this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
     this.animateMove = null;
     this.lastDoubleStepPawn = null;
@@ -354,7 +391,7 @@ class Game {
     this.currentPlayer = "white";
     this.gameStatus = "playing";
     this.activePiece = null;
-    this.highlightLastMoves = {};
+    this.highlightLastMove = {};
     this.availableMoves = [];
     this.grab = null;
     this.animateMove = null;

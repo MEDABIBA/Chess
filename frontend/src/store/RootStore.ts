@@ -1,5 +1,5 @@
 import { makeAutoObservable, observable } from "mobx";
-import Game from "./Game";
+import Game from "../models/Game";
 import ChessMoveValidator from "./ChessMoveValidator";
 import Timer from "./Timer";
 import NewGame from "./NewGame";
@@ -46,6 +46,17 @@ export class RootStore {
 
   initNavigate(navigate: NavigateFunction) {
     this.navigate = navigate;
+  }
+
+  get canNavigate() {
+    if (!this.isAuthorized()) return false;
+    if (
+      this.games.currentGame.isParticipant() &&
+      this.games.currentGame.blackPlayerNickname !== null &&
+      !this.games.currentGame.isFinished()
+    )
+      return false;
+    return true;
   }
 
   getNickname() {

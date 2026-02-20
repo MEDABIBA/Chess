@@ -78,7 +78,7 @@ const SquareComponent: React.FC<SquareProps> = ({
     }
     if (!piece || !imgRef.current) return;
 
-    if (piece.color !== game.currentPlayer) return;
+    if (!game.moveAvailableForPiece(piece)) return;
 
     e.preventDefault();
     setAvailableMoves([piece, position]);
@@ -156,7 +156,7 @@ const SquareComponent: React.FC<SquareProps> = ({
       if (!piece) return;
     }
     if (!piece || !imgRef.current) return;
-    if (piece.color !== game.currentPlayer) return;
+    if (!game.moveAvailableForPiece(piece)) return;
 
     setAvailableMoves([piece, position]);
     setActivePiece(piece);

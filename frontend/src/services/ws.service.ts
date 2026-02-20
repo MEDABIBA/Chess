@@ -2,8 +2,9 @@ import { io, Socket } from "socket.io-client";
 import apiService from "./api.service";
 import tokenService from "./auth.service";
 import { RootStore } from "../store/RootStore";
-import { GameInterface } from "../types/types";
+import { GameInterface, Position } from "../types/types";
 import { makeAutoObservable, runInAction } from "mobx";
+import Piece from "../models/Piece";
 
 class WebSocketService {
   store: RootStore | null = null;
@@ -82,10 +83,23 @@ class WebSocketService {
       this.store?.games?.currentGame?.setBoard(res);
       console.log(res);
     });
-    this.socket?.on("state", (res: any) => {
-      // makeMove logic
-      console.log(res);
-    });
+    this.socket?.on(
+      "state",
+      (res: { success: boolean; piece: Piece; from: Position; to: Position }) => {
+        console.log("state called");
+        if (!res.success) return;
+        const { piece, from, to } = res;
+        if (this.store === null) return;
+        console.log(piece);
+        const hydratedPiece = new Piece(piece.pieceType, piece.position, piece.color);
+        this.store?.games.currentGame.updateTimer(hydratedPiece.color);
+        setTimeout(() => {
+          this.store!.games.currentGame.finalizeMove(hydratedPiece, from, to);
+          this.store!.games.currentGame.animateMove = null;
+        }, 200);
+        console.log(res);
+      },
+    );
 
     this.socket.on("error", async (err) => {
       runInAction(() => {
@@ -115,6 +129,16 @@ class WebSocketService {
     if (!this.socket?.connected) return;
     this.socket.emit("create-game", data);
   }
+  public joinRoom(data: { gameId: number }) {
+    if (!this.socket) throw new Error("Socket not initialized");
+    if (!this.socket?.connected) return;
+    this.socket.emit("join-room", data);
+  }
+  public leaveRoom(data: { gameId: number }) {
+    if (!this.socket) throw new Error("Socket not initialized");
+    if (!this.socket?.connected) return;
+    this.socket.emit("leave-room", data);
+  }
   public joinGame(data: any) {
     if (!this.socket) throw new Error("Socket not initialized");
     if (!this.socket?.connected) return;
@@ -138,6 +162,7 @@ class WebSocketService {
   public makeMove(data: any) {
     if (!this.socket) throw new Error("Socket not initialized");
     if (!this.socket?.connected) return;
+    console.log("called makeMove");
     this.socket.emit("make-move", data);
   }
 

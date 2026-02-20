@@ -54,7 +54,11 @@ interface Game {
   gameStatus: GameStatus;
   inviteCode: string;
   initialTime: number;
-  highlightLastMove: { from: Position; to: Position } | null;
+  fromX: number | null;
+  fromY: number | null;
+
+  toX: number | null;
+  toY: number | null;
   id: number;
   lastDoubleStepPawn: null | { color: Color; position: Position };
   updatedAt: string;

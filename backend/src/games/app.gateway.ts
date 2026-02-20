@@ -45,6 +45,19 @@ export class GameGateway {
     }
   }
 
+  @SubscribeMessage("join-room")
+  joinRoom(@MessageBody() data: { gameId: number }, @ConnectedSocket() client: Socket) {
+    const { gameId } = data;
+    console.log("user joined");
+    client.join(`game/${gameId}`);
+  }
+
+  @SubscribeMessage("leave-room")
+  leaveRoom(@MessageBody() data: { gameId: number }, @ConnectedSocket() client: Socket) {
+    const { gameId } = data;
+    client.leave(`game/${gameId}`);
+  }
+
   @SubscribeMessage("join-game")
   async joinGame(@MessageBody() dto: JoinGameDto, @ConnectedSocket() client: Socket) {
     try {
@@ -66,7 +79,7 @@ export class GameGateway {
       const boardState = fenToBoard(game.fen);
 
       client.join(`game/${game.id}`);
-      client.emit('game-joined-by-code-you',{ id: game.id })
+      client.emit("game-joined-by-code-you", { id: game.id });
       this.server.emit("guest-joined", { ...game, boardState });
     } catch (err) {
       client.emit("error", { message: err.message });
@@ -105,10 +118,13 @@ export class GameGateway {
     @ConnectedSocket() client: Socket,
   ) {
     try {
+      const { from, to } = dto.moveData;
       const game = await this.appService.makeMove(dto.id, dto.moveData);
       const boardState = fenToBoard(game.fen);
-
-      this.server.to(`game/${dto.id}`).emit("state", { ...game, boardState });
+      const piece = boardState.find(
+        (el) => el.position.col === to.col && el.position.row === to.row,
+      )?.piece;
+      this.server.to(`game/${dto.id}`).emit("state", { success: true, from, to, piece });
     } catch (err) {
       client.emit("error", { message: err.message });
     }

@@ -1,7 +1,7 @@
 import { makeAutoObservable, reaction } from "mobx";
 import { RootStore } from "./RootStore";
 import { GameInterface } from "../types/types";
-import Game from "./Game";
+import Game from "../models/Game";
 
 class Games {
   private appStore: RootStore;
@@ -18,6 +18,15 @@ class Games {
         if (connected) {
           appStore.socket?.getAllGames();
         }
+      },
+    );
+    reaction(
+      () => [this.currentGame.id, this.appStore.socket, this.appStore.socket?.isConnected] as const,
+      ([id, socket, isConnected]) => {
+        console.log("called", this.currentGame.id);
+        if (!id || !socket || !isConnected) return;
+        console.log("passed");
+        socket.getGame({ id: Number(id) });
       },
     );
   }

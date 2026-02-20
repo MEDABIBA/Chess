@@ -52,8 +52,11 @@ model Game {
   blackTimeLeft Int @default(180)
 
   lastDoubleStepPawn Json?
-  highlightLastMove Json?
+  fromX Int?
+  fromY Int?
 
+  toX   Int?
+  toY   Int?
   winner String?
   
   createdAt DateTime @default(now())

@@ -23,7 +23,7 @@ export class AppService {
       })),
       "white",
     );
-    const inviteCode = generateInviteCode()
+    const inviteCode = generateInviteCode();
     return this.prisma.game.create({
       data: {
         fen: fen,
@@ -32,60 +32,60 @@ export class AppService {
         initialTime,
         whiteTimeLeft: initialTime,
         blackTimeLeft: initialTime,
-        inviteCode
+        inviteCode,
       },
     });
   }
 
   async joinGame(dto: JoinGameDto) {
     const { id, username } = dto;
-    const user = await this.prisma.user.findUnique({ where: { username: username } })
+    const user = await this.prisma.user.findUnique({ where: { username: username } });
     if (!user) {
-      throw new Error("User not found in database")
+      throw new Error("User not found in database");
     }
     const game = await this.prisma.game.findUnique({
-      where: { id: id }
-    })
+      where: { id: id },
+    });
     if (!game) {
-      console.log("Game with code not founded")
-      throw new Error("Game with code not founded ")
+      console.log("Game with code not founded");
+      throw new Error("Game with code not founded ");
     }
     if (game.blackPlayerId) {
-      throw new Error("Game is already full")
+      throw new Error("Game is already full");
     }
     if (game.whitePlayerId === user.id) {
-      throw new Error("You cannot join your own game")
+      throw new Error("You cannot join your own game");
     }
     return await this.prisma.game.update({
       where: { id: id },
       data: { blackPlayerId: Number(user.id) },
-      include: {whitePlayer: true, blackPlayer: true}
+      include: { whitePlayer: true, blackPlayer: true },
     });
   }
 
   async joinGameByCode(dto: joinGameByCodeDto) {
     const { username, code } = dto;
-    const user = await this.prisma.user.findUnique({ where: { username: username } })
+    const user = await this.prisma.user.findUnique({ where: { username: username } });
     if (!user) {
-      throw new Error("User not found in database")
+      throw new Error("User not found in database");
     }
     const game = await this.prisma.game.findUnique({
-      where: { inviteCode: code }
-    })
+      where: { inviteCode: code },
+    });
     if (!game) {
-      console.log("Game with code not founded")
-      throw new Error("Game with code not founded ")
+      console.log("Game with code not founded");
+      throw new Error("Game with code not founded ");
     }
     if (game.blackPlayerId) {
-      throw new Error("Game is already full")
+      throw new Error("Game is already full");
     }
     if (game.whitePlayerId === user.id) {
-      throw new Error("You cannot join your own game")
+      throw new Error("You cannot join your own game");
     }
     return await this.prisma.game.update({
       where: { id: game.id },
       data: { blackPlayerId: Number(user.id) },
-      include: {whitePlayer: true, blackPlayer: true}
+      include: { whitePlayer: true, blackPlayer: true },
     });
   }
 
@@ -121,7 +121,7 @@ export class AppService {
   }
 
   async makeMove(id: number, dto: MakeMoveDto) {
-    const { from, to, whiteTimeLeft, blackTimeLeft } = dto;
+    const { from, to, whiteTimeLeft, blackTimeLeft, highlightLastMove } = dto;
     return this.prisma.$transaction(async (prisma) => {
       const game = await prisma.game.findUnique({
         where: {
@@ -134,7 +134,7 @@ export class AppService {
       }
       const fen = new Chess(game.fen);
       const res = validateMove(fen, from, to);
-
+      console.log("makeMove res: ", res.valid);
       if (!res.valid) {
         console.log("Invalid move");
         throw new Error("Invalid move");
@@ -147,6 +147,10 @@ export class AppService {
           currentPlayer: game.currentPlayer === "white" ? "black" : "white",
           whiteTimeLeft,
           blackTimeLeft,
+          fromX: highlightLastMove.from.col,
+          fromY: highlightLastMove.from.row,
+          toX: highlightLastMove.to.col,
+          toY: highlightLastMove.to.row,
         },
       });
     });

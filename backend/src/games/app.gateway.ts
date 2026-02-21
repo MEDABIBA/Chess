@@ -37,8 +37,9 @@ export class GameGateway {
         whitePlayerId: String(userId),
       });
       const gameWithNicknames = await this.appService.getGame(game.id);
+      const boardState = fenToBoard(gameWithNicknames.fen);
       client.join(`game/${game.id}`);
-      this.server.emit("game-created", gameWithNicknames);
+      this.server.emit("game-created", { ...gameWithNicknames, boardState });
       client.emit("game-created-you", { id: game.id });
     } catch (err) {
       client.emit("error", { message: err.message });
@@ -105,10 +106,20 @@ export class GameGateway {
     try {
       const game = await this.appService.getGame(dto.id);
       const boardState = fenToBoard(game.fen);
-      game.whiteTimeLeft = game.currentPlayer === 'white' && game.whiteTurnStarterAt ? 
-        Math.max(0, game.whiteTimeLeft - (Date.now() - game.whiteTurnStarterAt.getTime()) / 1000) : game.whiteTimeLeft
-      game.blackTimeLeft = game.currentPlayer === 'black' && game.blackTurnStarterAt ? 
-        Math.max(0, game.blackTimeLeft - (Date.now() - game.blackTurnStarterAt.getTime()) / 1000) : game.blackTimeLeft
+      game.whiteTimeLeft =
+        game.currentPlayer === "white" && game.whiteTurnStarterAt
+          ? Math.max(
+              0,
+              game.whiteTimeLeft - (Date.now() - game.whiteTurnStarterAt.getTime()) / 1000,
+            )
+          : game.whiteTimeLeft;
+      game.blackTimeLeft =
+        game.currentPlayer === "black" && game.blackTurnStarterAt
+          ? Math.max(
+              0,
+              game.blackTimeLeft - (Date.now() - game.blackTurnStarterAt.getTime()) / 1000,
+            )
+          : game.blackTimeLeft;
       client.emit("game-state", { ...game, boardState });
     } catch (err) {
       client.emit("error", { message: err.message });

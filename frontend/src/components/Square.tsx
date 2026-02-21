@@ -29,14 +29,6 @@ const SquareComponent: React.FC<SquareProps> = ({
   const imgRef = useRef<HTMLImageElement | null>(null);
   const { games } = useStore();
   const { currentGame: game } = games;
-  const {
-    makeMove,
-    getActivePiece,
-    setActivePiece,
-    setAvailableMoves,
-    setGrab,
-    setPendingPromotion,
-  } = game;
 
   useEffect(() => {
     if (animationTarget) {
@@ -59,6 +51,15 @@ const SquareComponent: React.FC<SquareProps> = ({
       imgRef.current.style.transition = "transform 0.2s ease-out";
     }
   }, [animationTarget, position]);
+  if (game === null) return;
+  const {
+    makeMove,
+    getActivePiece,
+    setActivePiece,
+    setAvailableMoves,
+    setGrab,
+    setPendingPromotion,
+  } = game;
   const handleMouseDown = (e: React.MouseEvent<HTMLImageElement>) => {
     console.log("row", row, ", col", col);
     const active = getActivePiece();

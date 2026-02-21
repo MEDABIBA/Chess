@@ -49,14 +49,16 @@ export class RootStore {
   }
 
   get canNavigate() {
+    const game = this.games.currentGame;
     if (!this.isAuthorized()) return false;
+    if (!game) return true;
     if (
-      this.games.currentGame.isParticipant() &&
-      this.games.currentGame.blackPlayerNickname !== null &&
-      !this.games.currentGame.isFinished()
+      this.games.currentGame?.isParticipant() &&
+      this.games.currentGame.gameStatus !== "playing" &&
+      this.games.currentGame.gameStatus !== "check"
     )
-      return false;
-    return true;
+      return true;
+    return false;
   }
 
   getNickname() {

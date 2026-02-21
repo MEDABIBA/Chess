@@ -1,5 +1,6 @@
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "./RootStore";
+import { initializeBoard } from "../helpers/initializeBoard";
 
 class NewGame {
   store: RootStore;
@@ -13,7 +14,7 @@ class NewGame {
   createNewGame = async (time: number) => {
     const nickname = this.store.getNickname();
     if (!nickname) throw new Error("User not logged in");
-    const board = this.store.games.currentGame.board;
+    const board = initializeBoard();
     try {
       this.store.socket?.createGame({
         boardState: board,

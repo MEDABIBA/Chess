@@ -5,13 +5,13 @@ import Game from "../models/Game";
 
 class Games {
   private appStore: RootStore;
-  gamesList: GameInterface[] | null = null;
-  currentGame: Game;
+  gamesList: Game[] = [];
+  currentGame: Game | null = null;
 
   constructor(appStore: RootStore) {
     makeAutoObservable(this);
     this.appStore = appStore;
-    this.currentGame = new Game(this.appStore);
+    // this.currentGame = new Game(this.appStore);
     reaction(
       () => appStore?.socket?.isConnected,
       (connected) => {
@@ -21,22 +21,25 @@ class Games {
       },
     );
     reaction(
-      () => [this.currentGame.id, this.appStore.socket, this.appStore.socket?.isConnected] as const,
+      () =>
+        [this.currentGame?.id, this.appStore.socket, this.appStore.socket?.isConnected] as const,
       ([id, socket, isConnected]) => {
-        console.log("called", this.currentGame.id);
         if (!id || !socket || !isConnected) return;
-        console.log("passed");
         socket.getGame({ id: Number(id) });
       },
     );
   }
 
   addGame(game: GameInterface) {
-    this.gamesList?.push(game);
+    console.log("addGame", game);
+    this.gamesList?.push(new Game(this.appStore, game));
   }
 
   setAllGames(games: GameInterface[]) {
-    this.gamesList = games;
+    this.gamesList = [];
+    games.forEach((game) => {
+      this.gamesList.push(new Game(this.appStore, game));
+    });
   }
 
   getAllGames() {
@@ -46,18 +49,19 @@ class Games {
   setCurrentGame(id: number) {
     const game = this.gamesList?.find((el) => el.id === id);
     if (game && game !== undefined) {
-      this.currentGame = new Game(this.appStore, game);
+      this.currentGame = game;
     }
   }
 
-  isParticipant(game: GameInterface) {
+  isParticipant(game: Game) {
     const user = this.appStore.getNickname();
-    return game.whitePlayer?.username === user || game.blackPlayer?.username === user;
+    return game.whitePlayerNickname === user || game.blackPlayerNickname === user;
   }
 
-  joinGame(game: GameInterface) {
+  joinGame(game: Game) {
     const username = this.appStore.getNickname();
     this.appStore.socket?.joinGame({ id: game.id, username });
+    this.appStore.games.setCurrentGame(game.id);
     this.appStore.navigate(`game/${game.id}`);
   }
   joinGameByCode(code: string) {
@@ -65,12 +69,11 @@ class Games {
     this.appStore.socket?.joinGameByCode({ username, code });
   }
 
-  updateGame(game: GameInterface) {
+  updateGame(dto: GameInterface) {
     if (!this.gamesList) return;
-    const index = this.gamesList?.findIndex((el) => el.id === game.id);
-    if (index !== -1) {
-      this.gamesList[index] = game;
-    }
+    const game = this.gamesList?.find((el) => el.id === dto.id);
+    if (!game) return;
+    game.setBoard(dto);
   }
 }
 export default Games;

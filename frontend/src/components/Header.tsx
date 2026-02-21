@@ -9,9 +9,9 @@ const Header = observer(() => {
   const { currentGame: game } = store.games;
   const showInviteCode =
     match?.params.id &&
-    game.inviteCode &&
-    game.whitePlayerNickname === store.getNickname() &&
-    game.blackPlayerNickname === null;
+    game?.inviteCode &&
+    game?.whitePlayerNickname === store.getNickname() &&
+    game?.blackPlayerNickname === null;
   const { canNavigate } = store;
   return (
     <section className="header">

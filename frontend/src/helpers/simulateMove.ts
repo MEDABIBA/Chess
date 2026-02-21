@@ -1,5 +1,5 @@
 import Piece from "../models/Piece";
-import { Position } from "../types/types";
+import { Color, Position } from "../types/types";
 
 export const simulateValidMove = (
   piece: Piece,
@@ -7,7 +7,7 @@ export const simulateValidMove = (
   to: Position,
   getPiece: (from: Position) => Piece | null | undefined,
   setPiece: (to: Position, piece: Piece | null) => void,
-  isKingUnderAttack: () => boolean
+  isKingUnderAttack: (color: Color) => boolean,
 ) => {
   const originalToPiece = getPiece(to);
   const originalPosition = piece.position;
@@ -16,7 +16,7 @@ export const simulateValidMove = (
   setPiece(to, piece);
   setPiece(from, null);
 
-  const stillUnderAttack = isKingUnderAttack();
+  const stillUnderAttack = isKingUnderAttack(piece.color);
 
   piece.position = originalPosition;
   setPiece(from, piece);

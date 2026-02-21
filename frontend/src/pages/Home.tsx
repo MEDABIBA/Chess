@@ -68,7 +68,7 @@ const Home = () => {
                       </td>
                       <td>{game.initialTime / 60}:00</td>
                       <td>
-                        {game.whitePlayer?.username} | {game.blackPlayer?.username ?? "..."}
+                        {game.whitePlayerNickname} | {game.blackPlayerNickname ?? "..."}
                       </td>
                       <td>{game.gameStatus}</td>
                       <td>
@@ -76,6 +76,7 @@ const Home = () => {
                           className="connect-game-btn"
                           onClick={() => {
                             if (isParticipant) {
+                              games.setCurrentGame(game.id);
                               navigate(`game/${game.id}`);
                             } else {
                               games.joinGame(game);

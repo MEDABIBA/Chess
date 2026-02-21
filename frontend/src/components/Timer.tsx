@@ -5,9 +5,9 @@ import { observer } from "mobx-react-lite";
 const Timer = observer(({ getPlayerTime }: { getPlayerTime: () => string }) => {
   const { timer, games } = useStore();
   const { currentGame: game } = games;
-  const { getFirstPlayerTime, getSecondPlayerTime, checkIfTimesUp, deactiveTimer } = timer;
+  const { checkIfTimesUp, deactiveTimer } = timer;
   useEffect(() => {
-    if (checkIfTimesUp()) {
+    if (checkIfTimesUp() && game !== null) {
       deactiveTimer();
       game.gameStatus = "timeout";
       game.setModalActive(true);

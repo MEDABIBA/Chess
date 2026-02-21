@@ -1,20 +1,22 @@
 import { action, computed, makeAutoObservable } from "mobx";
-import { Color, GameInterface, GameStatus, PieceType, Position, SquareData } from "../types/types";
+import { Color, GameInterface, GameStatus, Position, SquareData } from "../types/types";
 import Piece from "./Piece";
 import { RootStore } from "../store/RootStore";
 import { simulateValidMove } from "../helpers/simulateMove";
 import soundMove from "../assets/sounds/move.mp3";
+import { initializeBoard } from "../helpers/initializeBoard";
 
 class Game {
   private store: RootStore;
-  id: number | null = null;
+  id: number;
   board: SquareData[] = [];
   whitePlayerNickname: string | null = null;
   blackPlayerNickname: string | null = null;
   currentPlayer: Color = "white";
-  gameStatus: GameStatus = "playing";
+  gameStatus: GameStatus = "waiting";
   inviteCode: string | null = null;
   activePiece: Piece | null = null;
+  initialTime: number;
   highlightLastMove: { from: Position; to: Position } | {} = {};
   availableMoves: Position[] = [];
   grab: Position | null = null;
@@ -22,66 +24,49 @@ class Game {
   modalActive: boolean = false;
   lastDoubleStepPawn: null | { color: Color; position: Position } = null;
   pendingPromotion: { piece: Piece; position: Position; color: Color } | null = null;
+  createdAt: Date;
 
-  constructor(store: RootStore, game?: GameInterface) {
+  constructor(store: RootStore, game: GameInterface) {
     this.store = store;
     makeAutoObservable(this);
-    this.initializeBoard();
-    if (game) {
-      this.setBoard(game);
-    }
+
+    this.board = game.boardState.flat();
+    this.id = game.id;
+    this.hydratePieceClassesFromServer(this.board);
+    this.store.timer.setFirstPlayerTime(game.whiteTimeLeft);
+    this.store.timer.setSecondPlayerTime(game.blackTimeLeft);
+    this.currentPlayer = game.currentPlayer;
+    this.gameStatus = game.gameStatus;
+    this.inviteCode = game.inviteCode;
+    this.highlightLastMove = {
+      from: { col: game.fromX, row: game.fromY },
+      to: { col: game.toX, row: game.toY },
+    };
+    this.initialTime = game.initialTime;
+    this.lastDoubleStepPawn = game.lastDoubleStepPawn || this.lastDoubleStepPawn;
+    this.whitePlayerNickname = game.whitePlayer.username;
+    this.blackPlayerNickname = game?.blackPlayer?.username ?? null;
+    this.createdAt = game.createdAt;
   }
 
   @action
-  initializeBoard = () => {
-    this.board = [];
-    for (let row = 8; row > 0; row--) {
-      for (let col = 1; col < 9; col++) {
-        const color = (row + col) % 2 === 0 ? "black" : "white";
-        const position = {
-          row,
-          col,
-        };
-        this.board.push({
-          color,
-          position,
-          piece: this.createInitialPiece(position, color),
-        });
-      }
-    }
-  };
-
-  @action
   async setBoard(game: GameInterface) {
-    try {
-      if (game.boardState) {
-        console.log("game", game);
-        this.board = game.boardState.flat();
-        this.id = game.id;
-        this.hydratePieceClassesFromServer(this.board);
-        this.store.timer.setFirstPlayerTime(game.whiteTimeLeft);
-        this.store.timer.setSecondPlayerTime(game.blackTimeLeft);
-        this.currentPlayer = game.currentPlayer;
-        this.gameStatus = game.gameStatus;
-        this.inviteCode = game.inviteCode;
-        this.highlightLastMove = {
-          from: { col: game.fromX, row: game.fromY },
-          to: { col: game.toX, row: game.toY },
-        };
-        this.lastDoubleStepPawn = game.lastDoubleStepPawn || null;
-        this.whitePlayerNickname = game.whitePlayer.username;
-        this.blackPlayerNickname = game?.blackPlayer?.username ?? null;
-      }
-      return game;
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-        throw new Error(error.message);
-      } else {
-        console.log(String(error));
-        throw new Error(String(error));
-      }
-    }
+    this.board = game.boardState.flat();
+    this.id = game.id;
+    this.hydratePieceClassesFromServer(this.board);
+    this.store.timer.setFirstPlayerTime(game.whiteTimeLeft);
+    this.store.timer.setSecondPlayerTime(game.blackTimeLeft);
+    this.currentPlayer = game.currentPlayer;
+    this.gameStatus = game.gameStatus;
+    this.inviteCode = game.inviteCode;
+    this.highlightLastMove = {
+      from: { col: game.fromX, row: game.fromY },
+      to: { col: game.toX, row: game.toY },
+    };
+    this.lastDoubleStepPawn = game.lastDoubleStepPawn || null;
+    this.whitePlayerNickname = game.whitePlayer.username;
+    this.blackPlayerNickname = game?.blackPlayer?.username ?? this.blackPlayerNickname;
+    this.createdAt = game.createdAt;
   }
 
   @action
@@ -91,39 +76,6 @@ class Game {
       el.piece = new Piece(el.piece?.pieceType, el.piece?.position, el.piece?.color);
     });
   }
-
-  @action
-  createInitialPiece = (position: Position, color: Color): Piece | null => {
-    const col = position.col;
-    const pieceType =
-      col === 1 || col === 8
-        ? PieceType.ROOK
-        : col === 2 || col === 7
-          ? PieceType.KNIGHT
-          : col === 3 || col === 6
-            ? PieceType.BISHOP
-            : col === 4
-              ? PieceType.QUEEN
-              : col === 5
-                ? PieceType.KING
-                : null;
-    if (pieceType === null) {
-      return null;
-    }
-    if (position.row === 2) {
-      return new Piece(PieceType.PAWN, position, "white");
-    }
-    if (position.row === 1) {
-      return new Piece(pieceType, position, "white");
-    }
-    if (position.row === 7) {
-      return new Piece(PieceType.PAWN, position, "black");
-    }
-    if (position.row === 8) {
-      return new Piece(pieceType, position, "black");
-    }
-    return null;
-  };
 
   @action
   getPiece = (from: Position) => {
@@ -225,16 +177,10 @@ class Game {
       blackTimeLeft: this.store.timer.p2,
       highlightLastMove: { from, to },
     };
+    if (animation) {
+      this.animateMove = { from, to };
+    }
     this.store.socket?.makeMove({ id: this.id, moveData: MakeMoveDto });
-    // if (animation) {
-    //   this.animateMove = { from, to };
-    //   await setTimeout(() => {
-    //     this.finalizeMove(piece, from, to);
-    //     this.animateMove = null;
-    //   }, 200);
-    // } else {
-    //   this.finalizeMove(piece, from, to);
-    // }
   };
 
   @computed
@@ -250,8 +196,8 @@ class Game {
     this.board.forEach((el) => {
       if (
         (this.store.chessMoveValidator.isValidMove(piece, position, el.position) &&
-          !this.store.chessMoveValidator.isKingUnderAttack()) ||
-        (this.store.chessMoveValidator.isKingUnderAttack() &&
+          !this.store.chessMoveValidator.isKingUnderAttack(piece.color)) ||
+        (this.store.chessMoveValidator.isKingUnderAttack(piece.color) &&
           simulateValidMove(
             piece,
             position,
@@ -284,7 +230,10 @@ class Game {
       return false;
     }
     if (this.gameStatus === "checkmate" || this.gameStatus === "timeout") return false;
-    if (piece.pieceType !== "king" && this.store.chessMoveValidator.isKingUnderAttack()) {
+    if (
+      piece.pieceType !== "king" &&
+      this.store.chessMoveValidator.isKingUnderAttack(piece.color)
+    ) {
       if (
         !simulateValidMove(
           piece,
@@ -307,7 +256,7 @@ class Game {
     return true;
   };
 
-  finalizeMove = (piece: Piece, from: Position, to: Position) => {
+  finalizeMove = async (piece: Piece, from: Position, to: Position) => {
     piece.position = to;
     if (
       piece.pieceType === "pawn" &&
@@ -387,7 +336,7 @@ class Game {
 
   reloadGame = () => {
     this.board = [];
-    this.initializeBoard();
+    initializeBoard();
     this.currentPlayer = "white";
     this.gameStatus = "playing";
     this.activePiece = null;

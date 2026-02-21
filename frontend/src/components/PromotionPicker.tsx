@@ -17,7 +17,7 @@ const PromotionPiece = ({ oldPiece, piece }: { oldPiece: Piece; piece: Piece }) 
       draggable={false}
       onPointerDown={(e) => {
         e.preventDefault();
-        if (e.pointerType === "touch" || e.pointerType === "mouse") {
+        if ((e.pointerType === "touch" || e.pointerType === "mouse") && games.currentGame) {
           games.currentGame.promotePiece(oldPiece, piece);
         }
       }}

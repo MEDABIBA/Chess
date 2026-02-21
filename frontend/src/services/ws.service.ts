@@ -81,7 +81,7 @@ class WebSocketService {
     });
     this.socket?.on("game-state", (res: GameInterface) => {
       this.store?.games?.currentGame?.setBoard(res);
-      console.log(res);
+      console.log("game-state", res);
     });
     this.socket?.on(
       "state",
@@ -89,14 +89,26 @@ class WebSocketService {
         console.log("state called");
         if (!res.success) return;
         const { piece, from, to } = res;
-        if (this.store === null) return;
+        if (!this.store?.games.currentGame || this.store?.games.currentGame === null) return;
         console.log(piece);
         const hydratedPiece = new Piece(piece.pieceType, piece.position, piece.color);
-        this.store?.games.currentGame.updateTimer(hydratedPiece.color);
-        setTimeout(() => {
-          this.store!.games.currentGame.finalizeMove(hydratedPiece, from, to);
-          this.store!.games.currentGame.animateMove = null;
-        }, 200);
+        if (
+          this.store?.games?.currentGame.yourColor !==
+            this.store?.games?.currentGame.currentPlayer ||
+          this.store.games.currentGame.animateMove !== null
+        ) {
+          this.store.games.currentGame.animateMove = { from, to };
+          setTimeout(() => {
+            this.store?.games?.currentGame?.finalizeMove(hydratedPiece, from, to);
+            if (this.store?.games?.currentGame?.animateMove) {
+              this.store.games.currentGame.animateMove = null;
+            } // Animate move for opponent and for us if we have animated move
+          }, 200);
+          this.store?.games?.currentGame?.updateTimer(hydratedPiece.color);
+        } else {
+          this.store?.games?.currentGame?.finalizeMove(hydratedPiece, from, to);
+        }
+
         console.log(res);
       },
     );
@@ -111,7 +123,7 @@ class WebSocketService {
         console.log("refreshed");
         if (token && this.socket) {
           this.socket.auth = { token };
-          this.socket.connect();
+          this.connect();
         }
       }
     });
@@ -179,7 +191,7 @@ class WebSocketService {
       if (err instanceof Error) {
         if (err.message.includes("Invalid token")) {
           console.error("Refresh token not found");
-          localStorage.clear()
+          localStorage.clear();
           this.store?.navigate("registration-form");
         }
       }

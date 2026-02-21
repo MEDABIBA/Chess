@@ -1,31 +1,16 @@
-import { useParams } from "react-router-dom";
 import { useStore } from "../provider/context";
 import PromotionPicker from "./PromotionPicker";
 import Square from "./Square";
 import { observer } from "mobx-react-lite";
-import { useEffect } from "react";
 
 const Board = observer(() => {
-  const { id } = useParams();
-  const { socket, games, timer, chessMoveValidator } = useStore();
+  const { games, chessMoveValidator } = useStore();
   const { currentGame: game } = games;
+  if (game === null) return;
   const { availableMovesSet, pendingPromotionValue } = game;
   const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack("white");
   const blackKingUnerAttack = chessMoveValidator.isKingUnderAttack("black");
-  const grab = games.currentGame.getGrab();
-
-  useEffect(() => {
-    if (!id || !socket || !socket.isConnected) return;
-    games.currentGame.id = Number(id);
-    socket.joinRoom({ gameId: Number(id) });
-    if (game.gameStatus === 'playing' || game.gameStatus === 'check') {
-          console.log('activated useEffect')
-      timer.activateTimer(game.currentPlayer)
-    }
-    return () => {
-      socket.leaveRoom({ gameId: Number(id) });
-    };
-  }, [games.currentGame, id, socket, socket?.isConnected]);
+  const grab = game.getGrab();
 
   return (
     <>

@@ -5,7 +5,7 @@ export interface MyJwtPayload extends JwtPayload {
   username: string;
 }
 
-export type GameStatus = "playing" | "check" | "checkmate" | "timeout";
+export type GameStatus = "playing" | "check" | "checkmate" | "timeout" | "waiting";
 
 export interface Position {
   row: number;
@@ -49,7 +49,7 @@ interface Game {
   blackPlayerId: string | null;
   blackTimeLeft: number;
   boardState: SquareData[][];
-  createdAt: string;
+  createdAt: Date;
   currentPlayer: "white" | "black";
   gameStatus: GameStatus;
   inviteCode: string;

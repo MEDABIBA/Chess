@@ -66,7 +66,7 @@ const Home = () => {
                         {hours ? hours + "h" : ""}{" "}
                         {minutes || hours ? minutes + "m" : "A couple of seconds"} ago
                       </td>
-                      <td>{game.initialTime}</td>
+                      <td>{game.initialTime / 60}:00</td>
                       <td>
                         {game.whitePlayer?.username} | {game.blackPlayer?.username ?? "..."}
                       </td>

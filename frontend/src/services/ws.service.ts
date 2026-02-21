@@ -179,6 +179,7 @@ class WebSocketService {
       if (err instanceof Error) {
         if (err.message.includes("Invalid token")) {
           console.error("Refresh token not found");
+          localStorage.clear()
           this.store?.navigate("registration-form");
         }
       }

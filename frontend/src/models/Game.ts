@@ -271,11 +271,11 @@ class Game {
     if (color === "white") {
       const timer = this.store.timer;
       timer.deactiveTimer();
-      timer.activateTimer("p2");
+      timer.activateTimer("black");
     } else if (color === "black") {
       const timer = this.store.timer;
       timer.deactiveTimer();
-      timer.activateTimer("p1");
+      timer.activateTimer("white");
     }
   };
 

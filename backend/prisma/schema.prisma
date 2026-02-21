@@ -49,9 +49,13 @@ model Game {
   blackPlayer User? @relation("blackPlayer", fields: [blackPlayerId], references: [id])
 
   whiteTimeLeft Int @default(180)
+  whiteTurnStarterAt DateTime?
   blackTimeLeft Int @default(180)
+  blackTurnStarterAt DateTime?
 
   lastDoubleStepPawn Json?
+
+  // Hightligt last move
   fromX Int?
   fromY Int?
 

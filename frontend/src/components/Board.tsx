@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 const Board = observer(() => {
   const { id } = useParams();
-  const { socket, games, chessMoveValidator } = useStore();
+  const { socket, games, timer, chessMoveValidator } = useStore();
   const { currentGame: game } = games;
   const { availableMovesSet, pendingPromotionValue } = game;
   const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack("white");
@@ -18,6 +18,10 @@ const Board = observer(() => {
     if (!id || !socket || !socket.isConnected) return;
     games.currentGame.id = Number(id);
     socket.joinRoom({ gameId: Number(id) });
+    if (game.gameStatus === 'playing' || game.gameStatus === 'check') {
+          console.log('activated useEffect')
+      timer.activateTimer(game.currentPlayer)
+    }
     return () => {
       socket.leaveRoom({ gameId: Number(id) });
     };

@@ -121,7 +121,7 @@ export class AppService {
   }
 
   async makeMove(id: number, dto: MakeMoveDto) {
-    const { from, to, whiteTimeLeft, blackTimeLeft, highlightLastMove } = dto;
+    const { from, to, highlightLastMove } = dto;
     return this.prisma.$transaction(async (prisma) => {
       const game = await prisma.game.findUnique({
         where: {
@@ -132,6 +132,9 @@ export class AppService {
         console.log("game not found");
         throw new Error("game not found");
       }
+      let turnStartedAt: Date | null = null;
+      let timeLeft;
+      let opponentTurnStartAt = new Date();
       const fen = new Chess(game.fen);
       const res = validateMove(fen, from, to);
       console.log("makeMove res: ", res.valid);
@@ -139,18 +142,47 @@ export class AppService {
         console.log("Invalid move");
         throw new Error("Invalid move");
       }
+      if (res.valid) {
+        if (game.gameStatus !== 'playing') {
+          game.gameStatus = 'playing'
+        }
+        if (res.isCheck) {
+          game.gameStatus = 'check'
+        }
+        if (res.isCheckmate) {
+          game.gameStatus = 'checkmate'
+        }
+      }
+      if (game.currentPlayer === 'white') {
+        turnStartedAt = game.whiteTurnStarterAt
+        timeLeft = game.whiteTimeLeft
+        game.blackTurnStarterAt = new Date()
+      } else if (game.currentPlayer === 'black') {
+          turnStartedAt = game.blackTurnStarterAt
+        timeLeft = game.blackTimeLeft
+        game.whiteTurnStarterAt = new Date()
+      } else {
+        throw new Error(`Invalid player color ${game.currentPlayer}`)
+      }
+      if (turnStartedAt !== null) {
+        const timeSpend = (Date.now() - turnStartedAt.getTime()) / 1000
+        timeLeft -= timeSpend
+      }
 
       return await prisma.game.update({
         where: { id: id },
         data: {
           fen: res.newFen,
           currentPlayer: game.currentPlayer === "white" ? "black" : "white",
-          whiteTimeLeft,
-          blackTimeLeft,
+          whiteTimeLeft: game.currentPlayer === 'white' ? timeLeft : game.whiteTimeLeft,
+          whiteTurnStarterAt: game.currentPlayer === 'white' ? null : opponentTurnStartAt,
+          blackTimeLeft: game.currentPlayer === 'black' ? timeLeft : game.blackTimeLeft,
+          blackTurnStarterAt: game.currentPlayer === 'black' ? null : opponentTurnStartAt,
           fromX: highlightLastMove.from.col,
           fromY: highlightLastMove.from.row,
           toX: highlightLastMove.to.col,
           toY: highlightLastMove.to.row,
+          gameStatus: game.gameStatus
         },
       });
     });

@@ -10,14 +10,14 @@ export const validateMove = (
   chess: Chess,
   from: Position,
   to: Position,
-): { valid: false } | { valid: true; newFen: string } => {
+): { valid: false } | { valid: true; newFen: string, isCheck: boolean, isCheckmate: boolean } => {
   try {
     const move = chess.move({ from: formatter(from), to: formatter(to) });
 
     if (!move) {
       return { valid: false };
     }
-    return { valid: true, newFen: chess.fen() };
+    return { valid: true, newFen: chess.fen(), isCheck: chess.isCheck(), isCheckmate: chess.isCheckmate()  };
   } catch {
     return { valid: false };
   }

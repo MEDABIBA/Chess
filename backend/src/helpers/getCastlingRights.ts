@@ -1,4 +1,4 @@
-import { SquareData } from "types/board";
+import { SquareData } from "../types/board";
 
 export function getCastlingRights(board: SquareData[]): string {
   let rights = "";

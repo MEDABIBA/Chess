@@ -1,5 +1,5 @@
 import { Chess } from "chess.js";
-import { Position } from "types/board";
+import { Position } from "../types/board";
 
 const formatter = (pos: Position) => {
   const row = ["a", "b", "c", "d", "e", "f", "g", "h"];

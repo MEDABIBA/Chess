@@ -10,6 +10,8 @@ services:
       - 3000:3000
     volumes:
       - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/tsconfig.json:/app/tsconfig.json
       - frontend_node_modules:/app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
@@ -24,12 +26,13 @@ services:
     ports:
       - 3030:3030
     volumes:
-      - ./backend/src:/app/src
+      - ./backend:/app
       - backend_node_modules:/app/node_modules
-    command: sh -c "npx prisma generate && npx prisma db push && npm run start:dev"
+    command: sh -c "npx prisma generate && npx prisma db push && yarn start:dev"
     environment:
       DATABASE_URL: "postgresql://postgres:postgres@postgresql:5432/chess"
       CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
     depends_on:
       postgresql:
         condition: service_healthy

@@ -1,5 +1,5 @@
 import { Chess } from "chess.js";
-import { Piece, SquareData } from "../../types/board";
+import { Piece, SquareData } from "../types/board";
 import { getCastlingRights } from "./getCastlingRights";
 
 const pieceTypeMap = {

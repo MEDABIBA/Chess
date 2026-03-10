@@ -134,7 +134,7 @@ export class AppService {
       }
       let turnStartedAt: Date | null = null;
       let timeLeft;
-      let opponentTurnStartAt = new Date();
+      const opponentTurnStartAt = new Date();
       const fen = new Chess(game.fen);
       const res = validateMove(fen, from, to);
       console.log("makeMove res: ", res.valid);

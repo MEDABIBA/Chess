@@ -11,7 +11,11 @@ const AuthForm = () => {
 
   useEffect(() => {
     if (isError) {
-      checkValidValue(username) && checkValidValue(password) ? setIsError(false) : setIsError(true);
+      if (checkValidValue(username) && checkValidValue(password)) {
+        setIsError(false)
+      } else {
+        setIsError(true);
+      } 
     }
   }, [isError, username, password]);
 

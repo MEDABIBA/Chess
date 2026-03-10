@@ -1,5 +1,4 @@
 import { makeAutoObservable, observable } from "mobx";
-import Game from "../models/Game";
 import ChessMoveValidator from "./ChessMoveValidator";
 import Timer from "./Timer";
 import NewGame from "./NewGame";

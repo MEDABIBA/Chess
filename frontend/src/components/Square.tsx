@@ -60,7 +60,7 @@ const SquareComponent: React.FC<SquareProps> = ({
     setGrab,
     setPendingPromotion,
   } = game;
-  const handleMouseDown = (e: React.MouseEvent<HTMLImageElement>) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
     console.log("row", row, ", col", col);
     const active = getActivePiece();
     if (
@@ -70,7 +70,7 @@ const SquareComponent: React.FC<SquareProps> = ({
       setPendingPromotion(null);
     }
     if (active?.position) {
-      const square = getTargetSquare(e);
+      const square = getTargetSquare(e.nativeEvent);
       if (!square) return;
       tryMove(square, active.position, makeMove);
       setActivePiece(null);

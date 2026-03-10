@@ -5,6 +5,7 @@ import { RootStore } from "../store/RootStore";
 import { GameInterface, Position } from "../types/types";
 import { makeAutoObservable, runInAction } from "mobx";
 import Piece from "../models/Piece";
+import { ICreateGame, IGetGame, IJoinGame, IJoinGameByCode, IJoinRoom, ILeaveRoom, IMakeMove } from "../types/api.types";
 
 class WebSocketService {
   store: RootStore | null = null;
@@ -136,27 +137,27 @@ class WebSocketService {
     });
   }
 
-  public createGame(data: any) {
+  public createGame(data: ICreateGame) {
     if (!this.socket) throw new Error("Socket not initialized");
     if (!this.socket?.connected) return;
     this.socket.emit("create-game", data);
   }
-  public joinRoom(data: { gameId: number }) {
+  public joinRoom(data: IJoinRoom) {
     if (!this.socket) throw new Error("Socket not initialized");
     if (!this.socket?.connected) return;
     this.socket.emit("join-room", data);
   }
-  public leaveRoom(data: { gameId: number }) {
+  public leaveRoom(data: ILeaveRoom) {
     if (!this.socket) throw new Error("Socket not initialized");
     if (!this.socket?.connected) return;
     this.socket.emit("leave-room", data);
   }
-  public joinGame(data: any) {
+  public joinGame(data: IJoinGame) {
     if (!this.socket) throw new Error("Socket not initialized");
     if (!this.socket?.connected) return;
     this.socket.emit("join-game", data);
   }
-  public joinGameByCode(data: any) {
+  public joinGameByCode(data: IJoinGameByCode) {
     if (!this.socket) throw new Error("Socket not initialized");
     if (!this.socket?.connected) return;
     this.socket.emit("join-game-code", data);
@@ -166,12 +167,12 @@ class WebSocketService {
     if (!this.socket?.connected) return;
     this.socket?.emit("get-games");
   }
-  public getGame(data: { id: number }) {
+  public getGame(data: IGetGame) {
     if (!this.socket) throw new Error("Socket not initialized");
     if (!this.socket?.connected) return;
     this.socket?.emit("get-game", data);
   }
-  public makeMove(data: any) {
+  public makeMove(data: IMakeMove) {
     if (!this.socket) throw new Error("Socket not initialized");
     if (!this.socket?.connected) return;
     console.log("called makeMove");

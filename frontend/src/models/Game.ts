@@ -17,7 +17,7 @@ class Game {
   inviteCode: string | null = null;
   activePiece: Piece | null = null;
   initialTime: number;
-  highlightLastMove: { from: Position; to: Position } | {} = {};
+  highlightLastMove: { from: Position; to: Position } | null = null;
   availableMoves: Position[] = [];
   grab: Position | null = null;
   animateMove: { from: Position; to: Position } | null = null;
@@ -38,10 +38,12 @@ class Game {
     this.currentPlayer = game.currentPlayer;
     this.gameStatus = game.gameStatus;
     this.inviteCode = game.inviteCode;
-    this.highlightLastMove = {
+    if (game.fromX && game.fromY && game.toX && game.toY) {
+      this.highlightLastMove = {
       from: { col: game.fromX, row: game.fromY },
       to: { col: game.toX, row: game.toY },
     };
+    }
     this.initialTime = game.initialTime;
     this.lastDoubleStepPawn = game.lastDoubleStepPawn || this.lastDoubleStepPawn;
     this.whitePlayerNickname = game.whitePlayer.username;
@@ -59,10 +61,12 @@ class Game {
     this.currentPlayer = game.currentPlayer;
     this.gameStatus = game.gameStatus;
     this.inviteCode = game.inviteCode;
-    this.highlightLastMove = {
-      from: { col: game.fromX, row: game.fromY },
-      to: { col: game.toX, row: game.toY },
-    };
+    if (game.fromX && game.fromY && game.toX && game.toY) {
+      this.highlightLastMove = {
+        from: { col: game.fromX, row: game.fromY },
+        to: { col: game.toX, row: game.toY },
+      };
+    }
     this.lastDoubleStepPawn = game.lastDoubleStepPawn || null;
     this.whitePlayerNickname = game.whitePlayer.username;
     this.blackPlayerNickname = game?.blackPlayer?.username ?? this.blackPlayerNickname;
@@ -173,9 +177,9 @@ class Game {
     const MakeMoveDto = {
       from,
       to,
-      whiteTimeLeft: this.store.timer.p1,
-      blackTimeLeft: this.store.timer.p2,
       highlightLastMove: { from, to },
+      whiteTimeLeft: this.store.timer.p1 || this.initialTime,
+      blackTimeLeft: this.store.timer.p2 || this.initialTime,
     };
     if (animation) {
       this.animateMove = { from, to };
@@ -340,7 +344,7 @@ class Game {
     this.currentPlayer = "white";
     this.gameStatus = "playing";
     this.activePiece = null;
-    this.highlightLastMove = {};
+    this.highlightLastMove = null;
     this.availableMoves = [];
     this.grab = null;
     this.animateMove = null;

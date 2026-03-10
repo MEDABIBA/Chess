@@ -96,7 +96,7 @@ function calculateHasMoved(
 }
 
 export function fenToBoard(fen: string): SquareData[] {
-  const [position, _, castling] = fen.split(" ");
+  const [position, , castling] = fen.split(" ");
   const res: SquareData[] = [];
   let row = 8; // FEN starts from row 8 going down
   let col = 1;

@@ -22,8 +22,8 @@ export class WsJwtGuard implements CanActivate {
       client.data.user = payload;
 
       return true;
-    } catch (error) {
-      console.log("Unauthorized");
+    } catch (err) {
+      console.log("Unauthorized, error message: ", err);
       const client = context.switchToWs().getClient();
       client.emit("error", { message: "Unauthorized" });
       return false;

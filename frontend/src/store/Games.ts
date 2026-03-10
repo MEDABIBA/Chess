@@ -60,12 +60,14 @@ class Games {
 
   joinGame(game: Game) {
     const username = this.appStore.getNickname();
+    if (!username) return;
     this.appStore.socket?.joinGame({ id: game.id, username });
     this.appStore.games.setCurrentGame(game.id);
     this.appStore.navigate(`game/${game.id}`);
   }
   joinGameByCode(code: string) {
     const username = this.appStore.getNickname();
+    if (!username) return;
     this.appStore.socket?.joinGameByCode({ username, code });
   }
 

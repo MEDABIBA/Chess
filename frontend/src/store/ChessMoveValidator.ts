@@ -267,7 +267,7 @@ class ChessMoveValidator {
 
   isKingUnderAttack = (currColPlayer: Color) => {
     const king: SquareData | undefined = this.store.games.currentGame?.board.find(
-      (e: any) => e.piece?.pieceType === "king" && e.piece?.color === currColPlayer,
+      (e: SquareData) => e.piece?.pieceType === "king" && e.piece?.color === currColPlayer,
     );
     if (!king) return false;
     return this.isAttackedField(king.position, currColPlayer);

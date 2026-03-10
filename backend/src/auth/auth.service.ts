@@ -30,7 +30,7 @@ export class AuthService {
       }
       return payload;
     } catch (err) {
-      console.log("Invalid or expired access token");
+      console.log("Invalid or expired access token, error message: ", err);
       throw new UnauthorizedException("Invalid or expired access token");
     }
   }
@@ -67,7 +67,7 @@ export class AuthService {
       );
       return newAccessToken;
     } catch (err) {
-      console.log("Invalid token or not found");
+      console.log("Invalid token or not found, error message: ", err);
       throw new UnauthorizedException("Invalid token or not found");
     }
   }

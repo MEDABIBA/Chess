@@ -35,6 +35,7 @@ const Board = observer(() => {
         {game.board.map(({ color, position, piece }) => {
           const grabbed = grab?.col === position.col && grab.row === position.row;
           const isLastMove =
+            game.highlightLastMove &&
             "from" in game.highlightLastMove &&
             "to" in game.highlightLastMove &&
             ((game.highlightLastMove?.from.col === position.col &&

@@ -31,7 +31,11 @@ const CreateGame = () => {
           <button
             className="timer-button"
             onClick={() => {
-              activeTimer ? setActiveTimer(false) : setActiveTimer(true);
+              if (activeTimer) {
+                setActiveTimer(false);
+              } else {
+                setActiveTimer(true);
+              }
             }}>
             {timerValue} (Rapid){" "}
             <img

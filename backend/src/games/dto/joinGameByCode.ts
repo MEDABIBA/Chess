@@ -1,9 +1,9 @@
-import { IsString } from "class-validator";
+import { IsString } from 'class-validator';
 
 export class joinGameByCodeDto {
-      @IsString()
-    username: string;
-    
-    @IsString()
-    code: string
+  @IsString()
+  username: string;
+
+  @IsString()
+  code: string;
 }

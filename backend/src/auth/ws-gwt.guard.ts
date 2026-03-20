@@ -1,21 +1,21 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { AuthService } from "./auth.service";
-import { Socket } from "socket.io";
-import { WsException } from "@nestjs/websockets";
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { Socket } from 'socket.io';
+import { WsException } from '@nestjs/websockets';
 
 @Injectable()
 export class WsJwtGuard implements CanActivate {
   constructor(private authService: AuthService) {}
 
   async canActivate(context: ExecutionContext) {
-    console.log("=== GUARD CALLED ===");
+    console.log('=== GUARD CALLED ===');
     try {
       const client = context.switchToWs().getClient();
       const token = this.extractToken(client);
 
       if (!token) {
-        console.log("Token not found");
-        throw new WsException("Token not found");
+        console.log('Token not found');
+        throw new WsException('Token not found');
       }
 
       const payload = await this.authService.validateAccessToken(token);
@@ -23,9 +23,9 @@ export class WsJwtGuard implements CanActivate {
 
       return true;
     } catch (err) {
-      console.log("Unauthorized, error message: ", err);
+      console.log('Unauthorized, error message: ', err);
       const client = context.switchToWs().getClient();
-      client.emit("error", { message: "Unauthorized" });
+      client.emit('error', { message: 'Unauthorized' });
       return false;
     }
   }

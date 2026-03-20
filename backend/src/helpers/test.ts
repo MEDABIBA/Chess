@@ -1,15 +1,15 @@
-import { SquareData } from "../types/board";
+import { SquareData } from '../types/board';
 
 export const board: SquareData[] = [
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 8,
       col: 1,
     },
     piece: {
-      pieceType: "rook",
-      color: "black",
+      pieceType: 'rook',
+      color: 'black',
       position: {
         row: 8,
         col: 1,
@@ -18,14 +18,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 8,
       col: 2,
     },
     piece: {
-      pieceType: "knight",
-      color: "black",
+      pieceType: 'knight',
+      color: 'black',
       position: {
         row: 8,
         col: 2,
@@ -34,14 +34,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 8,
       col: 3,
     },
     piece: {
-      pieceType: "bishop",
-      color: "black",
+      pieceType: 'bishop',
+      color: 'black',
       position: {
         row: 8,
         col: 3,
@@ -50,14 +50,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 8,
       col: 4,
     },
     piece: {
-      pieceType: "queen",
-      color: "black",
+      pieceType: 'queen',
+      color: 'black',
       position: {
         row: 8,
         col: 4,
@@ -66,14 +66,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 8,
       col: 5,
     },
     piece: {
-      pieceType: "king",
-      color: "black",
+      pieceType: 'king',
+      color: 'black',
       position: {
         row: 8,
         col: 5,
@@ -82,14 +82,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 8,
       col: 6,
     },
     piece: {
-      pieceType: "bishop",
-      color: "black",
+      pieceType: 'bishop',
+      color: 'black',
       position: {
         row: 8,
         col: 6,
@@ -98,14 +98,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 8,
       col: 7,
     },
     piece: {
-      pieceType: "knight",
-      color: "black",
+      pieceType: 'knight',
+      color: 'black',
       position: {
         row: 8,
         col: 7,
@@ -114,14 +114,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 8,
       col: 8,
     },
     piece: {
-      pieceType: "rook",
-      color: "black",
+      pieceType: 'rook',
+      color: 'black',
       position: {
         row: 8,
         col: 8,
@@ -130,14 +130,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 7,
       col: 1,
     },
     piece: {
-      pieceType: "pawn",
-      color: "black",
+      pieceType: 'pawn',
+      color: 'black',
       position: {
         row: 7,
         col: 1,
@@ -146,14 +146,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 7,
       col: 2,
     },
     piece: {
-      pieceType: "pawn",
-      color: "black",
+      pieceType: 'pawn',
+      color: 'black',
       position: {
         row: 7,
         col: 2,
@@ -162,14 +162,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 7,
       col: 3,
     },
     piece: {
-      pieceType: "pawn",
-      color: "black",
+      pieceType: 'pawn',
+      color: 'black',
       position: {
         row: 7,
         col: 3,
@@ -178,14 +178,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 7,
       col: 4,
     },
     piece: {
-      pieceType: "pawn",
-      color: "black",
+      pieceType: 'pawn',
+      color: 'black',
       position: {
         row: 7,
         col: 4,
@@ -194,14 +194,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 7,
       col: 5,
     },
     piece: {
-      pieceType: "pawn",
-      color: "black",
+      pieceType: 'pawn',
+      color: 'black',
       position: {
         row: 7,
         col: 5,
@@ -210,14 +210,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 7,
       col: 6,
     },
     piece: {
-      pieceType: "pawn",
-      color: "black",
+      pieceType: 'pawn',
+      color: 'black',
       position: {
         row: 7,
         col: 6,
@@ -226,14 +226,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 7,
       col: 7,
     },
     piece: {
-      pieceType: "pawn",
-      color: "black",
+      pieceType: 'pawn',
+      color: 'black',
       position: {
         row: 7,
         col: 7,
@@ -242,14 +242,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 7,
       col: 8,
     },
     piece: {
-      pieceType: "pawn",
-      color: "black",
+      pieceType: 'pawn',
+      color: 'black',
       position: {
         row: 7,
         col: 8,
@@ -258,7 +258,7 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 6,
       col: 1,
@@ -266,7 +266,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 6,
       col: 2,
@@ -274,7 +274,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 6,
       col: 3,
@@ -282,7 +282,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 6,
       col: 4,
@@ -290,7 +290,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 6,
       col: 5,
@@ -298,7 +298,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 6,
       col: 6,
@@ -306,7 +306,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 6,
       col: 7,
@@ -314,7 +314,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 6,
       col: 8,
@@ -322,7 +322,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 5,
       col: 1,
@@ -330,7 +330,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 5,
       col: 2,
@@ -338,7 +338,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 5,
       col: 3,
@@ -346,7 +346,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 5,
       col: 4,
@@ -354,7 +354,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 5,
       col: 5,
@@ -362,7 +362,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 5,
       col: 6,
@@ -370,7 +370,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 5,
       col: 7,
@@ -378,7 +378,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 5,
       col: 8,
@@ -386,7 +386,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 4,
       col: 1,
@@ -394,7 +394,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 4,
       col: 2,
@@ -402,7 +402,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 4,
       col: 3,
@@ -410,7 +410,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 4,
       col: 4,
@@ -418,7 +418,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 4,
       col: 5,
@@ -426,7 +426,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 4,
       col: 6,
@@ -434,7 +434,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 4,
       col: 7,
@@ -442,7 +442,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 4,
       col: 8,
@@ -450,7 +450,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 3,
       col: 1,
@@ -458,7 +458,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 3,
       col: 2,
@@ -466,7 +466,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 3,
       col: 3,
@@ -474,7 +474,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 3,
       col: 4,
@@ -482,7 +482,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 3,
       col: 5,
@@ -490,7 +490,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 3,
       col: 6,
@@ -498,7 +498,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 3,
       col: 7,
@@ -506,7 +506,7 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 3,
       col: 8,
@@ -514,14 +514,14 @@ export const board: SquareData[] = [
     piece: null,
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 2,
       col: 1,
     },
     piece: {
-      pieceType: "pawn",
-      color: "white",
+      pieceType: 'pawn',
+      color: 'white',
       position: {
         row: 2,
         col: 1,
@@ -530,14 +530,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 2,
       col: 2,
     },
     piece: {
-      pieceType: "pawn",
-      color: "white",
+      pieceType: 'pawn',
+      color: 'white',
       position: {
         row: 2,
         col: 2,
@@ -546,14 +546,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 2,
       col: 3,
     },
     piece: {
-      pieceType: "pawn",
-      color: "white",
+      pieceType: 'pawn',
+      color: 'white',
       position: {
         row: 2,
         col: 3,
@@ -562,14 +562,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 2,
       col: 4,
     },
     piece: {
-      pieceType: "pawn",
-      color: "white",
+      pieceType: 'pawn',
+      color: 'white',
       position: {
         row: 2,
         col: 4,
@@ -578,14 +578,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 2,
       col: 5,
     },
     piece: {
-      pieceType: "pawn",
-      color: "white",
+      pieceType: 'pawn',
+      color: 'white',
       position: {
         row: 2,
         col: 5,
@@ -594,14 +594,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 2,
       col: 6,
     },
     piece: {
-      pieceType: "pawn",
-      color: "white",
+      pieceType: 'pawn',
+      color: 'white',
       position: {
         row: 2,
         col: 6,
@@ -610,14 +610,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 2,
       col: 7,
     },
     piece: {
-      pieceType: "pawn",
-      color: "white",
+      pieceType: 'pawn',
+      color: 'white',
       position: {
         row: 2,
         col: 7,
@@ -626,14 +626,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 2,
       col: 8,
     },
     piece: {
-      pieceType: "pawn",
-      color: "white",
+      pieceType: 'pawn',
+      color: 'white',
       position: {
         row: 2,
         col: 8,
@@ -642,14 +642,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 1,
       col: 1,
     },
     piece: {
-      pieceType: "rook",
-      color: "white",
+      pieceType: 'rook',
+      color: 'white',
       position: {
         row: 1,
         col: 1,
@@ -658,14 +658,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 1,
       col: 2,
     },
     piece: {
-      pieceType: "knight",
-      color: "white",
+      pieceType: 'knight',
+      color: 'white',
       position: {
         row: 1,
         col: 2,
@@ -674,14 +674,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 1,
       col: 3,
     },
     piece: {
-      pieceType: "bishop",
-      color: "white",
+      pieceType: 'bishop',
+      color: 'white',
       position: {
         row: 1,
         col: 3,
@@ -690,14 +690,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 1,
       col: 4,
     },
     piece: {
-      pieceType: "queen",
-      color: "white",
+      pieceType: 'queen',
+      color: 'white',
       position: {
         row: 1,
         col: 4,
@@ -706,14 +706,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 1,
       col: 5,
     },
     piece: {
-      pieceType: "king",
-      color: "white",
+      pieceType: 'king',
+      color: 'white',
       position: {
         row: 1,
         col: 5,
@@ -722,14 +722,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 1,
       col: 6,
     },
     piece: {
-      pieceType: "bishop",
-      color: "white",
+      pieceType: 'bishop',
+      color: 'white',
       position: {
         row: 1,
         col: 6,
@@ -738,14 +738,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "black",
+    color: 'black',
     position: {
       row: 1,
       col: 7,
     },
     piece: {
-      pieceType: "knight",
-      color: "white",
+      pieceType: 'knight',
+      color: 'white',
       position: {
         row: 1,
         col: 7,
@@ -754,14 +754,14 @@ export const board: SquareData[] = [
     },
   },
   {
-    color: "white",
+    color: 'white',
     position: {
       row: 1,
       col: 8,
     },
     piece: {
-      pieceType: "rook",
-      color: "white",
+      pieceType: 'rook',
+      color: 'white',
       position: {
         row: 1,
         col: 8,

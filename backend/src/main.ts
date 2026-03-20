@@ -1,7 +1,7 @@
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./games/app.module";
-import { ValidationPipe } from "@nestjs/common";
-import cookieParser from "cookie-parser";
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './games/app.module';
+import { ValidationPipe } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   // Catch the exceptions
@@ -15,7 +15,7 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: 'http://localhost:3000',
       credentials: true,
     },
   });

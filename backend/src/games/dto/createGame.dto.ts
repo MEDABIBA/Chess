@@ -1,4 +1,4 @@
-import { Type } from "class-transformer";
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -9,7 +9,7 @@ import {
   IsString,
   Min,
   ValidateNested,
-} from "class-validator";
+} from 'class-validator';
 
 class PositionDto {
   @IsNumber()
@@ -20,11 +20,11 @@ class PositionDto {
 }
 
 class PieceDto {
-  @IsEnum(["pawn", "rook", "knight", "bishop", "queen", "king"])
-  pieceType: "pawn" | "rook" | "knight" | "bishop" | "queen" | "king";
+  @IsEnum(['pawn', 'rook', 'knight', 'bishop', 'queen', 'king'])
+  pieceType: 'pawn' | 'rook' | 'knight' | 'bishop' | 'queen' | 'king';
 
-  @IsEnum(["white", "black"])
-  color: "white" | "black";
+  @IsEnum(['white', 'black'])
+  color: 'white' | 'black';
 
   @ValidateNested()
   @Type(() => PositionDto)
@@ -35,8 +35,8 @@ class PieceDto {
 }
 
 class SquareDto {
-  @IsEnum(["white", "black"])
-  color: "white" | "black";
+  @IsEnum(['white', 'black'])
+  color: 'white' | 'black';
 
   @ValidateNested()
   @Type(() => PositionDto)

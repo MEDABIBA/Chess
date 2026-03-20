@@ -1,13 +1,13 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "prisma/prisma.service";
-import { CreateGameDto } from "./dto/createGame.dto";
-import { JoinGameDto } from "./dto/joinGame.dto";
-import { MakeMoveDto } from "./dto/makeMove.dto";
-import { boardToFen } from "src/helpers";
-import { Chess } from "chess.js";
-import { validateMove } from "src/helpers/validateMove";
-import { generateInviteCode } from "src/helpers/generateInviteCode";
-import { joinGameByCodeDto } from "./dto/joinGameByCode";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'prisma/prisma.service';
+import { CreateGameDto } from './dto/createGame.dto';
+import { JoinGameDto } from './dto/joinGame.dto';
+import { MakeMoveDto } from './dto/makeMove.dto';
+import { boardToFen } from 'src/helpers';
+import { Chess } from 'chess.js';
+import { validateMove } from 'src/helpers/validateMove';
+import { generateInviteCode } from 'src/helpers/generateInviteCode';
+import { joinGameByCodeDto } from './dto/joinGameByCode';
 
 @Injectable()
 export class AppService {
@@ -21,15 +21,17 @@ export class AppService {
         position: square.position,
         piece: square.piece ? square.piece : null,
       })),
-      "white",
+      'white',
     );
-    const user = await this.prisma.user.findUnique({ where: { username: whitePlayerUsername } });
-    if (!user) throw new Error("user didnt exist");
+    const user = await this.prisma.user.findUnique({
+      where: { username: whitePlayerUsername },
+    });
+    if (!user) throw new Error('user didnt exist');
     const inviteCode = generateInviteCode();
     return this.prisma.game.create({
       data: {
         fen: fen,
-        currentPlayer: "white",
+        currentPlayer: 'white',
         whitePlayerId: user?.id,
         initialTime,
         whiteTimeLeft: initialTime,
@@ -41,22 +43,24 @@ export class AppService {
 
   async joinGame(dto: JoinGameDto) {
     const { id, username } = dto;
-    const user = await this.prisma.user.findUnique({ where: { username: username } });
+    const user = await this.prisma.user.findUnique({
+      where: { username: username },
+    });
     if (!user) {
-      throw new Error("User not found in database");
+      throw new Error('User not found in database');
     }
     const game = await this.prisma.game.findUnique({
       where: { id: id },
     });
     if (!game) {
-      console.log("Game with code not founded");
-      throw new Error("Game with code not founded ");
+      console.log('Game with code not founded');
+      throw new Error('Game with code not founded ');
     }
     if (game.blackPlayerId) {
-      throw new Error("Game is already full");
+      throw new Error('Game is already full');
     }
     if (game.whitePlayerId === user.id) {
-      throw new Error("You cannot join your own game");
+      throw new Error('You cannot join your own game');
     }
     return await this.prisma.game.update({
       where: { id: id },
@@ -67,22 +71,24 @@ export class AppService {
 
   async joinGameByCode(dto: joinGameByCodeDto) {
     const { username, code } = dto;
-    const user = await this.prisma.user.findUnique({ where: { username: username } });
+    const user = await this.prisma.user.findUnique({
+      where: { username: username },
+    });
     if (!user) {
-      throw new Error("User not found in database");
+      throw new Error('User not found in database');
     }
     const game = await this.prisma.game.findUnique({
       where: { inviteCode: code },
     });
     if (!game) {
-      console.log("Game with code not founded");
-      throw new Error("Game with code not founded ");
+      console.log('Game with code not founded');
+      throw new Error('Game with code not founded ');
     }
     if (game.blackPlayerId) {
-      throw new Error("Game is already full");
+      throw new Error('Game is already full');
     }
     if (game.whitePlayerId === user.id) {
-      throw new Error("You cannot join your own game");
+      throw new Error('You cannot join your own game');
     }
     return await this.prisma.game.update({
       where: { id: game.id },
@@ -99,8 +105,8 @@ export class AppService {
       },
     });
     if (!games.length) {
-      console.log("Games not found");
-      throw new NotFoundException("Games not found");
+      console.log('Games not found');
+      throw new NotFoundException('Games not found');
     }
     return games;
   }
@@ -117,8 +123,8 @@ export class AppService {
     if (game) {
       return game;
     } else {
-      console.log("game not found");
-      throw new NotFoundException("game not found");
+      console.log('game not found');
+      throw new NotFoundException('game not found');
     }
   }
 
@@ -131,35 +137,35 @@ export class AppService {
         },
       });
       if (!game) {
-        console.log("game not found");
-        throw new Error("game not found");
+        console.log('game not found');
+        throw new Error('game not found');
       }
       let turnStartedAt: Date | null = null;
       let timeLeft;
       const opponentTurnStartAt = new Date();
       const fen = new Chess(game.fen);
       const res = validateMove(fen, from, to);
-      console.log("makeMove res: ", res.valid);
+      console.log('makeMove res: ', res.valid);
       if (!res.valid) {
-        console.log("Invalid move");
-        throw new Error("Invalid move");
+        console.log('Invalid move');
+        throw new Error('Invalid move');
       }
       if (res.valid) {
-        if (game.gameStatus !== "playing") {
-          game.gameStatus = "playing";
+        if (game.gameStatus !== 'playing') {
+          game.gameStatus = 'playing';
         }
         if (res.isCheck) {
-          game.gameStatus = "check";
+          game.gameStatus = 'check';
         }
         if (res.isCheckmate) {
-          game.gameStatus = "checkmate";
+          game.gameStatus = 'checkmate';
         }
       }
-      if (game.currentPlayer === "white") {
+      if (game.currentPlayer === 'white') {
         turnStartedAt = game.whiteTurnStarterAt;
         timeLeft = game.whiteTimeLeft;
         game.blackTurnStarterAt = new Date();
-      } else if (game.currentPlayer === "black") {
+      } else if (game.currentPlayer === 'black') {
         turnStartedAt = game.blackTurnStarterAt;
         timeLeft = game.blackTimeLeft;
         game.whiteTurnStarterAt = new Date();
@@ -175,11 +181,15 @@ export class AppService {
         where: { id: id },
         data: {
           fen: res.newFen,
-          currentPlayer: game.currentPlayer === "white" ? "black" : "white",
-          whiteTimeLeft: game.currentPlayer === "white" ? timeLeft : game.whiteTimeLeft,
-          whiteTurnStarterAt: game.currentPlayer === "white" ? null : opponentTurnStartAt,
-          blackTimeLeft: game.currentPlayer === "black" ? timeLeft : game.blackTimeLeft,
-          blackTurnStarterAt: game.currentPlayer === "black" ? null : opponentTurnStartAt,
+          currentPlayer: game.currentPlayer === 'white' ? 'black' : 'white',
+          whiteTimeLeft:
+            game.currentPlayer === 'white' ? timeLeft : game.whiteTimeLeft,
+          whiteTurnStarterAt:
+            game.currentPlayer === 'white' ? null : opponentTurnStartAt,
+          blackTimeLeft:
+            game.currentPlayer === 'black' ? timeLeft : game.blackTimeLeft,
+          blackTurnStarterAt:
+            game.currentPlayer === 'black' ? null : opponentTurnStartAt,
           fromX: highlightLastMove.from.col,
           fromY: highlightLastMove.from.row,
           toX: highlightLastMove.to.col,

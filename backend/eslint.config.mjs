@@ -1,8 +1,8 @@
-import tseslint from "typescript-eslint";
+import tseslint from 'typescript-eslint';
 
 export default [
   ...tseslint.configs.recommended,
   {
-    files: ["src/**/*.ts"]
-  }
+    files: ['src/**/*.ts'],
+  },
 ];

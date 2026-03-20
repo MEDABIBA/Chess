@@ -1,11 +1,11 @@
-import { matchPath, useLocation } from "react-router-dom";
-import blackIcon from "../assets/icon-black.png";
-import { useStore } from "../provider/context";
-import { observer } from "mobx-react-lite";
+import { matchPath, useLocation } from 'react-router-dom';
+import blackIcon from '../assets/icon-black.png';
+import { useStore } from '../provider/context';
+import { observer } from 'mobx-react-lite';
 const Header = observer(() => {
   const store = useStore();
   const location = useLocation();
-  const match = matchPath("/game/:id", location.pathname);
+  const match = matchPath('/game/:id', location.pathname);
   const { currentGame: game } = store.games;
   const showInviteCode =
     match?.params.id &&
@@ -22,13 +22,17 @@ const Header = observer(() => {
         onClick={() => {
           if (canNavigate) {
             store.games.currentGame = null;
-            store.navigate("home");
+            store.navigate('home');
           }
         }}
       />
       <div>
-        <div className="nickname">Nickname: {store.getNickname() ?? "Not set"}</div>
-        {showInviteCode && <div>Invite your friend by this code: {game.inviteCode}</div>}
+        <div className="nickname">
+          Nickname: {store.getNickname() ?? 'Not set'}
+        </div>
+        {showInviteCode && (
+          <div>Invite your friend by this code: {game.inviteCode}</div>
+        )}
       </div>
     </section>
   );

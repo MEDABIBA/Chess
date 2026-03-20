@@ -1,5 +1,11 @@
-export type Color = "white" | "black";
-export type PieceType = "pawn" | "rook" | "knight" | "bishop" | "queen" | "king";
+export type Color = 'white' | 'black';
+export type PieceType =
+  | 'pawn'
+  | 'rook'
+  | 'knight'
+  | 'bishop'
+  | 'queen'
+  | 'king';
 export interface Position {
   row: number;
   col: number;

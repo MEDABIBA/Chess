@@ -62,7 +62,7 @@ interface Game {
   id: number;
   lastDoubleStepPawn: null | { color: Color; position: Position };
   updatedAt: string;
-  whitePlayerId: string;
+  whitePlayerUsername: string;
   whiteTimeLeft: number;
   winner: string | number;
 }

@@ -21,6 +21,7 @@ const Header = observer(() => {
         alt="icon"
         onClick={() => {
           if (canNavigate) {
+            store.games.currentGame = null;
             store.navigate("home");
           }
         }}

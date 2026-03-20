@@ -57,7 +57,7 @@ export class CreateGameDto {
   // currentPlayer: "white" | "black";
 
   @IsString()
-  whitePlayerId: string;
+  whitePlayerUsername: string;
 
   @IsInt()
   @Min(0)

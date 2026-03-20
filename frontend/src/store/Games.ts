@@ -53,6 +53,10 @@ class Games {
     }
   }
 
+  get activeGame() {
+    return this.gamesList.find((el) => this.isParticipant(el) && el.gameStatus === "playing")?.id;
+  }
+
   isParticipant(game: Game) {
     const user = this.appStore.getNickname();
     return game.whitePlayerNickname === user || game.blackPlayerNickname === user;

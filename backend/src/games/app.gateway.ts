@@ -31,10 +31,10 @@ export class GameGateway {
   ) {
     console.log("=== CREATE GAME CALLED ===");
     try {
-      const userId: number = client.data.user.userId;
+      // const userId: number = client.data.user.userId;
       const game = await this.appService.createGame({
         ...createGameOptions,
-        whitePlayerId: String(userId),
+        // whitePlayerId: String(userId),
       });
       const gameWithNicknames = await this.appService.getGame(game.id);
       const boardState = fenToBoard(gameWithNicknames.fen);
@@ -138,6 +138,10 @@ export class GameGateway {
       const piece = boardState.find(
         (el) => el.position.col === to.col && el.position.row === to.row,
       )?.piece;
+      this.server.emit("update-game-status", {
+        id: game.id,
+        gameStatus: game.gameStatus,
+      });
       this.server.to(`game/${dto.id}`).emit("state", { success: true, from, to, piece });
     } catch (err) {
       client.emit("error", { message: err.message });

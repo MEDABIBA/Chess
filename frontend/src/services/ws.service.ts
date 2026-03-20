@@ -2,10 +2,18 @@ import { io, Socket } from "socket.io-client";
 import apiService from "./api.service";
 import tokenService from "./auth.service";
 import { RootStore } from "../store/RootStore";
-import { GameInterface, Position } from "../types/types";
+import { GameInterface, GameStatus, Position } from "../types/types";
 import { makeAutoObservable, runInAction } from "mobx";
 import Piece from "../models/Piece";
-import { ICreateGame, IGetGame, IJoinGame, IJoinGameByCode, IJoinRoom, ILeaveRoom, IMakeMove } from "../types/api.types";
+import {
+  ICreateGame,
+  IGetGame,
+  IJoinGame,
+  IJoinGameByCode,
+  IJoinRoom,
+  ILeaveRoom,
+  IMakeMove,
+} from "../types/api.types";
 
 class WebSocketService {
   store: RootStore | null = null;
@@ -84,6 +92,12 @@ class WebSocketService {
       this.store?.games?.currentGame?.setBoard(res);
       console.log("game-state", res);
     });
+    this.socket?.on("update-game-status", (res: { id: number; gameStatus: GameStatus }) => {
+      const game = this.store?.games.gamesList.find((el) => el.id === res.id);
+      if (!game) return;
+      game.gameStatus = res.gameStatus;
+      console.log("update-game-status", res);
+    });
     this.socket?.on(
       "state",
       (res: { success: boolean; piece: Piece; from: Position; to: Position }) => {
@@ -143,6 +157,7 @@ class WebSocketService {
     this.socket.emit("create-game", data);
   }
   public joinRoom(data: IJoinRoom) {
+    console.log("joinRoom func");
     if (!this.socket) throw new Error("Socket not initialized");
     if (!this.socket?.connected) return;
     this.socket.emit("join-room", data);

@@ -14,7 +14,7 @@ export class AppService {
   constructor(private prisma: PrismaService) {}
 
   async createGame(dto: CreateGameDto) {
-    const { boardState, whitePlayerId, initialTime } = dto;
+    const { boardState, whitePlayerUsername, initialTime } = dto;
     const fen = boardToFen(
       boardState.map((square) => ({
         color: square.color,
@@ -23,12 +23,14 @@ export class AppService {
       })),
       "white",
     );
+    const user = await this.prisma.user.findUnique({ where: { username: whitePlayerUsername } });
+    if (!user) throw new Error("user didnt exist");
     const inviteCode = generateInviteCode();
     return this.prisma.game.create({
       data: {
         fen: fen,
         currentPlayer: "white",
-        whitePlayerId: Number(whitePlayerId),
+        whitePlayerId: user?.id,
         initialTime,
         whiteTimeLeft: initialTime,
         blackTimeLeft: initialTime,
@@ -143,30 +145,30 @@ export class AppService {
         throw new Error("Invalid move");
       }
       if (res.valid) {
-        if (game.gameStatus !== 'playing') {
-          game.gameStatus = 'playing'
+        if (game.gameStatus !== "playing") {
+          game.gameStatus = "playing";
         }
         if (res.isCheck) {
-          game.gameStatus = 'check'
+          game.gameStatus = "check";
         }
         if (res.isCheckmate) {
-          game.gameStatus = 'checkmate'
+          game.gameStatus = "checkmate";
         }
       }
-      if (game.currentPlayer === 'white') {
-        turnStartedAt = game.whiteTurnStarterAt
-        timeLeft = game.whiteTimeLeft
-        game.blackTurnStarterAt = new Date()
-      } else if (game.currentPlayer === 'black') {
-          turnStartedAt = game.blackTurnStarterAt
-        timeLeft = game.blackTimeLeft
-        game.whiteTurnStarterAt = new Date()
+      if (game.currentPlayer === "white") {
+        turnStartedAt = game.whiteTurnStarterAt;
+        timeLeft = game.whiteTimeLeft;
+        game.blackTurnStarterAt = new Date();
+      } else if (game.currentPlayer === "black") {
+        turnStartedAt = game.blackTurnStarterAt;
+        timeLeft = game.blackTimeLeft;
+        game.whiteTurnStarterAt = new Date();
       } else {
-        throw new Error(`Invalid player color ${game.currentPlayer}`)
+        throw new Error(`Invalid player color ${game.currentPlayer}`);
       }
       if (turnStartedAt !== null) {
-        const timeSpend = (Date.now() - turnStartedAt.getTime()) / 1000
-        timeLeft -= timeSpend
+        const timeSpend = (Date.now() - turnStartedAt.getTime()) / 1000;
+        timeLeft -= timeSpend;
       }
 
       return await prisma.game.update({
@@ -174,15 +176,15 @@ export class AppService {
         data: {
           fen: res.newFen,
           currentPlayer: game.currentPlayer === "white" ? "black" : "white",
-          whiteTimeLeft: game.currentPlayer === 'white' ? timeLeft : game.whiteTimeLeft,
-          whiteTurnStarterAt: game.currentPlayer === 'white' ? null : opponentTurnStartAt,
-          blackTimeLeft: game.currentPlayer === 'black' ? timeLeft : game.blackTimeLeft,
-          blackTurnStarterAt: game.currentPlayer === 'black' ? null : opponentTurnStartAt,
+          whiteTimeLeft: game.currentPlayer === "white" ? timeLeft : game.whiteTimeLeft,
+          whiteTurnStarterAt: game.currentPlayer === "white" ? null : opponentTurnStartAt,
+          blackTimeLeft: game.currentPlayer === "black" ? timeLeft : game.blackTimeLeft,
+          blackTurnStarterAt: game.currentPlayer === "black" ? null : opponentTurnStartAt,
           fromX: highlightLastMove.from.col,
           fromY: highlightLastMove.from.row,
           toX: highlightLastMove.to.col,
           toY: highlightLastMove.to.row,
-          gameStatus: game.gameStatus
+          gameStatus: game.gameStatus,
         },
       });
     });

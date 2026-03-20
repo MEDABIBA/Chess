@@ -1,46 +1,40 @@
-import {Position, SquareData} from "./types"
+import { Position, SquareData } from "./types";
 
 export interface ICreateGame {
-    boardState: SquareData[],
-    whitePlayerId: string,
-    initialTime: number
-}  
+  boardState: SquareData[];
+  whitePlayerUsername: string;
+  initialTime: number;
+}
 
 export interface IJoinRoom {
-    gameId: number
+  gameId: number;
 }
 
 export interface ILeaveRoom {
-    gameId: number
+  gameId: number;
 }
 
 export interface IJoinGame {
-    id: number,
-    username: string
+  id: number;
+  username: string;
 }
 
 export interface IJoinGameByCode {
-    username: string;
-    code: string
+  username: string;
+  code: string;
 }
 
 export interface IGetGame {
-    id: number
+  id: number;
 }
 
-export type IMakeMove =  {
-    id: number,
-    moveData: {
-    from: Position,
-    to: Position,
+export type IMakeMove = {
+  id: number;
+  moveData: {
+    from: Position;
+    to: Position;
     highlightLastMove: { from: Position; to: Position };
-    whiteTimeLeft: number
-    blackTimeLeft: number
-    }
-
-}
-
-
-
-
-
+    whiteTimeLeft: number;
+    blackTimeLeft: number;
+  };
+};

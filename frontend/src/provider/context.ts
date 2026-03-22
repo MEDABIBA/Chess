@@ -11,7 +11,9 @@ export function StoreInitializer() {
     const initApp = async () => {
       store.initNavigate(navigate);
       await store.initWs();
-      if (!store.isAuthorized) {
+      if (!store.isAuthorized()) {
+        console.log('navigate user ');
+
         store.navigate('registration-form');
       }
     };

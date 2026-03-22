@@ -20,6 +20,8 @@ class WebSocketService {
   socket: Socket | null = null;
   isConnected: boolean = false;
   accessToken: string | null = null;
+  pendingEvent: { event: string; data?: unknown } | null = null;
+
   constructor(store: RootStore) {
     makeAutoObservable(this);
     this.store = store;
@@ -59,6 +61,10 @@ class WebSocketService {
       runInAction(() => {
         this.isConnected = true;
       });
+      if (this.pendingEvent) {
+        this.socket?.emit(this.pendingEvent.event, this.pendingEvent.data);
+        this.pendingEvent = null;
+      }
       console.log('WebSocket connected');
     });
 
@@ -145,10 +151,10 @@ class WebSocketService {
     this.socket.on('error', async (err) => {
       runInAction(() => {
         this.isConnected = false;
+        this.accessToken = null;
       });
       console.log('error', err);
       if (err.message.includes('Unauthorized')) {
-        this.accessToken = null;
         const token = await this.refreshAccessToken();
         console.log('refreshed');
         if (token && this.socket) {
@@ -170,27 +176,32 @@ class WebSocketService {
   public createGame(data: ICreateGame) {
     if (!this.socket) throw new Error('Socket not initialized');
     if (!this.socket?.connected) return;
+    this.pendingEvent = { event: 'create-game', data };
     this.socket.emit('create-game', data);
   }
   public joinRoom(data: IJoinRoom) {
     console.log('joinRoom func');
     if (!this.socket) throw new Error('Socket not initialized');
     if (!this.socket?.connected) return;
+    this.pendingEvent = { event: 'join-room', data };
     this.socket.emit('join-room', data);
   }
   public leaveRoom(data: ILeaveRoom) {
     if (!this.socket) throw new Error('Socket not initialized');
     if (!this.socket?.connected) return;
+    this.pendingEvent = { event: 'leave-room', data };
     this.socket.emit('leave-room', data);
   }
   public joinGame(data: IJoinGame) {
     if (!this.socket) throw new Error('Socket not initialized');
     if (!this.socket?.connected) return;
+    this.pendingEvent = { event: 'join-game', data };
     this.socket.emit('join-game', data);
   }
   public joinGameByCode(data: IJoinGameByCode) {
     if (!this.socket) throw new Error('Socket not initialized');
     if (!this.socket?.connected) return;
+    this.pendingEvent = { event: 'join-game-code', data };
     this.socket.emit('join-game-code', data);
   }
   public getAllGames() {
@@ -207,6 +218,7 @@ class WebSocketService {
     if (!this.socket) throw new Error('Socket not initialized');
     if (!this.socket?.connected) return;
     console.log('called makeMove');
+    this.pendingEvent = { event: 'make-move', data };
     this.socket.emit('make-move', data);
   }
 

@@ -37,6 +37,9 @@ export class RootStore {
       }
       await this.socket.connect();
     } catch (error) {
+      if (error instanceof Error && error.message === 'Invalid access token') {
+        return;
+      }
       console.error('Initialization failed:', error);
       this.navigate('registration-form');
     }
@@ -61,7 +64,6 @@ export class RootStore {
 
   getNickname() {
     if (!this.socket?.accessToken) {
-      console.error('There is no accessToken to exteract nickname!');
       return null;
     }
     const decoded: MyJwtPayload = jwtDecode(this.socket.accessToken);

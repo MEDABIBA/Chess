@@ -1,11 +1,11 @@
 class ApiService {
   async register(username: string, password: string) {
     try {
-      const response = await fetch("http://localhost:3030/auth/registration", {
-        method: "POST",
-        credentials: "include",
+      const response = await fetch('http://localhost:3030/auth/registration', {
+        method: 'POST',
+        credentials: 'include',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password }),
       });
@@ -20,11 +20,11 @@ class ApiService {
   }
 
   async login(username: string, password: string) {
-    const response = await fetch("http://localhost:3030/auth/login", {
-      method: "POST",
-      credentials: "include",
+    const response = await fetch('http://localhost:3030/auth/login', {
+      method: 'POST',
+      credentials: 'include',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ username, password }),
     });
@@ -35,11 +35,11 @@ class ApiService {
     return parsed;
   }
   async refreshAccessToken() {
-    const response = await fetch("http://localhost:3030/auth/refresh", {
-      method: "POST",
-      credentials: "include",
+    const response = await fetch('http://localhost:3030/auth/refresh', {
+      method: 'POST',
+      credentials: 'include',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
     const parsed = await response.json();

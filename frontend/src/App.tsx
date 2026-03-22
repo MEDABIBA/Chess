@@ -1,12 +1,12 @@
-import { observer } from "mobx-react-lite";
-import { Navigate, Route, Routes } from "react-router-dom";
-import Board from "./pages/Board";
-import CreateGame from "./pages/CreateGame";
-import AuthForm from "./pages/AuthForm";
-import Home from "./pages/Home";
-import Header from "./components/Header";
-import { useStore } from "./provider/context";
-import { useEffect } from "react";
+import { observer } from 'mobx-react-lite';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import Board from './pages/Board';
+import CreateGame from './pages/CreateGame';
+import AuthForm from './pages/AuthForm';
+import Home from './pages/Home';
+import Header from './components/Header';
+import { useStore } from './provider/context';
+import { useEffect } from 'react';
 
 const App = observer(() => {
   const store = useStore();
@@ -14,7 +14,7 @@ const App = observer(() => {
   useEffect(() => {
     const activeGame = games.activeGame;
     if (activeGame) {
-      games.setCurrentGame(activeGame)
+      games.setCurrentGame(activeGame);
       navigate(`game/${activeGame}`);
     }
   }, [games.activeGame]);

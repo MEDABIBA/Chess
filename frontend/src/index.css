@@ -11,7 +11,8 @@
   box-sizing: border-box;
 }
 
-input, button {
+input,
+button {
   border: none;
   outline: none;
   box-shadow: none;
@@ -49,7 +50,7 @@ body {
 }
 .backgound-image::before {
   z-index: -1;
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
@@ -137,10 +138,10 @@ body {
   -ms-user-select: none;
 }
 .square::before {
-  content: "";
+  content: '';
 }
 .square-active::before {
-  content: "";
+  content: '';
   position: relative !important;
   height: 36% !important;
   width: 36% !important;
@@ -149,7 +150,7 @@ body {
   background: rgba(0, 0, 0, 0.34) !important;
 }
 .square-attack::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   height: 100%;
@@ -162,7 +163,7 @@ body {
 }
 
 .last-move::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   background: radial-gradient(
@@ -177,7 +178,7 @@ body {
 }
 
 .grabbed::before {
-  content: "";
+  content: '';
   height: 100%;
   width: 100%;
   border: 3px solid #444;
@@ -503,26 +504,26 @@ body {
 }
 .home-input-wrapper {
   display: flex;
-  gap: 10px
+  gap: 10px;
 }
-.home-input{
+.home-input {
   padding: 2px 5px;
   color: #fff;
   background-color: #444;
-  border-radius: 4px
+  border-radius: 4px;
 }
 .home-input:focus {
-  background-color: #555
+  background-color: #555;
 }
-.home-input-button{
+.home-input-button {
   padding: 0 15px;
   background: #444;
   color: #fff;
   border-radius: 10px;
 }
-.home-input-button:hover{
+.home-input-button:hover {
   background-color: #555;
-  cursor: pointer
+  cursor: pointer;
 }
 
 .home-button {
@@ -553,7 +554,7 @@ th {
   border: 1px solid #999;
   text-align: left;
   padding: 8px;
-  text-align: center
+  text-align: center;
 }
 .connect-game-btn {
   width: 100%;

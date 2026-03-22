@@ -1,11 +1,11 @@
-import ReactDOM from "react-dom/client";
-import App from "./App";
+import ReactDOM from 'react-dom/client';
+import App from './App';
 
-import "./index.css";
-import { BrowserRouter } from "react-router-dom";
-import { StoreInitializer } from "./provider/context";
+import './index.css';
+import { BrowserRouter } from 'react-router-dom';
+import { StoreInitializer } from './provider/context';
 
-const rootElement = document.getElementById("root");
+const rootElement = document.getElementById('root');
 if (rootElement) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(

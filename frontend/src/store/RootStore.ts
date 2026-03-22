@@ -1,13 +1,13 @@
-import { makeAutoObservable, observable } from "mobx";
-import ChessMoveValidator from "./ChessMoveValidator";
-import Timer from "./Timer";
-import NewGame from "./NewGame";
-import { NavigateFunction } from "react-router-dom";
-import { socket } from "../services/ws.service";
-import tokenService from "../services/auth.service";
-import { jwtDecode } from "jwt-decode";
-import { MyJwtPayload } from "../types/types";
-import Games from "./Games";
+import { makeAutoObservable, observable } from 'mobx';
+import ChessMoveValidator from './ChessMoveValidator';
+import Timer from './Timer';
+import NewGame from './NewGame';
+import { NavigateFunction } from 'react-router-dom';
+import { socket } from '../services/ws.service';
+import tokenService from '../services/auth.service';
+import { jwtDecode } from 'jwt-decode';
+import { MyJwtPayload } from '../types/types';
+import Games from './Games';
 
 export class RootStore {
   games: Games;
@@ -32,14 +32,14 @@ export class RootStore {
   async initWs() {
     try {
       if (!this.socket) {
-        console.error("Socket unucialized!");
+        console.error('Socket unucialized!');
         return;
       }
       this.socket.setStore(this); // ← передаём через метод, не импорт
       await this.socket.connect();
     } catch (error) {
-      console.error("Initialization failed:", error);
-      this.navigate("registration-form");
+      console.error('Initialization failed:', error);
+      this.navigate('registration-form');
     }
   }
 
@@ -53,8 +53,8 @@ export class RootStore {
     if (!game) return true;
     if (
       this.games.currentGame?.isParticipant() &&
-      this.games.currentGame.gameStatus !== "playing" &&
-      this.games.currentGame.gameStatus !== "check"
+      this.games.currentGame.gameStatus !== 'playing' &&
+      this.games.currentGame.gameStatus !== 'check'
     )
       return true;
     return false;
@@ -62,7 +62,7 @@ export class RootStore {
 
   getNickname() {
     if (!this.socket?.accessToken) {
-      console.error("There is no accessToken to exteract nickname!");
+      console.error('There is no accessToken to exteract nickname!');
       return null;
     }
     const decoded: MyJwtPayload = jwtDecode(this.socket.accessToken);
@@ -72,33 +72,37 @@ export class RootStore {
   isAuthorized() {
     return tokenService.isAuthenticated();
   }
-  handleAuthSubmit = async (auth: "login" | "registration", username: string, password: string) => {
+  handleAuthSubmit = async (
+    auth: 'login' | 'registration',
+    username: string,
+    password: string,
+  ) => {
     try {
       if (!this.socket) {
-        console.error("Socket unucialized!");
+        console.error('Socket unucialized!');
         return;
       }
       const res = await fetch(`http://localhost:3030/auth/${auth}`, {
-        method: "POST",
-        credentials: "include",
+        method: 'POST',
+        credentials: 'include',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password }),
       });
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Request failed");
+        throw new Error(data.message || 'Request failed');
       }
       tokenService.setAccessToken(data.accessToken);
       this.socket.accessToken = data.accessToken;
-      console.log("user created!");
-      this.navigate("home");
+      console.log('user created!');
+      this.navigate('home');
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Error processed");
-        throw new Error(error.message || "Request failed");
+        console.error('Error processed');
+        throw new Error(error.message || 'Request failed');
       }
     }
   };

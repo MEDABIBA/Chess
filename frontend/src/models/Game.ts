@@ -1,10 +1,16 @@
-import { action, computed, makeAutoObservable } from "mobx";
-import { Color, GameInterface, GameStatus, Position, SquareData } from "../types/types";
-import Piece from "./Piece";
-import { RootStore } from "../store/RootStore";
-import { simulateValidMove } from "../helpers/simulateMove";
-import soundMove from "../assets/sounds/move.mp3";
-import { initializeBoard } from "../helpers/initializeBoard";
+import { action, computed, makeAutoObservable } from 'mobx';
+import {
+  Color,
+  GameInterface,
+  GameStatus,
+  Position,
+  SquareData,
+} from '../types/types';
+import Piece from './Piece';
+import { RootStore } from '../store/RootStore';
+import { simulateValidMove } from '../helpers/simulateMove';
+import soundMove from '../assets/sounds/move.mp3';
+import { initializeBoard } from '../helpers/initializeBoard';
 
 class Game {
   private store: RootStore;
@@ -12,8 +18,8 @@ class Game {
   board: SquareData[] = [];
   whitePlayerNickname: string | null = null;
   blackPlayerNickname: string | null = null;
-  currentPlayer: Color = "white";
-  gameStatus: GameStatus = "waiting";
+  currentPlayer: Color = 'white';
+  gameStatus: GameStatus = 'waiting';
   inviteCode: string | null = null;
   activePiece: Piece | null = null;
   initialTime: number;
@@ -23,7 +29,8 @@ class Game {
   animateMove: { from: Position; to: Position } | null = null;
   modalActive: boolean = false;
   lastDoubleStepPawn: null | { color: Color; position: Position } = null;
-  pendingPromotion: { piece: Piece; position: Position; color: Color } | null = null;
+  pendingPromotion: { piece: Piece; position: Position; color: Color } | null =
+    null;
   createdAt: Date;
 
   constructor(store: RootStore, game: GameInterface) {
@@ -40,12 +47,13 @@ class Game {
     this.inviteCode = game.inviteCode;
     if (game.fromX && game.fromY && game.toX && game.toY) {
       this.highlightLastMove = {
-      from: { col: game.fromX, row: game.fromY },
-      to: { col: game.toX, row: game.toY },
-    };
+        from: { col: game.fromX, row: game.fromY },
+        to: { col: game.toX, row: game.toY },
+      };
     }
     this.initialTime = game.initialTime;
-    this.lastDoubleStepPawn = game.lastDoubleStepPawn || this.lastDoubleStepPawn;
+    this.lastDoubleStepPawn =
+      game.lastDoubleStepPawn || this.lastDoubleStepPawn;
     this.whitePlayerNickname = game.whitePlayer.username;
     this.blackPlayerNickname = game?.blackPlayer?.username ?? null;
     this.createdAt = game.createdAt;
@@ -69,7 +77,8 @@ class Game {
     }
     this.lastDoubleStepPawn = game.lastDoubleStepPawn || null;
     this.whitePlayerNickname = game.whitePlayer.username;
-    this.blackPlayerNickname = game?.blackPlayer?.username ?? this.blackPlayerNickname;
+    this.blackPlayerNickname =
+      game?.blackPlayer?.username ?? this.blackPlayerNickname;
     this.createdAt = game.createdAt;
   }
 
@@ -77,14 +86,19 @@ class Game {
   hydratePieceClassesFromServer(board: SquareData[]) {
     board.forEach((el) => {
       if (!el.piece?.pieceType) return;
-      el.piece = new Piece(el.piece?.pieceType, el.piece?.position, el.piece?.color);
+      el.piece = new Piece(
+        el.piece?.pieceType,
+        el.piece?.position,
+        el.piece?.color,
+      );
     });
   }
 
   @action
   getPiece = (from: Position) => {
-    return this.board.find((el) => el.position.col === from.col && el.position.row === from.row)
-      ?.piece;
+    return this.board.find(
+      (el) => el.position.col === from.col && el.position.row === from.row,
+    )?.piece;
   };
 
   @action
@@ -122,19 +136,22 @@ class Game {
   @action
   isParticipant() {
     const username = this.store.getNickname();
-    return this.whitePlayerNickname === username || this.blackPlayerNickname === username;
+    return (
+      this.whitePlayerNickname === username ||
+      this.blackPlayerNickname === username
+    );
   }
 
   @action
   isFinished() {
-    return this.gameStatus === "checkmate" || this.gameStatus === "timeout";
+    return this.gameStatus === 'checkmate' || this.gameStatus === 'timeout';
   }
 
   @action
-  get yourColor(): "white" | "black" | null {
+  get yourColor(): 'white' | 'black' | null {
     const username = this.store.getNickname();
-    if (this.whitePlayerNickname === username) return "white";
-    if (this.blackPlayerNickname === username) return "black";
+    if (this.whitePlayerNickname === username) return 'white';
+    if (this.blackPlayerNickname === username) return 'black';
     return null;
   }
 
@@ -158,19 +175,27 @@ class Game {
   };
 
   @action
-  makeMove = async (from: Position, to: Position, animation = false): Promise<void> => {
+  makeMove = async (
+    from: Position,
+    to: Position,
+    animation = false,
+  ): Promise<void> => {
     const piece = this.getPiece(from);
-    const side = from.col < to.col ? "right" : "left";
+    const side = from.col < to.col ? 'right' : 'left';
     if (!piece) {
-      console.warn("No piece at this position");
+      console.warn('No piece at this position');
       return;
     }
     if (!this.isValidMove(piece, from, to, side)) {
-      console.warn("Invalid move");
+      console.warn('Invalid move');
       return;
     }
     if (this.isPromotion(piece, to)) {
-      this.setPendingPromotion({ piece: piece, position: to, color: piece.color });
+      this.setPendingPromotion({
+        piece: piece,
+        position: to,
+        color: piece.color,
+      });
       return;
     }
 
@@ -195,11 +220,16 @@ class Game {
   setAvailableMoves = (args: [Piece, Position] | null) => {
     this.availableMoves = [];
     if (!args) return;
-    if (this.gameStatus === "checkmate" || this.gameStatus === "timeout") return;
+    if (this.gameStatus === 'checkmate' || this.gameStatus === 'timeout')
+      return;
     const [piece, position] = args;
     this.board.forEach((el) => {
       if (
-        (this.store.chessMoveValidator.isValidMove(piece, position, el.position) &&
+        (this.store.chessMoveValidator.isValidMove(
+          piece,
+          position,
+          el.position,
+        ) &&
           !this.store.chessMoveValidator.isKingUnderAttack(piece.color)) ||
         (this.store.chessMoveValidator.isKingUnderAttack(piece.color) &&
           simulateValidMove(
@@ -210,7 +240,11 @@ class Game {
             this.setPiece,
             this.store.chessMoveValidator.isKingUnderAttack,
           ) &&
-          this.store.chessMoveValidator.isValidMove(piece, position, el.position))
+          this.store.chessMoveValidator.isValidMove(
+            piece,
+            position,
+            el.position,
+          ))
       ) {
         this.availableMoves.push(el.position);
       }
@@ -218,24 +252,30 @@ class Game {
   };
 
   updateTimer = (color: Color) => {
-    if (color === "white") {
+    if (color === 'white') {
       const timer = this.store.timer;
       timer.deactiveTimer();
-      timer.activateTimer("black");
-    } else if (color === "black") {
+      timer.activateTimer('black');
+    } else if (color === 'black') {
       const timer = this.store.timer;
       timer.deactiveTimer();
-      timer.activateTimer("white");
+      timer.activateTimer('white');
     }
   };
 
-  isValidMove = (piece: Piece, from: Position, to: Position, side: "right" | "left") => {
+  isValidMove = (
+    piece: Piece,
+    from: Position,
+    to: Position,
+    side: 'right' | 'left',
+  ) => {
     if (!this.store.chessMoveValidator.isValidMove(piece, from, to)) {
       return false;
     }
-    if (this.gameStatus === "checkmate" || this.gameStatus === "timeout") return false;
+    if (this.gameStatus === 'checkmate' || this.gameStatus === 'timeout')
+      return false;
     if (
-      piece.pieceType !== "king" &&
+      piece.pieceType !== 'king' &&
       this.store.chessMoveValidator.isKingUnderAttack(piece.color)
     ) {
       if (
@@ -251,7 +291,7 @@ class Game {
         return false;
       }
     } else if (
-      piece.pieceType === "king" &&
+      piece.pieceType === 'king' &&
       this.store.chessMoveValidator.isCastlingAvailable(side, piece, from, to)
     ) {
       this.store.chessMoveValidator.executeCastling(side, piece, from, to);
@@ -263,7 +303,7 @@ class Game {
   finalizeMove = async (piece: Piece, from: Position, to: Position) => {
     piece.position = to;
     if (
-      piece.pieceType === "pawn" &&
+      piece.pieceType === 'pawn' &&
       from.col !== to.col &&
       !this.getPiece(to) &&
       this.lastDoubleStepPawn
@@ -278,15 +318,15 @@ class Game {
     this.setActivePiece(null);
     this.availableMoves = [];
     this.highlightLastMove = { from, to };
-    this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
+    this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
     this.animateMove = null;
     this.lastDoubleStepPawn = null;
-    if (piece.pieceType === "pawn" && Math.abs(from.row - to.row) === 2) {
+    if (piece.pieceType === 'pawn' && Math.abs(from.row - to.row) === 2) {
       this.lastDoubleStepPawn = { color: piece.color, position: to };
     }
     if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
       this.store.timer.deactiveTimer();
-      this.gameStatus = "checkmate";
+      this.gameStatus = 'checkmate';
       this.setModalActive(true);
     }
   };
@@ -298,7 +338,9 @@ class Game {
   @action
   promotePiece = (oldPiece: Piece, piece: Piece) => {
     const square = this.board.find(
-      (el) => el.position.col === piece.position.col && el.position.row === piece.position.row,
+      (el) =>
+        el.position.col === piece.position.col &&
+        el.position.row === piece.position.row,
     );
     if (square) {
       square.piece = piece;
@@ -308,11 +350,11 @@ class Game {
       this.setPendingPromotion(null);
       this.setActivePiece(null);
       this.availableMoves = [];
-      this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
+      this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
       this.setPiece(oldPiece.position, null);
       if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
         this.store.timer.deactiveTimer();
-        this.gameStatus = "checkmate";
+        this.gameStatus = 'checkmate';
         this.setModalActive(true);
       }
     }
@@ -324,7 +366,9 @@ class Game {
   }
 
   @action
-  setPendingPromotion = (value: { piece: Piece; position: Position; color: Color } | null) => {
+  setPendingPromotion = (
+    value: { piece: Piece; position: Position; color: Color } | null,
+  ) => {
     this.pendingPromotion = value;
   };
 
@@ -341,8 +385,8 @@ class Game {
   reloadGame = () => {
     this.board = [];
     initializeBoard();
-    this.currentPlayer = "white";
-    this.gameStatus = "playing";
+    this.currentPlayer = 'white';
+    this.gameStatus = 'playing';
     this.activePiece = null;
     this.highlightLastMove = null;
     this.availableMoves = [];

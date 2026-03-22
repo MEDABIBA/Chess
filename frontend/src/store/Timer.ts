@@ -1,6 +1,6 @@
-import { action, makeAutoObservable } from "mobx";
-import { RootStore } from "./RootStore";
-import { Color } from "../types/types";
+import { action, makeAutoObservable } from 'mobx';
+import { RootStore } from './RootStore';
+import { Color } from '../types/types';
 
 class Timer {
   store: RootStore;
@@ -14,10 +14,10 @@ class Timer {
 
   @action
   getFirstPlayerTime = () => {
-    if (this.p1 === null) return "00:00";
+    if (this.p1 === null) return '00:00';
     const minutes = Math.floor(this.p1 / 60);
     const seconds = Math.floor(this.p1 - minutes * 60);
-    return `${minutes > 9 ? "" : 0}${minutes}:${seconds > 9 ? "" : 0}${seconds}`;
+    return `${minutes > 9 ? '' : 0}${minutes}:${seconds > 9 ? '' : 0}${seconds}`;
   };
 
   @action
@@ -27,10 +27,10 @@ class Timer {
 
   @action
   getSecondPlayerTime = () => {
-    if (this.p2 === null) return "00:00";
+    if (this.p2 === null) return '00:00';
     const minutes = Math.floor(this.p2 / 60);
     const seconds = Math.floor(this.p2 - minutes * 60);
-    return `${minutes > 9 ? "" : 0}${minutes}:${seconds > 9 ? "" : 0}${seconds}`;
+    return `${minutes > 9 ? '' : 0}${minutes}:${seconds > 9 ? '' : 0}${seconds}`;
   };
 
   @action
@@ -39,19 +39,26 @@ class Timer {
   };
 
   activateTimer = (player: Color) => {
-    return (this.interval = setInterval(() => this.decrementTime(player), 1000));
+    return (this.interval = setInterval(
+      () => this.decrementTime(player),
+      1000,
+    ));
   };
 
   private decrementTime = (player: Color) => {
-    if (player === "white" && this.p1 !== null) {
+    if (player === 'white' && this.p1 !== null) {
       this.p1 -= 1;
-    } else if (player === "black" && this.p2 !== null) {
+    } else if (player === 'black' && this.p2 !== null) {
       this.p2 -= 1;
     }
   };
 
   checkIfTimesUp = () => {
-    if ((this.p1 !== null && this.p1 <= 0) || (this.p2 !== null && this.p2 <= 0)) return true;
+    if (
+      (this.p1 !== null && this.p1 <= 0) ||
+      (this.p2 !== null && this.p2 <= 0)
+    )
+      return true;
     return false;
   };
 

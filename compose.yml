@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.9'
 
 services:
   frontend:
@@ -30,9 +30,9 @@ services:
       - backend_node_modules:/app/node_modules
     command: sh -c "npx prisma generate && npx prisma db push && yarn start:dev"
     environment:
-      DATABASE_URL: "postgresql://postgres:postgres@postgresql:5432/chess"
-      CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
+      DATABASE_URL: 'postgresql://postgres:postgres@postgresql:5432/chess'
+      CHOKIDAR_USEPOLLING: 'true'
+      WATCHPACK_POLLING: 'true'
     depends_on:
       postgresql:
         condition: service_healthy
@@ -44,11 +44,11 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: chess
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
       timeout: 5s
       retries: 5

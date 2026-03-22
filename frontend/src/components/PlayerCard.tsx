@@ -1,5 +1,5 @@
-import { observer } from "mobx-react-lite";
-import Timer from "./Timer";
+import { observer } from 'mobx-react-lite';
+import Timer from './Timer';
 
 const PlayerCard = ({
   playerName,
@@ -8,7 +8,7 @@ const PlayerCard = ({
   playerName: string | null;
   getPlayerTime: () => string;
 }) => {
-  const displayName = playerName ?? "...";
+  const displayName = playerName ?? '...';
   return (
     <div className="player-card">
       <div className="player-name">{displayName}</div>

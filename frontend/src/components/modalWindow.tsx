@@ -3,7 +3,7 @@ const Modal = ({
   reloadGame,
   setIsActive,
 }: {
-  winColor: "White" | "Black";
+  winColor: 'White' | 'Black';
   reloadGame: () => void;
   setIsActive: (value: boolean) => void;
 }) => (
@@ -17,7 +17,8 @@ const Modal = ({
             className="close"
             onClick={() => setIsActive(false)}
             data-dismiss="modal"
-            aria-label="Close">
+            aria-label="Close"
+          >
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -25,14 +26,19 @@ const Modal = ({
           <p>Modal body text goes here.</p>
         </div> */}
         <div className="modal-footer">
-          <button type="button" onClick={() => reloadGame()} className="btn btn-primary">
+          <button
+            type="button"
+            onClick={() => reloadGame()}
+            className="btn btn-primary"
+          >
             Reset
           </button>
           <button
             type="button"
             onClick={() => setIsActive(false)}
             className="btn btn-secondary"
-            data-dismiss="modal">
+            data-dismiss="modal"
+          >
             Close
           </button>
         </div>

@@ -1,7 +1,7 @@
-import { makeAutoObservable, reaction } from "mobx";
-import { RootStore } from "./RootStore";
-import { GameInterface } from "../types/types";
-import Game from "../models/Game";
+import { makeAutoObservable, reaction } from 'mobx';
+import { RootStore } from './RootStore';
+import { GameInterface } from '../types/types';
+import Game from '../models/Game';
 
 class Games {
   private appStore: RootStore;
@@ -13,16 +13,20 @@ class Games {
     this.appStore = appStore;
     // this.currentGame = new Game(this.appStore);
     reaction(
-      () => appStore?.socket?.isConnected,
-      (connected) => {
-        if (connected) {
+      () => [appStore?.socket?.isConnected, appStore?.socket?.accessToken],
+      (connected, accessToken) => {
+        if (connected && accessToken) {
           appStore.socket?.getAllGames();
         }
       },
     );
     reaction(
       () =>
-        [this.currentGame?.id, this.appStore.socket, this.appStore.socket?.isConnected] as const,
+        [
+          this.currentGame?.id,
+          this.appStore.socket,
+          this.appStore.socket?.isConnected,
+        ] as const,
       ([id, socket, isConnected]) => {
         if (!id || !socket || !isConnected) return;
         socket.getGame({ id: Number(id) });
@@ -31,7 +35,7 @@ class Games {
   }
 
   addGame(game: GameInterface) {
-    console.log("addGame", game);
+    console.log('addGame', game);
     this.gamesList?.push(new Game(this.appStore, game));
   }
 
@@ -54,12 +58,16 @@ class Games {
   }
 
   get activeGame() {
-    return this.gamesList.find((el) => this.isParticipant(el) && el.gameStatus === "playing")?.id;
+    return this.gamesList.find(
+      (el) => this.isParticipant(el) && el.gameStatus === 'playing',
+    )?.id;
   }
 
   isParticipant(game: Game) {
     const user = this.appStore.getNickname();
-    return game.whitePlayerNickname === user || game.blackPlayerNickname === user;
+    return (
+      game.whitePlayerNickname === user || game.blackPlayerNickname === user
+    );
   }
 
   joinGame(game: Game) {

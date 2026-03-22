@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
-import { useStore } from "../provider/context";
-import checkValidValue from "../helpers/checkValidNickname";
+import { useEffect, useState } from 'react';
+import { useStore } from '../provider/context';
+import checkValidValue from '../helpers/checkValidNickname';
 
 const AuthForm = () => {
   const { handleAuthSubmit } = useStore();
-  const [auth, setAuth] = useState<"login" | "registration">("registration");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [auth, setAuth] = useState<'login' | 'registration'>('registration');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     if (isError) {
       if (checkValidValue(username) && checkValidValue(password)) {
-        setIsError(false)
+        setIsError(false);
       } else {
         setIsError(true);
-      } 
+      }
     }
   }, [isError, username, password]);
 
@@ -31,9 +31,12 @@ const AuthForm = () => {
             setIsError(true);
           }
         }}
-        className="modal-window">
+        className="modal-window"
+      >
         <div className="auth-title">
-          <h2 className="auth-title-text">{auth === "login" ? "Login" : "Registration"}</h2>
+          <h2 className="auth-title-text">
+            {auth === 'login' ? 'Login' : 'Registration'}
+          </h2>
         </div>
         <label className="auth-elem">
           <h4>Username</h4>
@@ -56,17 +59,26 @@ const AuthForm = () => {
           />
         </label>
         <button disabled={isError} className="submit-button">
-          {" "}
-          {auth === "login" ? "Login" : "Create account"}
+          {' '}
+          {auth === 'login' ? 'Login' : 'Create account'}
         </button>
-        {isError && <div className="input-error">Maximum 30 characters (Latin letters only)</div>}
+        {isError && (
+          <div className="input-error">
+            Maximum 30 characters (Latin letters only)
+          </div>
+        )}
         <p>
-          {auth === "login" ? "Dont have account? " : "Already have username and password? "}
+          {auth === 'login'
+            ? 'Dont have account? '
+            : 'Already have username and password? '}
           <button
             className="auth-button"
             type="button"
-            onClick={() => (auth === "login" ? setAuth("registration") : setAuth("login"))}>
-            {auth === "login" ? "Registration" : "Login"}
+            onClick={() =>
+              auth === 'login' ? setAuth('registration') : setAuth('login')
+            }
+          >
+            {auth === 'login' ? 'Registration' : 'Login'}
           </button>
         </p>
       </form>

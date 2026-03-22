@@ -1,26 +1,31 @@
-import { JwtPayload } from "jwt-decode";
-import Piece from "../models/Piece";
+import { JwtPayload } from 'jwt-decode';
+import Piece from '../models/Piece';
 
 export interface MyJwtPayload extends JwtPayload {
   username: string;
 }
 
-export type GameStatus = "playing" | "check" | "checkmate" | "timeout" | "waiting";
+export type GameStatus =
+  | 'playing'
+  | 'check'
+  | 'checkmate'
+  | 'timeout'
+  | 'waiting';
 
 export interface Position {
   row: number;
   col: number;
 }
 
-export type Color = "white" | "black";
+export type Color = 'white' | 'black';
 
 export enum PieceType {
-  PAWN = "pawn",
-  ROOK = "rook",
-  KNIGHT = "knight",
-  BISHOP = "bishop",
-  QUEEN = "queen",
-  KING = "king",
+  PAWN = 'pawn',
+  ROOK = 'rook',
+  KNIGHT = 'knight',
+  BISHOP = 'bishop',
+  QUEEN = 'queen',
+  KING = 'king',
 }
 
 export const PropotionPieceType: PieceType[] = [
@@ -50,7 +55,7 @@ interface Game {
   blackTimeLeft: number;
   boardState: SquareData[][];
   createdAt: Date;
-  currentPlayer: "white" | "black";
+  currentPlayer: 'white' | 'black';
   gameStatus: GameStatus;
   inviteCode: string;
   initialTime: number;

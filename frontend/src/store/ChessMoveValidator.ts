@@ -1,8 +1,8 @@
-import { action, makeAutoObservable } from "mobx";
-import Piece from "../models/Piece";
-import { Position, Color, SquareData } from "../types/types";
-import { RootStore } from "./RootStore";
-import { simulateValidMove } from "../helpers/simulateMove";
+import { action, makeAutoObservable } from 'mobx';
+import Piece from '../models/Piece';
+import { Position, Color, SquareData } from '../types/types';
+import { RootStore } from './RootStore';
+import { simulateValidMove } from '../helpers/simulateMove';
 
 class ChessMoveValidator {
   private store: RootStore;
@@ -14,28 +14,30 @@ class ChessMoveValidator {
 
   @action
   isValidMove = (piece: Piece, from: Position, to: Position) => {
-    if (piece.color !== this.store.games.currentGame?.currentPlayer) return false;
-    if (piece.color === this.store.games.currentGame?.getPiece(to)?.color) return false;
+    if (piece.color !== this.store.games.currentGame?.currentPlayer)
+      return false;
+    if (piece.color === this.store.games.currentGame?.getPiece(to)?.color)
+      return false;
     if (from.col === to.col && from.row === to.row) return false;
 
     let valid = false;
     switch (piece.pieceType) {
-      case "pawn":
+      case 'pawn':
         valid = this.isValidPawnMove(piece, from, to);
         break;
-      case "rook":
+      case 'rook':
         valid = this.isValidRookMove(from, to);
         break;
-      case "knight":
+      case 'knight':
         valid = this.isValidKnightMove(from, to);
         break;
-      case "bishop":
+      case 'bishop':
         valid = this.isValidBishopMove(from, to);
         break;
-      case "queen":
+      case 'queen':
         valid = this.isValidQueenMove(from, to);
         break;
-      case "king":
+      case 'king':
         valid = this.isValidKingMove(piece, from, to);
         break;
       default:
@@ -71,7 +73,8 @@ class ChessMoveValidator {
       const start = Math.min(from.col, to.col) + 1;
       const end = Math.max(from.col, to.col);
       for (let r = start; r < end; r++) {
-        if (this.store.games.currentGame?.getPiece({ row: from.row, col: r })) return false;
+        if (this.store.games.currentGame?.getPiece({ row: from.row, col: r }))
+          return false;
       }
       return true;
       // col horizontal --
@@ -79,7 +82,8 @@ class ChessMoveValidator {
       const start = Math.min(from.row, to.row) + 1;
       const end = Math.max(from.row, to.row);
       for (let r = start; r < end; r++) {
-        if (this.store.games.currentGame?.getPiece({ row: r, col: from.col })) return false;
+        if (this.store.games.currentGame?.getPiece({ row: r, col: from.col }))
+          return false;
       }
       return true;
     }
@@ -104,19 +108,27 @@ class ChessMoveValidator {
   };
 
   private isValidPawnMove = (figure: Piece, from: Position, to: Position) => {
-    const dir = figure.color === "white" ? 1 : -1;
-    const startingPos = figure.color === "white" ? 2 : 7;
+    const dir = figure.color === 'white' ? 1 : -1;
+    const startingPos = figure.color === 'white' ? 2 : 7;
     const attackedPiece = this.store.games.currentGame?.getPiece(to);
-    const isEnPassant = this.store.games.currentGame?.getPiece({ row: to.row - dir, col: to.col });
+    const isEnPassant = this.store.games.currentGame?.getPiece({
+      row: to.row - dir,
+      col: to.col,
+    });
     const lastDoubleStepPawn = this.store.games.currentGame?.lastDoubleStepPawn;
     if (from.col === to.col) {
       if (to.row === from.row + dir) {
         return !attackedPiece;
       } else if (from.row === startingPos && to.row === from.row + 2 * dir) {
         const middlePos = { row: from.row + dir, col: from.col };
-        return !this.store.games.currentGame?.getPiece(middlePos) && !attackedPiece;
+        return (
+          !this.store.games.currentGame?.getPiece(middlePos) && !attackedPiece
+        );
       } else return false;
-    } else if (to.row === from.row + dir && (from.col === to.col + 1 || from.col === to.col - 1)) {
+    } else if (
+      to.row === from.row + dir &&
+      (from.col === to.col + 1 || from.col === to.col - 1)
+    ) {
       if (!!attackedPiece?.color && attackedPiece?.color !== figure.color) {
         return true;
       } else if (
@@ -132,7 +144,9 @@ class ChessMoveValidator {
   };
 
   private isValidRookMove = (from: Position, to: Position) => {
-    return from.row === to.row || from.col === to.col ? this.isPathClear(from, to) : false;
+    return from.row === to.row || from.col === to.col
+      ? this.isPathClear(from, to)
+      : false;
   };
 
   private isValidKnightMove = (from: Position, to: Position) => {
@@ -157,7 +171,7 @@ class ChessMoveValidator {
   };
 
   private isValidKingMove = (piece: Piece, from: Position, to: Position) => {
-    const side = from.col < to.col ? "right" : "left";
+    const side = from.col < to.col ? 'right' : 'left';
     if (this.isCastlingAvailable(side, piece, from, to)) return true;
     const rowDiff = Math.abs(from.row - to.row);
     const colDiff = Math.abs(from.col - to.col);
@@ -167,7 +181,10 @@ class ChessMoveValidator {
     this.store.games.currentGame?.setPiece(to, piece);
     this.store.games.currentGame?.setPiece(from, null);
 
-    const stillUnderAttack = this.isAttackedField(to, this.store.games.currentGame!.currentPlayer);
+    const stillUnderAttack = this.isAttackedField(
+      to,
+      this.store.games.currentGame!.currentPlayer,
+    );
 
     this.store.games.currentGame?.setPiece(from, piece);
     this.store.games.currentGame?.setPiece(to, originalToPiece ?? null);
@@ -175,9 +192,14 @@ class ChessMoveValidator {
     return rowDiff <= 1 && colDiff <= 1 && !stillUnderAttack;
   };
 
-  isCastlingAvailable = (side: "right" | "left", piece: Piece, from: Position, to: Position) => {
+  isCastlingAvailable = (
+    side: 'right' | 'left',
+    piece: Piece,
+    from: Position,
+    to: Position,
+  ) => {
     const diff = Math.abs(from.col - to.col);
-    const rookColPos = side === "left" ? 1 : 8;
+    const rookColPos = side === 'left' ? 1 : 8;
     const rook = this.store.games.currentGame?.board.find(
       (el) => el.position.col === rookColPos && el.position.row === from.row,
     )?.piece;
@@ -190,13 +212,13 @@ class ChessMoveValidator {
       !this.isPathClear(from, { row: to.row, col: rookColPos })
     )
       return false;
-    if (side === "right" && rook.hasMoved ? false : true) {
+    if (side === 'right' && rook.hasMoved ? false : true) {
       for (let i = from.col; i < to.col + 1; i++) {
         if (this.isAttackedField({ row: from.row, col: i }, piece.color)) {
           return false;
         } else continue;
       }
-    } else if (side === "left" && rook.hasMoved ? false : true) {
+    } else if (side === 'left' && rook.hasMoved ? false : true) {
       for (let i = from.col; i < to.col + 1; i++) {
         if (this.isAttackedField({ row: from.row, col: i }, piece.color)) {
           return false;
@@ -207,14 +229,17 @@ class ChessMoveValidator {
   };
 
   executeCastling = async (
-    side: "left" | "right",
+    side: 'left' | 'right',
     king: Piece,
     from: Position,
     to: Position,
   ): Promise<void> => {
-    const rookFromCol = side === "left" ? 1 : 8;
-    const rookToCol = side === "left" ? to.col + 1 : to.col - 1;
-    const rook = this.store.games.currentGame?.getPiece({ row: from.row, col: rookFromCol });
+    const rookFromCol = side === 'left' ? 1 : 8;
+    const rookToCol = side === 'left' ? to.col + 1 : to.col - 1;
+    const rook = this.store.games.currentGame?.getPiece({
+      row: from.row,
+      col: rookFromCol,
+    });
     if (!rook) return;
     if (this.store.games.currentGame) {
       this.store.games.currentGame.animateMove = {
@@ -225,8 +250,14 @@ class ChessMoveValidator {
 
     setTimeout(() => {
       rook.position = { row: to.row, col: rookToCol };
-      this.store.games.currentGame?.setPiece({ row: to.row, col: rookToCol }, rook);
-      this.store.games.currentGame?.setPiece({ row: from.row, col: rookFromCol }, null);
+      this.store.games.currentGame?.setPiece(
+        { row: to.row, col: rookToCol },
+        rook,
+      );
+      this.store.games.currentGame?.setPiece(
+        { row: from.row, col: rookFromCol },
+        null,
+      );
     }, 200);
   };
 
@@ -234,17 +265,17 @@ class ChessMoveValidator {
     if (from.col === to.col && from.row === to.row) return false;
 
     switch (piece.pieceType) {
-      case "pawn":
+      case 'pawn':
         return this.canPawnAttack(piece, from, to);
-      case "rook":
+      case 'rook':
         return this.isValidRookMove(from, to);
-      case "knight":
+      case 'knight':
         return this.isValidKnightMove(from, to);
-      case "bishop":
+      case 'bishop':
         return this.isValidBishopMove(from, to);
-      case "queen":
+      case 'queen':
         return this.isValidQueenMove(from, to);
-      case "king":
+      case 'king':
         return this.canKingAttack(from, to);
       default:
         return false;
@@ -252,7 +283,7 @@ class ChessMoveValidator {
   };
 
   private canPawnAttack = (pawn: Piece, from: Position, to: Position) => {
-    const direction = pawn.color === "white" ? 1 : -1;
+    const direction = pawn.color === 'white' ? 1 : -1;
     const rowDiff = to.row - from.row;
     const colDiff = Math.abs(to.col - from.col);
 
@@ -266,9 +297,11 @@ class ChessMoveValidator {
   };
 
   isKingUnderAttack = (currColPlayer: Color) => {
-    const king: SquareData | undefined = this.store.games.currentGame?.board.find(
-      (e: SquareData) => e.piece?.pieceType === "king" && e.piece?.color === currColPlayer,
-    );
+    const king: SquareData | undefined =
+      this.store.games.currentGame?.board.find(
+        (e: SquareData) =>
+          e.piece?.pieceType === 'king' && e.piece?.color === currColPlayer,
+      );
     if (!king) return false;
     return this.isAttackedField(king.position, currColPlayer);
   };
@@ -291,28 +324,30 @@ class ChessMoveValidator {
   };
 
   private canMakeMove = (piece: Piece, from: Position, to: Position) => {
-    if (piece.color !== this.store.games.currentGame?.currentPlayer) return false;
-    if (piece.color === this.store.games.currentGame.getPiece(to)?.color) return false;
+    if (piece.color !== this.store.games.currentGame?.currentPlayer)
+      return false;
+    if (piece.color === this.store.games.currentGame.getPiece(to)?.color)
+      return false;
     if (from.col === to.col && from.row === to.row) return false;
     let valid = false;
 
     switch (piece.pieceType) {
-      case "pawn":
+      case 'pawn':
         valid = this.isValidPawnMove(piece, from, to);
         break;
-      case "rook":
+      case 'rook':
         valid = this.isValidRookMove(from, to);
         break;
-      case "knight":
+      case 'knight':
         valid = this.isValidKnightMove(from, to);
         break;
-      case "bishop":
+      case 'bishop':
         valid = this.isValidBishopMove(from, to);
         break;
-      case "queen":
+      case 'queen':
         valid = this.isValidQueenMove(from, to);
         break;
-      case "king":
+      case 'king':
         valid = this.isValidKingMove(piece, from, to);
         break;
       default:
@@ -330,8 +365,8 @@ class ChessMoveValidator {
     );
   };
   isLastRow = (piece: Piece, position: Position) => {
-    const row = piece.color === "white" ? 8 : 1;
-    if (position.row === row && piece.pieceType === "pawn") return true;
+    const row = piece.color === 'white' ? 8 : 1;
+    if (position.row === row && piece.pieceType === 'pawn') return true;
     return false;
   };
 }

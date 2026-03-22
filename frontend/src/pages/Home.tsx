@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { useStore } from "../provider/context";
-import { observer } from "mobx-react-lite";
+import { useState } from 'react';
+import { useStore } from '../provider/context';
+import { observer } from 'mobx-react-lite';
 
 const Home = () => {
   const store = useStore();
   const { navigate, games } = store;
-  const [friendCode, setFriendCode] = useState("");
+  const [friendCode, setFriendCode] = useState('');
   const [isError, setIsError] = useState(false);
   const allGames = games.getAllGames();
   return (
@@ -34,7 +34,8 @@ const Home = () => {
                   } else {
                     setIsError(true);
                   }
-                }}>
+                }}
+              >
                 Find game!
               </button>
             </div>
@@ -63,12 +64,16 @@ const Home = () => {
                   return (
                     <tr key={key}>
                       <td>
-                        {hours ? hours + "h" : ""}{" "}
-                        {minutes || hours ? minutes + "m" : "A couple of seconds"} ago
+                        {hours ? hours + 'h' : ''}{' '}
+                        {minutes || hours
+                          ? minutes + 'm'
+                          : 'A couple of seconds'}{' '}
+                        ago
                       </td>
                       <td>{game.initialTime / 60}:00</td>
                       <td>
-                        {game.whitePlayerNickname} | {game.blackPlayerNickname ?? "..."}
+                        {game.whitePlayerNickname} |{' '}
+                        {game.blackPlayerNickname ?? '...'}
                       </td>
                       <td>{game.gameStatus}</td>
                       <td>
@@ -81,8 +86,9 @@ const Home = () => {
                             } else {
                               games.joinGame(game);
                             }
-                          }}>
-                          {isParticipant ? "Enter" : "Join game"}
+                          }}
+                        >
+                          {isParticipant ? 'Enter' : 'Join game'}
                         </button>
                       </td>
                     </tr>

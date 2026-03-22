@@ -1,5 +1,5 @@
-import Piece from "../models/Piece";
-import { Color, Position } from "../types/types";
+import Piece from '../models/Piece';
+import { Color, Position } from '../types/types';
 
 export const simulateValidMove = (
   piece: Piece,

@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect } from "react";
-import { RootStore, store } from "../store/RootStore";
-import { useNavigate } from "react-router-dom";
+import { createContext, useContext, useEffect } from 'react';
+import { RootStore, store } from '../store/RootStore';
+import { useNavigate } from 'react-router-dom';
 
 export const StoreContext = createContext<RootStore>(store as RootStore);
 export const useStore = () => useContext(StoreContext);
@@ -12,7 +12,7 @@ export function StoreInitializer() {
       store.initNavigate(navigate);
       await store.initWs();
       if (!store.isAuthorized) {
-        store.navigate("registration-form");
+        store.navigate('registration-form');
       }
     };
     initApp();

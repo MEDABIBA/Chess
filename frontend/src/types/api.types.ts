@@ -1,4 +1,4 @@
-import { Position, SquareData } from "./types";
+import { Position, SquareData } from './types';
 
 export interface ICreateGame {
   boardState: SquareData[];

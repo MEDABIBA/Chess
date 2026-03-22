@@ -1,5 +1,5 @@
-import Piece from "../models/Piece";
-import { PieceType, Position, SquareData } from "../types/types";
+import Piece from '../models/Piece';
+import { PieceType, Position, SquareData } from '../types/types';
 
 const createInitialPiece = (position: Position): Piece | null => {
   const col = position.col;
@@ -19,16 +19,16 @@ const createInitialPiece = (position: Position): Piece | null => {
     return null;
   }
   if (position.row === 2) {
-    return new Piece(PieceType.PAWN, position, "white");
+    return new Piece(PieceType.PAWN, position, 'white');
   }
   if (position.row === 1) {
-    return new Piece(pieceType, position, "white");
+    return new Piece(pieceType, position, 'white');
   }
   if (position.row === 7) {
-    return new Piece(PieceType.PAWN, position, "black");
+    return new Piece(PieceType.PAWN, position, 'black');
   }
   if (position.row === 8) {
-    return new Piece(pieceType, position, "black");
+    return new Piece(pieceType, position, 'black');
   }
   return null;
 };
@@ -37,7 +37,7 @@ export const initializeBoard = () => {
   const board: SquareData[] = [];
   for (let row = 8; row > 0; row--) {
     for (let col = 1; col < 9; col++) {
-      const color = (row + col) % 2 === 0 ? "black" : "white";
+      const color = (row + col) % 2 === 0 ? 'black' : 'white';
       const position = {
         row,
         col,

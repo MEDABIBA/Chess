@@ -1,14 +1,14 @@
 name: Docker Build & Push
 
-on: 
+on:
   push:
     branches: [main, multiplayer]
 
 jobs:
-  build: 
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build images
-        run: docker compose build 
+        run: docker compose build

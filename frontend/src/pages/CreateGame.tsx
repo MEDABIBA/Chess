@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
-import arrowUp from "../assets/up-arrow.png";
-import downArrow from "../assets/down-arrow.png";
-import { useStore } from "../provider/context";
+import { useEffect, useState } from 'react';
+import arrowUp from '../assets/up-arrow.png';
+import downArrow from '../assets/down-arrow.png';
+import { useStore } from '../provider/context';
 
 const CreateGame = () => {
   const { newGame } = useStore();
   const { createNewGame } = newGame;
-  const timerValues = ["3 min", "5 min", "10 min", "15 min"] as const;
-  const [timerValue, setTimerValue] = useState<(typeof timerValues)[number]>("3 min");
+  const timerValues = ['3 min', '5 min', '10 min', '15 min'] as const;
+  const [timerValue, setTimerValue] =
+    useState<(typeof timerValues)[number]>('3 min');
   const [activeTimer, setActiveTimer] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   // const [nicknameError, setNicknameError] = useState(false);
@@ -36,22 +37,26 @@ const CreateGame = () => {
               } else {
                 setActiveTimer(true);
               }
-            }}>
-            {timerValue} (Rapid){" "}
+            }}
+          >
+            {timerValue} (Rapid){' '}
             <img
               src={activeTimer ? arrowUp : downArrow}
               alt="arrow"
-              style={{ width: "16px", height: "16px", marginLeft: "5px" }}
+              style={{ width: '16px', height: '16px', marginLeft: '5px' }}
             />
           </button>
           {isVisible && (
-            <ul className={`timer-list ${activeTimer ? "timer-list-active" : "timer-list-hidden"}`}>
+            <ul
+              className={`timer-list ${activeTimer ? 'timer-list-active' : 'timer-list-hidden'}`}
+            >
               {timerValues.map((el, i) => {
                 return (
                   <li
                     key={i}
-                    className={`timer-element ${el === timerValue ? "timer-element-active" : null}`}
-                    onClick={() => setTimerValue(el)}>
+                    className={`timer-element ${el === timerValue ? 'timer-element-active' : null}`}
+                    onClick={() => setTimerValue(el)}
+                  >
                     {el}
                   </li>
                 );
@@ -68,7 +73,10 @@ const CreateGame = () => {
           {/* {nicknameError && (
           <div className="input-error">Maximum 30 characters (Latin letters only)</div>
         )} */}
-          <button onClick={async () => await createNewGame(selectTime)} className="submit-button">
+          <button
+            onClick={async () => await createNewGame(selectTime)}
+            className="submit-button"
+          >
             Create game
           </button>
         </div>

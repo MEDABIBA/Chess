@@ -1,10 +1,10 @@
-import BoardComponent from "../components/Board";
-import { useStore } from "../provider/context";
-import Modal from "../components/modalWindow";
-import { observer } from "mobx-react-lite";
-import PlayerCard from "../components/PlayerCard";
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import BoardComponent from '../components/Board';
+import { useStore } from '../provider/context';
+import Modal from '../components/modalWindow';
+import { observer } from 'mobx-react-lite';
+import PlayerCard from '../components/PlayerCard';
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 const Board = () => {
   const { id } = useParams();
@@ -16,7 +16,10 @@ const Board = () => {
     if (currentGame === null || !id || !socket || !socket.isConnected) return;
     currentGame.id = Number(id);
     socket.joinRoom({ gameId: Number(id) });
-    if (currentGame.gameStatus === "playing" || currentGame.gameStatus === "check") {
+    if (
+      currentGame.gameStatus === 'playing' ||
+      currentGame.gameStatus === 'check'
+    ) {
       timer.activateTimer(currentGame.currentPlayer);
     }
     return () => {
@@ -29,20 +32,23 @@ const Board = () => {
 
   return (
     <div className="app">
-      {(currentGame.gameStatus === "checkmate" || currentGame.gameStatus === "timeout") &&
+      {(currentGame.gameStatus === 'checkmate' ||
+        currentGame.gameStatus === 'timeout') &&
         isModalActive === true && (
           <Modal
-            winColor={currentGame.currentPlayer === "black" ? "White" : "Black"}
+            winColor={currentGame.currentPlayer === 'black' ? 'White' : 'Black'}
             reloadGame={currentGame.reloadGame}
             setIsActive={currentGame.setModalActive}
           />
         )}
       <div className="main-content">
-        {(currentGame.gameStatus === "checkmate" || currentGame.gameStatus === "timeout") && (
+        {(currentGame.gameStatus === 'checkmate' ||
+          currentGame.gameStatus === 'timeout') && (
           <button
             type="button"
             onClick={() => currentGame.setModalActive(true)}
-            className="btn btn-primary btn-lg">
+            className="btn btn-primary btn-lg"
+          >
             Open modal
           </button>
         )}

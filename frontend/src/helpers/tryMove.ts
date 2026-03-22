@@ -1,9 +1,9 @@
-import { Position } from "../types/types";
+import { Position } from '../types/types';
 
 const tryMove = (
   square: HTMLElement | null,
   position: Position,
-  makeMove: (from: Position, to: Position, animation?: boolean) => void
+  makeMove: (from: Position, to: Position, animation?: boolean) => void,
 ) => {
   if (!square) return;
   const toRow = Number(square.dataset.row);

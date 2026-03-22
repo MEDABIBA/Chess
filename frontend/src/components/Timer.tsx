@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { useStore } from "../provider/context";
-import { observer } from "mobx-react-lite";
+import { useEffect } from 'react';
+import { useStore } from '../provider/context';
+import { observer } from 'mobx-react-lite';
 
 const Timer = observer(({ getPlayerTime }: { getPlayerTime: () => string }) => {
   const { timer, games } = useStore();
@@ -9,7 +9,7 @@ const Timer = observer(({ getPlayerTime }: { getPlayerTime: () => string }) => {
   useEffect(() => {
     if (checkIfTimesUp() && game !== null) {
       deactiveTimer();
-      game.gameStatus = "timeout";
+      game.gameStatus = 'timeout';
       game.setModalActive(true);
     }
   }, [getPlayerTime()]);

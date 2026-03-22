@@ -16,23 +16,17 @@ import {
 } from '../types/api.types';
 
 class WebSocketService {
-  store: RootStore | null = null;
+  store: RootStore;
   socket: Socket | null = null;
   isConnected: boolean = false;
   accessToken: string | null = null;
-  constructor() {
+  constructor(store: RootStore) {
     makeAutoObservable(this);
+    this.store = store;
     this.accessToken = tokenService.getAccessToken();
   }
 
-  public setStore(store: RootStore) {
-    this.store = store;
-  }
-
   public async connect() {
-    if (this.socket?.connected) {
-      return this.socket;
-    }
     if (this.socket) {
       this.socket.removeAllListeners();
       this.socket = null;
@@ -154,10 +148,12 @@ class WebSocketService {
       });
       console.log('error', err);
       if (err.message.includes('Unauthorized')) {
+        this.accessToken = null;
         const token = await this.refreshAccessToken();
         console.log('refreshed');
         if (token && this.socket) {
           this.socket.auth = { token };
+          console.log('reconnecting..');
           this.connect();
         }
       }
@@ -221,7 +217,8 @@ class WebSocketService {
       const token = await apiService.refreshAccessToken();
 
       tokenService.setAccessToken(token);
-      this.accessToken = token;
+      console.log('Token changed');
+      runInAction(() => (this.accessToken = token));
       return token;
     } catch (err) {
       if (err instanceof Error) {
@@ -234,4 +231,4 @@ class WebSocketService {
     }
   }
 }
-export const socket = new WebSocketService();
+export default WebSocketService;

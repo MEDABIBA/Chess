@@ -3,18 +3,18 @@ import ChessMoveValidator from './ChessMoveValidator';
 import Timer from './Timer';
 import NewGame from './NewGame';
 import { NavigateFunction } from 'react-router-dom';
-import { socket } from '../services/ws.service';
 import tokenService from '../services/auth.service';
 import { jwtDecode } from 'jwt-decode';
 import { MyJwtPayload } from '../types/types';
 import Games from './Games';
+import WebSocketService from '../services/ws.service';
 
 export class RootStore {
   games: Games;
   chessMoveValidator: ChessMoveValidator;
   timer: Timer;
   newGame: NewGame;
-  socket: typeof socket | null;
+  socket: WebSocketService;
 
   @observable navigate!: NavigateFunction;
 
@@ -24,7 +24,7 @@ export class RootStore {
     this.games = new Games(this);
     this.timer = new Timer(this);
     this.newGame = new NewGame(this);
-    this.socket = socket;
+    this.socket = new WebSocketService(this);
 
     // this.init();
   }
@@ -35,7 +35,6 @@ export class RootStore {
         console.error('Socket unucialized!');
         return;
       }
-      this.socket.setStore(this); // ← передаём через метод, не импорт
       await this.socket.connect();
     } catch (error) {
       console.error('Initialization failed:', error);

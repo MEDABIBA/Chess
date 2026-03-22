@@ -11,11 +11,14 @@ class Games {
   constructor(appStore: RootStore) {
     makeAutoObservable(this);
     this.appStore = appStore;
-    // this.currentGame = new Game(this.appStore);
     reaction(
-      () => [appStore?.socket?.isConnected, appStore?.socket?.accessToken],
-      (connected, accessToken) => {
-        if (connected && accessToken) {
+      () => [
+        this.appStore?.socket,
+        this.appStore?.socket?.isConnected,
+        this.appStore?.socket?.accessToken,
+      ],
+      ([socket, connected, accessToken]) => {
+        if (socket && connected && accessToken) {
           appStore.socket?.getAllGames();
         }
       },

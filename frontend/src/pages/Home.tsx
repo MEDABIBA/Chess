@@ -39,9 +39,12 @@ const Home = () => {
                 Find game!
               </button>
             </div>
-            <a href="create-game" className="home-button">
+            <button
+              className="home-button"
+              onClick={() => navigate('/create-game')}
+            >
               Create game!
-            </a>
+            </button>
           </div>
           <table className="home-table">
             <thead>

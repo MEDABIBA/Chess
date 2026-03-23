@@ -515,13 +515,13 @@ body {
 .home-input:focus {
   background-color: #555;
 }
-.home-input-button {
-  padding: 0 15px;
+.button {
+  padding: 5px 15px;
   background: #444;
   color: #fff;
   border-radius: 10px;
 }
-.home-input-button:hover {
+.button:hover {
   background-color: #555;
   cursor: pointer;
 }
@@ -548,6 +548,7 @@ body {
   width: 100%;
   min-width: 462px;
   background: #333;
+  margin-bottom: 15px;
 }
 td,
 th {
@@ -568,6 +569,14 @@ th {
 .connect-game-btn:hover {
   cursor: pointer;
   background: #777;
+}
+
+.pagination {
+  color: #eee;
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  justify-content: right;
 }
 
 @media (max-width: 768px) {

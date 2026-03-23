@@ -18,7 +18,7 @@ export function StoreInitializer() {
       }
     };
     initApp();
-  }, [store, navigate]);
+  }, [store]);
 
   return null;
 }

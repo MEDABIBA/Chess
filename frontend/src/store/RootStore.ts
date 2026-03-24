@@ -98,6 +98,7 @@ export class RootStore {
       }
       tokenService.setAccessToken(data.accessToken);
       this.socket.accessToken = data.accessToken;
+      this.socket.connect();
       console.log('user created!');
       this.navigate('home');
     } catch (error) {

@@ -24,6 +24,7 @@ button {
 }
 
 body {
+  color: #eee;
   background-color: #333;
   height: 100%;
 }
@@ -542,6 +543,37 @@ body {
   color: inherit;
   background-color: #777;
 }
+
+.filter {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+.filter-title {
+  padding: 5px 10px 5px 0;
+}
+.filter-btn {
+  font-size: 14px;
+  font-weight: 600;
+  color: #eee;
+  padding: 5px 10px;
+  border-radius: 13px;
+  background-color: #222;
+  transition: all 0.2s ease-out;
+}
+.filter-btn:hover {
+  cursor: pointer;
+  font-size: 15px;
+  color: #fff;
+  background-color: #333;
+}
+.filter-btn-active {
+  color: #eee;
+  padding: 5px 10px;
+  border-radius: 13px;
+  background-color: #444;
+}
+
 .home-table {
   color: #fff;
   border-collapse: collapse;

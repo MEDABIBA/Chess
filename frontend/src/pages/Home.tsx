@@ -5,16 +5,28 @@ import { observer } from 'mobx-react-lite';
 const Home = () => {
   const store = useStore();
   const { navigate, games } = store;
+  const [filter, setFilter] = useState<
+    'all' | 'active' | 'waiting' | 'archive'
+  >('all');
   const [friendCode, setFriendCode] = useState('');
   const [isError, setIsError] = useState(false);
   const allGames = games.getAllGames();
   const ITEMS_PER_PAGE = 8;
   const [page, setPage] = useState(1);
+  const filteredGames = allGames.filter(
+    (game) =>
+      filter === 'all' ||
+      (filter === 'active' &&
+        (game.gameStatus === 'playing' || game.gameStatus === 'check')) ||
+      (filter === 'waiting' && game.gameStatus === 'waiting') ||
+      (filter === 'archive' &&
+        (game.gameStatus === 'checkmate' || game.gameStatus === 'timeout')),
+  );
   const paginated =
-    allGames.length > 0
-      ? allGames.slice((page - 1) * ITEMS_PER_PAGE, ITEMS_PER_PAGE * page)
+    filteredGames.length > 0
+      ? filteredGames.slice((page - 1) * ITEMS_PER_PAGE, ITEMS_PER_PAGE * page)
       : [];
-  const totalPages = Math.ceil((allGames.length ?? 0) / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil((filteredGames.length ?? 0) / ITEMS_PER_PAGE);
   return (
     <>
       <div className="backgound-image">
@@ -52,6 +64,17 @@ const Home = () => {
             >
               Create game!
             </button>
+          </div>
+          <div className="filter">
+            <span className="filter-title">FILTER: </span>
+            {(['all', 'active', 'waiting', 'archive'] as const).map((f) => (
+              <button
+                onClick={() => setFilter(f)}
+                className={`${filter === f ? 'filter-btn-active' : 'filter-btn'}`}
+              >
+                {f.toUpperCase()}
+              </button>
+            ))}
           </div>
           <table className="home-table">
             <thead>

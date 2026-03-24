@@ -93,19 +93,33 @@ const Home = () => {
                   const date = Date.now() - new Date(game.createdAt).getTime();
                   const totalSeconds = Math.floor(date / 1000);
                   const minutes = Math.floor(totalSeconds / 60) % 60;
-                  const hours = Math.floor(totalSeconds / 60 / 60) % 60;
+                  const hours = Math.floor(totalSeconds / 3600) % 24;
+                  const days = Math.floor(totalSeconds / 3600 / 24);
                   return (
                     <tr key={key}>
                       <td>
-                        {hours ? hours + 'h' : ''}{' '}
-                        {minutes || hours
-                          ? minutes + 'm'
-                          : 'A couple of seconds'}{' '}
-                        ago
+                        {days ? (
+                          <>
+                            {days + `${days > 1 ? ' days ' : ' day '}`}
+                            {hours ? hours + 'h ' : ''}
+                            ago
+                          </>
+                        ) : (
+                          <>
+                            {hours ? hours + 'h ' : ''}
+                            {minutes
+                              ? minutes + 'm '
+                              : hours
+                                ? ''
+                                : 'A couple of seconds'}
+                            ago
+                          </>
+                        )}
                       </td>
+
                       <td>{game.initialTime / 60}:00</td>
                       <td>
-                        {game.whitePlayerNickname} |{' '}
+                        {game.whitePlayerNickname} |
                         {game.blackPlayerNickname ?? '...'}
                       </td>
                       <td>{game.gameStatus}</td>

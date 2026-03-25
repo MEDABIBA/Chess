@@ -3,6 +3,7 @@ import {
   Color,
   GameInterface,
   GameStatus,
+  PieceType,
   Position,
   SquareData,
 } from '../types/types';
@@ -294,8 +295,7 @@ class Game {
       piece.pieceType === 'king' &&
       this.store.chessMoveValidator.isCastlingAvailable(side, piece, from, to)
     ) {
-      this.store.chessMoveValidator.executeCastling(side, piece, from, to);
-      return false;
+      return true;
     }
     return true;
   };
@@ -323,6 +323,9 @@ class Game {
     this.lastDoubleStepPawn = null;
     if (piece.pieceType === 'pawn' && Math.abs(from.row - to.row) === 2) {
       this.lastDoubleStepPawn = { color: piece.color, position: to };
+    }
+    if (piece.pieceType === PieceType.KING && Math.abs(from.col - to.col) > 1) {
+      this.store.chessMoveValidator.executeCastling(piece, from, to);
     }
     if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
       this.store.timer.deactiveTimer();

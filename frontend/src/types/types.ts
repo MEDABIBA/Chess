@@ -5,12 +5,7 @@ export interface MyJwtPayload extends JwtPayload {
   username: string;
 }
 
-export type GameStatus =
-  | 'playing'
-  | 'check'
-  | 'checkmate'
-  | 'timeout'
-  | 'waiting';
+export type GameStatus = 'playing' | 'checkmate' | 'timeout' | 'waiting';
 
 export interface Position {
   row: number;

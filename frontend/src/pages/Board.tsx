@@ -16,10 +16,7 @@ const Board = () => {
     if (currentGame === null || !id || !socket || !socket.isConnected) return;
     currentGame.id = Number(id);
     socket.joinRoom({ gameId: Number(id) });
-    if (
-      currentGame.gameStatus === 'playing' ||
-      currentGame.gameStatus === 'check'
-    ) {
+    if (currentGame.gameStatus === 'playing') {
       timer.activateTimer(currentGame.currentPlayer);
     }
     return () => {

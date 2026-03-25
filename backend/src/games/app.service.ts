@@ -104,10 +104,6 @@ export class AppService {
         blackPlayer: { select: { username: true } },
       },
     });
-    if (!games.length) {
-      console.log('Games not found');
-      throw new NotFoundException('Games not found');
-    }
     return games;
   }
 
@@ -153,9 +149,6 @@ export class AppService {
       if (res.valid) {
         if (game.gameStatus !== 'playing') {
           game.gameStatus = 'playing';
-        }
-        if (res.isCheck) {
-          game.gameStatus = 'check';
         }
         if (res.isCheckmate) {
           game.gameStatus = 'checkmate';

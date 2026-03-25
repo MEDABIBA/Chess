@@ -16,8 +16,7 @@ const Home = () => {
   const filteredGames = allGames.filter(
     (game) =>
       filter === 'all' ||
-      (filter === 'active' &&
-        (game.gameStatus === 'playing' || game.gameStatus === 'check')) ||
+      (filter === 'active' && game.gameStatus === 'playing') ||
       (filter === 'waiting' && game.gameStatus === 'waiting') ||
       (filter === 'archive' &&
         (game.gameStatus === 'checkmate' || game.gameStatus === 'timeout')),
@@ -67,8 +66,9 @@ const Home = () => {
           </div>
           <div className="filter">
             <span className="filter-title">FILTER: </span>
-            {(['all', 'active', 'waiting', 'archive'] as const).map((f) => (
+            {(['all', 'active', 'waiting', 'archive'] as const).map((f, i) => (
               <button
+                key={i}
                 onClick={() => setFilter(f)}
                 className={`${filter === f ? 'filter-btn-active' : 'filter-btn'}`}
               >
@@ -98,7 +98,7 @@ const Home = () => {
                   return (
                     <tr key={key}>
                       <td>
-                        {days ? (
+                        {days > 0 ? (
                           <>
                             {days + `${days > 1 ? ' days ' : ' day '}`}
                             {hours ? hours + 'h ' : ''}
@@ -106,12 +106,12 @@ const Home = () => {
                           </>
                         ) : (
                           <>
-                            {hours ? hours + 'h ' : ''}
-                            {minutes
+                            {hours > 0 ? hours + 'h ' : ''}
+                            {minutes > 0
                               ? minutes + 'm '
-                              : hours
+                              : hours > 0
                                 ? ''
-                                : 'A couple of seconds'}
+                                : 'A couple of seconds '}
                             ago
                           </>
                         )}

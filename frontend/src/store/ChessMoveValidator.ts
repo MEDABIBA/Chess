@@ -229,13 +229,12 @@ class ChessMoveValidator {
   };
 
   executeCastling = async (
-    side: 'left' | 'right',
     king: Piece,
     from: Position,
     to: Position,
   ): Promise<void> => {
-    const rookFromCol = side === 'left' ? 1 : 8;
-    const rookToCol = side === 'left' ? to.col + 1 : to.col - 1;
+    const rookFromCol = from.col > to.col ? 1 : 8;
+    const rookToCol = king.position.col > to.col ? to.col + 1 : to.col - 1;
     const rook = this.store.games.currentGame?.getPiece({
       row: from.row,
       col: rookFromCol,

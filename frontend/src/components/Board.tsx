@@ -1,3 +1,4 @@
+import maybeReverse from '../helpers/maybeReverse';
 import { useStore } from '../provider/context';
 import PromotionPicker from './PromotionPicker';
 import Square from './Square';
@@ -11,17 +12,22 @@ const Board = observer(() => {
   const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack('white');
   const blackKingUnerAttack = chessMoveValidator.isKingUnderAttack('black');
   const grab = game.getGrab();
-
   return (
     <>
       <div className="board">
         <div className="numeration">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((e) => (
+          {maybeReverse(
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            game.blackPlayerNickname === useStore().getNickname(), // useStore because of loss of context (this)
+          ).map((e) => (
             <span key={e}>{e}</span>
           ))}
         </div>
         <div className="alphanumeric-numbering">
-          {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((e) => (
+          {maybeReverse(
+            ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+            game.blackPlayerNickname === useStore().getNickname(), // useStore because of loss of context (this)
+          ).map((e) => (
             <span key={e}>{e}</span>
           ))}
         </div>
@@ -32,7 +38,10 @@ const Board = observer(() => {
             position={pendingPromotionValue.position}
           />
         )}
-        {game.board.map(({ color, position, piece }) => {
+        {maybeReverse(
+          game.board,
+          game.blackPlayerNickname === useStore().getNickname(), // useStore because of loss of context (this)
+        ).map(({ color, position, piece }) => {
           const grabbed =
             grab?.col === position.col && grab.row === position.row;
           const isLastMove =

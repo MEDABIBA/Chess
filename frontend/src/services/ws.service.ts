@@ -94,10 +94,14 @@ class WebSocketService {
     });
     this.socket?.on(
       'update-game-status',
-      (res: { id: number; gameStatus: GameStatus }) => {
+      (res: { id: number; gameStatus: GameStatus; winner: string }) => {
         const game = this.store?.games.gamesList.find((el) => el.id === res.id);
         if (!game) return;
         game.gameStatus = res.gameStatus;
+        game.winner = res.winner;
+        if (game.gameStatus === 'resign') {
+          game.setModalActive(true);
+        }
         console.log('update-game-status', res);
       },
     );
@@ -163,6 +167,10 @@ class WebSocketService {
           this.connect();
         }
       }
+      if (err.message.includes('user didnt exist')) {
+        localStorage.clear();
+        this.store?.navigate('registration-form');
+      }
     });
 
     this.socket.on('disconnect', (reason: Socket.DisconnectReason) => {
@@ -220,6 +228,13 @@ class WebSocketService {
     console.log('called makeMove');
     this.pendingEvent = { event: 'make-move', data };
     this.socket.emit('make-move', data);
+  }
+  public resign(data: { id: number }) {
+    if (!this.socket) throw new Error('Socket not initialized');
+    if (!this.socket?.connected) return;
+    console.log('called resign');
+    this.pendingEvent = { event: 'resign', data };
+    this.socket?.emit('resign', data);
   }
 
   startHeartbeat = () => {};

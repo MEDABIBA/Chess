@@ -11,7 +11,6 @@ import Piece from './Piece';
 import { RootStore } from '../store/RootStore';
 import { simulateValidMove } from '../helpers/simulateMove';
 import soundMove from '../assets/sounds/move.mp3';
-import { initializeBoard } from '../helpers/initializeBoard';
 
 class Game {
   private store: RootStore;
@@ -20,6 +19,7 @@ class Game {
   whitePlayerNickname: string | null = null;
   blackPlayerNickname: string | null = null;
   currentPlayer: Color = 'white';
+  winner: string | null = null;
   gameStatus: GameStatus = 'waiting';
   inviteCode: string | null = null;
   activePiece: Piece | null = null;
@@ -28,7 +28,7 @@ class Game {
   availableMoves: Position[] = [];
   grab: Position | null = null;
   animateMove: { from: Position; to: Position } | null = null;
-  modalActive: boolean = false;
+  modalActive: boolean;
   lastDoubleStepPawn: null | { color: Color; position: Position } = null;
   pendingPromotion: { piece: Piece; position: Position; color: Color } | null =
     null;
@@ -44,6 +44,7 @@ class Game {
     this.store.timer.setFirstPlayerTime(game.whiteTimeLeft);
     this.store.timer.setSecondPlayerTime(game.blackTimeLeft);
     this.currentPlayer = game.currentPlayer;
+    this.winner = game.winner;
     this.gameStatus = game.gameStatus;
     this.inviteCode = game.inviteCode;
     if (game.fromX && game.fromY && game.toX && game.toY) {
@@ -58,6 +59,11 @@ class Game {
     this.whitePlayerNickname = game.whitePlayer.username;
     this.blackPlayerNickname = game?.blackPlayer?.username ?? null;
     this.createdAt = game.createdAt;
+
+    this.modalActive =
+      this.gameStatus === 'resign' || this.gameStatus === 'checkmate'
+        ? true
+        : false;
   }
 
   @action
@@ -145,7 +151,11 @@ class Game {
 
   @action
   isFinished() {
-    return this.gameStatus === 'checkmate' || this.gameStatus === 'timeout';
+    return (
+      this.gameStatus === 'checkmate' ||
+      this.gameStatus === 'timeout' ||
+      this.gameStatus === 'resign'
+    );
   }
 
   @action
@@ -221,7 +231,11 @@ class Game {
   setAvailableMoves = (args: [Piece, Position] | null) => {
     this.availableMoves = [];
     if (!args) return;
-    if (this.gameStatus === 'checkmate' || this.gameStatus === 'timeout')
+    if (
+      this.gameStatus === 'checkmate' ||
+      this.gameStatus === 'timeout' ||
+      this.gameStatus === 'resign'
+    )
       return;
     const [piece, position] = args;
     this.board.forEach((el) => {
@@ -273,7 +287,11 @@ class Game {
     if (!this.store.chessMoveValidator.isValidMove(piece, from, to)) {
       return false;
     }
-    if (this.gameStatus === 'checkmate' || this.gameStatus === 'timeout')
+    if (
+      this.gameStatus === 'checkmate' ||
+      this.gameStatus === 'timeout' ||
+      this.gameStatus === 'resign'
+    )
       return false;
     if (
       piece.pieceType !== 'king' &&
@@ -385,17 +403,17 @@ class Game {
     this.modalActive = value;
   };
 
-  reloadGame = () => {
-    this.board = [];
-    initializeBoard();
-    this.currentPlayer = 'white';
-    this.gameStatus = 'playing';
-    this.activePiece = null;
-    this.highlightLastMove = null;
-    this.availableMoves = [];
-    this.grab = null;
-    this.animateMove = null;
-    this.store.timer.resetTimer(1800);
-  };
+  // reloadGame = () => {
+  //   this.board = [];
+  //   initializeBoard();
+  //   this.currentPlayer = 'white';
+  //   this.gameStatus = 'playing';
+  //   this.activePiece = null;
+  //   this.highlightLastMove = null;
+  //   this.availableMoves = [];
+  //   this.grab = null;
+  //   this.animateMove = null;
+  //   this.store.timer.resetTimer(1800);
+  // };
 }
 export default Game;

@@ -156,10 +156,29 @@ export class GameGateway {
       this.server.emit('update-game-status', {
         id: game.id,
         gameStatus: game.gameStatus,
+        winner: game.winner,
       });
       this.server
         .to(`game/${dto.id}`)
         .emit('state', { success: true, from, to, piece });
+    } catch (err) {
+      client.emit('error', { message: err.message });
+    }
+  }
+
+  @SubscribeMessage('resign')
+  async resign(
+    @MessageBody() dto: { id: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const user = client.data.user;
+      const game = await this.appService.resign(dto.id, user.userId);
+      this.server.emit('update-game-status', {
+        id: game.id,
+        gameStatus: game.gameStatus,
+        winner: game.winner,
+      });
     } catch (err) {
       client.emit('error', { message: err.message });
     }

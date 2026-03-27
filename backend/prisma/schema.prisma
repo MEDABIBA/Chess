@@ -20,6 +20,7 @@ enum gameStatus {
   check
   checkmate
   timeout
+  resign
 }
 
 model User {

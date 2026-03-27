@@ -94,11 +94,16 @@ body {
 
 .main-content {
   position: relative;
-  width: 100%;
   max-width: 680px;
+  display: flex;
+  align-items: end;
+}
+
+.game-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-right: 15px;
 }
 
 .board-container {
@@ -110,19 +115,31 @@ body {
 
 .board {
   width: 100%;
-  aspect-ratio: 1; /* сохраняет квадрат */
+  aspect-ratio: 1;
   display: flex;
   flex-wrap: wrap;
   position: relative;
 
-  min-height: 50vh; /* минимум половина высоты экрана */
+  min-height: 50vh;
 }
 
 .btn-lg {
-  position: absolute;
   font-size: clamp(16px, 2vw, 24px);
-  top: -60px; /* кнопка над доской */
+  width: min-content;
+  top: -60px;
   z-index: 9;
+  margin-bottom: 15px;
+}
+
+.resign-btn {
+  padding: 15px;
+  background-color: #555;
+  border-radius: 13px;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+}
+.resign-btn:hover {
+  background-color: #666;
 }
 
 .square {

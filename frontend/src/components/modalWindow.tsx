@@ -1,17 +1,19 @@
 const Modal = ({
-  winColor,
-  reloadGame,
+  title,
   setIsActive,
+  action,
+  text,
 }: {
-  winColor: 'White' | 'Black';
-  reloadGame: () => void;
+  title: string;
   setIsActive: (value: boolean) => void;
+  action: () => void;
+  text?: string;
 }) => (
   <div className="modal" role="dialog">
     <div className="modal-dialog" role="document">
       <div className="modal-content">
         <div className="modal-header">
-          <h5 className="modal-title">{winColor} won!</h5>
+          <h5 className="modal-title">{title}</h5>
           <button
             type="button"
             className="close"
@@ -22,17 +24,20 @@ const Modal = ({
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        {/* <div className="modal-body">
-          <p>Modal body text goes here.</p>
-        </div> */}
         <div className="modal-footer">
-          <button
-            type="button"
-            onClick={() => reloadGame()}
-            className="btn btn-primary"
-          >
-            Reset
-          </button>
+          {text && (
+            <button
+              onClick={() => {
+                action();
+                setIsActive(false);
+              }}
+              type="button"
+              className="btn btn-primary"
+            >
+              {text}
+            </button>
+          )}
+
           <button
             type="button"
             onClick={() => setIsActive(false)}

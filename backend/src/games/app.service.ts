@@ -151,6 +151,14 @@ export class AppService {
           game.gameStatus = 'playing';
         }
         if (res.isCheckmate) {
+          const id =
+            game.currentPlayer === 'white'
+              ? game.whitePlayerId
+              : game.blackPlayerId;
+          if (!id) throw new Error('Winner id not found');
+          const winner = await this.prisma.user.findUnique({ where: { id } });
+          if (!winner?.username) throw new Error('Winner was not found');
+          game.winner = winner.username;
           game.gameStatus = 'checkmate';
         }
       }
@@ -188,8 +196,30 @@ export class AppService {
           toX: highlightLastMove.to.col,
           toY: highlightLastMove.to.row,
           gameStatus: game.gameStatus,
+          winner: game.winner,
         },
       });
+    });
+  }
+  async resign(id: number, loserId: number) {
+    const game = await this.prisma.game.findUnique({ where: { id } });
+    const winnerId =
+      loserId === game?.whitePlayerId
+        ? game.blackPlayerId
+        : loserId === game?.blackPlayerId
+          ? game.whitePlayerId
+          : null;
+    if (!winnerId) throw new Error(`Winner id was not found`);
+    const winner = await this.prisma.user.findUnique({
+      where: { id: winnerId },
+    });
+    if (!winner) throw new Error('Winner was not found');
+    return await this.prisma.game.update({
+      where: { id },
+      data: {
+        winner: winner?.username,
+        gameStatus: 'resign',
+      },
     });
   }
 }

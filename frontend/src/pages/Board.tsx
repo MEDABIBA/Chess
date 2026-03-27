@@ -3,14 +3,16 @@ import { useStore } from '../provider/context';
 import Modal from '../components/modalWindow';
 import { observer } from 'mobx-react-lite';
 import PlayerCard from '../components/PlayerCard';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import ResignButton from '../components/ResignButton';
 
 const Board = () => {
   const { id } = useParams();
-  const { socket, games, timer } = useStore();
+  const { socket, games, timer, navigate } = useStore();
   games.setCurrentGame(Number(id));
   const { currentGame } = games;
+  const [resignModal, setResignModal] = useState<boolean>(false);
 
   useEffect(() => {
     if (currentGame === null || !id || !socket || !socket.isConnected) return;
@@ -30,25 +32,38 @@ const Board = () => {
   return (
     <div className="app">
       {(currentGame.gameStatus === 'checkmate' ||
-        currentGame.gameStatus === 'timeout') &&
-        isModalActive === true && (
+        currentGame.gameStatus === 'timeout' ||
+        currentGame.gameStatus === 'resign') &&
+        isModalActive && (
           <Modal
-            winColor={currentGame.currentPlayer === 'black' ? 'White' : 'Black'}
-            reloadGame={currentGame.reloadGame}
+            title={`${currentGame.winner} won`}
             setIsActive={currentGame.setModalActive}
+            action={() => navigate(`home`)}
+            text="Navigate to home"
           />
         )}
+      {resignModal && (
+        <Modal
+          title="Are you sure you want to resign?"
+          setIsActive={setResignModal}
+          action={() => {
+            socket.resign({ id: currentGame.id });
+          }}
+          text="Resign"
+        />
+      )}
+      {(currentGame.gameStatus === 'checkmate' ||
+        currentGame.gameStatus === 'timeout' ||
+        currentGame.gameStatus === 'resign') && (
+        <button
+          type="button"
+          onClick={() => currentGame.setModalActive(true)}
+          className="btn btn-primary btn-lg"
+        >
+          Open modal
+        </button>
+      )}
       <div className="main-content">
-        {(currentGame.gameStatus === 'checkmate' ||
-          currentGame.gameStatus === 'timeout') && (
-          <button
-            type="button"
-            onClick={() => currentGame.setModalActive(true)}
-            className="btn btn-primary btn-lg"
-          >
-            Open modal
-          </button>
-        )}
         <div className="game-container">
           <PlayerCard
             playerName={currentGame.blackPlayerNickname}
@@ -60,6 +75,11 @@ const Board = () => {
             getPlayerTime={timer.getFirstPlayerTime}
           />
         </div>
+        {currentGame.blackPlayerNickname !== null &&
+          (currentGame.gameStatus === 'waiting' ||
+            currentGame.gameStatus === 'playing') && (
+            <ResignButton game={currentGame} setResignModal={setResignModal} />
+          )}
       </div>
     </div>
   );

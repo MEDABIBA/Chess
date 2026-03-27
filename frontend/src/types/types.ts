@@ -5,7 +5,12 @@ export interface MyJwtPayload extends JwtPayload {
   username: string;
 }
 
-export type GameStatus = 'playing' | 'checkmate' | 'timeout' | 'waiting';
+export type GameStatus =
+  | 'playing'
+  | 'checkmate'
+  | 'timeout'
+  | 'waiting'
+  | 'resign';
 
 export interface Position {
   row: number;
@@ -64,7 +69,7 @@ interface Game {
   updatedAt: string;
   whitePlayerUsername: string;
   whiteTimeLeft: number;
-  winner: string | number;
+  winner: string;
 }
 
 export type GameInterface = Nicknames & Game;

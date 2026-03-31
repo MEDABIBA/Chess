@@ -131,6 +131,10 @@ export class AppService {
         where: {
           id: id,
         },
+        include: {
+          blackPlayer: true,
+          whitePlayer: true,
+        },
       });
       if (!game) {
         console.log('game not found');
@@ -138,7 +142,6 @@ export class AppService {
       }
       let turnStartedAt: Date | null = null;
       let timeLeft;
-      const opponentTurnStartAt = new Date();
       const fen = new Chess(game.fen);
       const res = validateMove(fen, from, to);
       console.log('makeMove res: ', res.valid);
@@ -151,14 +154,11 @@ export class AppService {
           game.gameStatus = 'playing';
         }
         if (res.isCheckmate) {
-          const id =
+          game.winner =
             game.currentPlayer === 'white'
-              ? game.whitePlayerId
-              : game.blackPlayerId;
-          if (!id) throw new Error('Winner id not found');
-          const winner = await this.prisma.user.findUnique({ where: { id } });
-          if (!winner?.username) throw new Error('Winner was not found');
-          game.winner = winner.username;
+              ? game.whitePlayer.username
+              : game.blackPlayer!.username;
+          if (!game.winner) throw new Error('Winner was not found');
           game.gameStatus = 'checkmate';
         }
       }
@@ -178,19 +178,31 @@ export class AppService {
         timeLeft -= timeSpend;
       }
 
+      if (timeLeft <= 0) {
+        game.winner =
+          game.currentPlayer === 'white'
+            ? game.blackPlayer!.username
+            : game.whitePlayer.username;
+        game.gameStatus = 'timeout';
+      }
+
       return await prisma.game.update({
         where: { id: id },
         data: {
           fen: res.newFen,
           currentPlayer: game.currentPlayer === 'white' ? 'black' : 'white',
           whiteTimeLeft:
-            game.currentPlayer === 'white' ? timeLeft : game.whiteTimeLeft,
+            game.currentPlayer === 'white'
+              ? Math.floor(timeLeft)
+              : game.whiteTimeLeft,
           whiteTurnStarterAt:
-            game.currentPlayer === 'white' ? null : opponentTurnStartAt,
+            game.currentPlayer === 'white' ? null : game.whiteTurnStarterAt,
           blackTimeLeft:
-            game.currentPlayer === 'black' ? timeLeft : game.blackTimeLeft,
+            game.currentPlayer === 'black'
+              ? Math.floor(timeLeft)
+              : game.blackTimeLeft,
           blackTurnStarterAt:
-            game.currentPlayer === 'black' ? null : opponentTurnStartAt,
+            game.currentPlayer === 'black' ? null : game.blackTurnStarterAt,
           fromX: highlightLastMove.from.col,
           fromY: highlightLastMove.from.row,
           toX: highlightLastMove.to.col,

@@ -34,7 +34,5 @@ export type IMakeMove = {
     from: Position;
     to: Position;
     highlightLastMove: { from: Position; to: Position };
-    whiteTimeLeft: number;
-    blackTimeLeft: number;
   };
 };

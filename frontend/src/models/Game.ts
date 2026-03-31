@@ -214,8 +214,6 @@ class Game {
       from,
       to,
       highlightLastMove: { from, to },
-      whiteTimeLeft: this.store.timer.p1 || this.initialTime,
-      blackTimeLeft: this.store.timer.p2 || this.initialTime,
     };
     if (animation) {
       this.animateMove = { from, to };

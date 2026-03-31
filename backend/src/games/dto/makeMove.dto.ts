@@ -13,8 +13,4 @@ export class MakeMoveDto {
   from: PositionDto;
   to: PositionDto;
   highlightLastMove: { from: PositionDto; to: PositionDto };
-
-  @IsInt()
-  whiteTimeLeft: number;
-  blackTimeLeft: number;
 }

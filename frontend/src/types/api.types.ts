@@ -1,4 +1,4 @@
-import { Position, SquareData } from './types';
+import { Position, SquareData, GameStatus } from './types';
 
 export interface ICreateGame {
   boardState: SquareData[];
@@ -26,6 +26,11 @@ export interface IJoinGameByCode {
 
 export interface IGetGame {
   id: number;
+}
+
+export interface ITimeout {
+  winner: string;
+  gameStatus: GameStatus;
 }
 
 export type IMakeMove = {

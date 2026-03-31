@@ -89,6 +89,14 @@ class Game {
     this.createdAt = game.createdAt;
   }
 
+  setWinner(winner: string) {
+    this.winner = winner;
+  }
+
+  setStatus(status: GameStatus) {
+    this.gameStatus = status;
+  }
+
   @action
   hydratePieceClassesFromServer(board: SquareData[]) {
     board.forEach((el) => {

@@ -39,6 +39,7 @@ class Timer {
   };
 
   activateTimer = (player: Color) => {
+    if (this.interval) clearInterval(this.interval);
     return (this.interval = setInterval(
       () => this.decrementTime(player),
       1000,

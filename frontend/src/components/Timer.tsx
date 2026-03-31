@@ -9,8 +9,6 @@ const Timer = observer(({ getPlayerTime }: { getPlayerTime: () => string }) => {
   useEffect(() => {
     if (checkIfTimesUp() && game !== null) {
       deactiveTimer();
-      game.gameStatus = 'timeout';
-      game.setModalActive(true);
     }
   }, [getPlayerTime()]);
   return (

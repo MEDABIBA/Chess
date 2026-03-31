@@ -8,10 +8,68 @@ import { Chess } from 'chess.js';
 import { validateMove } from 'src/helpers/validateMove';
 import { generateInviteCode } from 'src/helpers/generateInviteCode';
 import { joinGameByCodeDto } from './dto/joinGameByCode';
+import { Server } from 'socket.io';
 
 @Injectable()
 export class AppService {
+  gameTimers = new Map<number, NodeJS.Timeout>();
+
   constructor(private prisma: PrismaService) {}
+
+  scheduleTimeout(
+    gameId: number,
+    timeLeftMs: number,
+    timeoutWinner: string,
+    server: Server,
+  ) {
+    clearTimeout(this.gameTimers.get(gameId));
+
+    const timeout = setTimeout(async () => {
+      this.setTimeoutWin(gameId, timeoutWinner, server);
+    }, timeLeftMs);
+    this.gameTimers.set(gameId, timeout);
+  }
+
+  async setTimeoutWin(gameId: number, timeoutWinner: string, server: Server) {
+    const game = await this.prisma.game.update({
+      where: { id: gameId },
+      data: { winner: timeoutWinner, gameStatus: 'timeout' },
+    });
+    server
+      .to(`game/${gameId}`)
+      .emit('timeout', { winer: game.winner, gameStatus: game.gameStatus });
+  }
+
+  async checkIfTimeoutWin(id: number): Promise<string | null> {
+    const game = await this.prisma.game.findUnique({
+      where: { id },
+      include: { whitePlayer: true, blackPlayer: true },
+    });
+    if (!game) throw new Error('Game not found');
+
+    let timeLeft: number;
+    let turnStartedAt: Date | null;
+    let timeoutWinner: string;
+
+    if (game.currentPlayer === 'white' && game.blackPlayer) {
+      timeLeft = Math.round(game.whiteTimeLeft);
+      turnStartedAt = game.whiteTurnStarterAt;
+      timeoutWinner = game.blackPlayer.username;
+    } else if (game.currentPlayer === 'black' && game.whitePlayer) {
+      timeLeft = Math.round(game.blackTimeLeft);
+      turnStartedAt = game.blackTurnStarterAt;
+      timeoutWinner = game.whitePlayer.username;
+    } else {
+      throw new Error(`Invalid player color ${game.currentPlayer}`);
+    }
+
+    if (turnStartedAt) {
+      const elapsed = (Date.now() - turnStartedAt.getTime()) / 1000;
+      timeLeft -= elapsed;
+    }
+
+    return timeLeft <= 0 ? timeoutWinner : null;
+  }
 
   async createGame(dto: CreateGameDto) {
     const { boardState, whitePlayerUsername, initialTime } = dto;
@@ -124,9 +182,13 @@ export class AppService {
     }
   }
 
-  async makeMove(id: number, dto: MakeMoveDto) {
+  async makeMove(id: number, dto: MakeMoveDto, server: Server) {
     const { from, to, highlightLastMove } = dto;
-    return this.prisma.$transaction(async (prisma) => {
+    let nextTimeLeft: number | null = null;
+    let nextTimeoutWinner: string = '';
+    let isActiveGame: boolean = false;
+
+    const result = await this.prisma.$transaction(async (prisma) => {
       const game = await prisma.game.findUnique({
         where: {
           id: id,
@@ -141,7 +203,7 @@ export class AppService {
         throw new Error('game not found');
       }
       let turnStartedAt: Date | null = null;
-      let timeLeft;
+      let timeLeft: number;
       const fen = new Chess(game.fen);
       const res = validateMove(fen, from, to);
       console.log('makeMove res: ', res.valid);
@@ -165,10 +227,12 @@ export class AppService {
       if (game.currentPlayer === 'white') {
         turnStartedAt = game.whiteTurnStarterAt;
         timeLeft = game.whiteTimeLeft;
+        nextTimeLeft = game.blackTimeLeft;
         game.blackTurnStarterAt = new Date();
       } else if (game.currentPlayer === 'black') {
         turnStartedAt = game.blackTurnStarterAt;
         timeLeft = game.blackTimeLeft;
+        nextTimeLeft = game.whiteTimeLeft;
         game.whiteTurnStarterAt = new Date();
       } else {
         throw new Error(`Invalid player color ${game.currentPlayer}`);
@@ -178,13 +242,12 @@ export class AppService {
         timeLeft -= timeSpend;
       }
 
-      if (timeLeft <= 0) {
-        game.winner =
-          game.currentPlayer === 'white'
-            ? game.blackPlayer!.username
-            : game.whitePlayer.username;
-        game.gameStatus = 'timeout';
-      }
+      nextTimeoutWinner =
+        game.currentPlayer === 'white'
+          ? game.whitePlayer.username
+          : game.blackPlayer!.username;
+      isActiveGame =
+        game.gameStatus === 'check' || game.gameStatus === 'playing';
 
       return await prisma.game.update({
         where: { id: id },
@@ -193,13 +256,13 @@ export class AppService {
           currentPlayer: game.currentPlayer === 'white' ? 'black' : 'white',
           whiteTimeLeft:
             game.currentPlayer === 'white'
-              ? Math.floor(timeLeft)
+              ? Math.max(timeLeft, 0)
               : game.whiteTimeLeft,
           whiteTurnStarterAt:
             game.currentPlayer === 'white' ? null : game.whiteTurnStarterAt,
           blackTimeLeft:
             game.currentPlayer === 'black'
-              ? Math.floor(timeLeft)
+              ? Math.max(timeLeft, 0)
               : game.blackTimeLeft,
           blackTurnStarterAt:
             game.currentPlayer === 'black' ? null : game.blackTurnStarterAt,
@@ -212,7 +275,14 @@ export class AppService {
         },
       });
     });
+    if (nextTimeLeft !== null && nextTimeoutWinner && isActiveGame)
+      this.scheduleTimeout(id, nextTimeLeft * 1000, nextTimeoutWinner, server);
+    else {
+      clearTimeout(this.gameTimers.get(id));
+    }
+    return result;
   }
+
   async resign(id: number, loserId: number) {
     const game = await this.prisma.game.findUnique({ where: { id } });
     const winnerId =

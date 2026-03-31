@@ -13,6 +13,7 @@ import {
   IJoinRoom,
   ILeaveRoom,
   IMakeMove,
+  ITimeout,
 } from '../types/api.types';
 
 class WebSocketService {
@@ -92,6 +93,11 @@ class WebSocketService {
       this.store?.games?.currentGame?.setBoard(res);
       console.log('game-state', res);
     });
+    this.socket?.on('timeout', (res: ITimeout) => {
+      this.store?.games?.currentGame?.setWinner(res.winner);
+      this.store?.games?.currentGame?.setStatus(res.gameStatus);
+      console.log('timeout', res);
+    });
     this.socket?.on(
       'update-game-status',
       (res: { id: number; gameStatus: GameStatus; winner: string }) => {
@@ -112,10 +118,12 @@ class WebSocketService {
         piece: Piece;
         from: Position;
         to: Position;
+        whiteTimeLeft: number;
+        blackTimeLeft: number;
       }) => {
         console.log('state called');
         if (!res.success) return;
-        const { piece, from, to } = res;
+        const { piece, from, to, whiteTimeLeft, blackTimeLeft } = res;
         if (
           !this.store?.games.currentGame ||
           this.store?.games.currentGame === null
@@ -127,6 +135,8 @@ class WebSocketService {
           piece.position,
           piece.color,
         );
+        this.store.timer.setFirstPlayerTime(whiteTimeLeft);
+        this.store.timer.setSecondPlayerTime(blackTimeLeft);
         if (
           this.store?.games?.currentGame.yourColor !==
             this.store?.games?.currentGame.currentPlayer ||

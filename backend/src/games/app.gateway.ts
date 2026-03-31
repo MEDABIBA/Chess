@@ -123,18 +123,22 @@ export class GameGateway {
         game.currentPlayer === 'white' && game.whiteTurnStarterAt
           ? Math.max(
               0,
-              game.whiteTimeLeft -
-                (Date.now() - game.whiteTurnStarterAt.getTime()) / 1000,
+              Math.floor(
+                game.whiteTimeLeft -
+                  (Date.now() - game.whiteTurnStarterAt.getTime()) / 1000,
+              ),
             )
-          : game.whiteTimeLeft;
+          : Math.floor(game.whiteTimeLeft);
       game.blackTimeLeft =
         game.currentPlayer === 'black' && game.blackTurnStarterAt
           ? Math.max(
               0,
-              game.blackTimeLeft -
-                (Date.now() - game.blackTurnStarterAt.getTime()) / 1000,
+              Math.floor(
+                game.blackTimeLeft -
+                  (Date.now() - game.blackTurnStarterAt.getTime()) / 1000,
+              ),
             )
-          : game.blackTimeLeft;
+          : Math.floor(game.blackTimeLeft);
       client.emit('game-state', { ...game, boardState });
     } catch (err) {
       client.emit('error', { message: err.message });
@@ -148,19 +152,36 @@ export class GameGateway {
   ) {
     try {
       const { from, to } = dto.moveData;
-      const game = await this.appService.makeMove(dto.id, dto.moveData);
-      const boardState = fenToBoard(game.fen);
+      const isTimeoutWinner = await this.appService.checkIfTimeoutWin(dto.id);
+      if (isTimeoutWinner !== null) {
+        return await this.appService.setTimeoutWin(
+          dto.id,
+          isTimeoutWinner,
+          this.server,
+        );
+      }
+      const res = await this.appService.makeMove(
+        dto.id,
+        dto.moveData,
+        this.server,
+      );
+      const boardState = fenToBoard(res.fen);
       const piece = boardState.find(
         (el) => el.position.col === to.col && el.position.row === to.row,
       )?.piece;
       this.server.emit('update-game-status', {
-        id: game.id,
-        gameStatus: game.gameStatus,
-        winner: game.winner,
+        id: res.id,
+        gameStatus: res.gameStatus,
+        winner: res.winner,
       });
-      this.server
-        .to(`game/${dto.id}`)
-        .emit('state', { success: true, from, to, piece });
+      this.server.to(`game/${dto.id}`).emit('state', {
+        success: true,
+        from,
+        to,
+        piece,
+        whiteTimeLeft: Math.round(res.whiteTimeLeft),
+        blackTimeLeft: Math.round(res.blackTimeLeft),
+      });
     } catch (err) {
       client.emit('error', { message: err.message });
     }

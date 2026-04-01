@@ -4,6 +4,7 @@ import Piece from '../models/Piece';
 import { Position } from '../types/types';
 import getTargetSquare from '../helpers/getTargetSquare';
 import tryMove from '../helpers/tryMove';
+import Game from '../models/Game';
 
 interface SquareProps {
   color: string;
@@ -61,6 +62,24 @@ const SquareComponent: React.FC<SquareProps> = ({
     setGrab,
     setPendingPromotion,
   } = game;
+
+  const handleMoveToSquare = (
+    game: Game,
+    piece: Piece,
+    position: Position,
+    animation = false,
+  ) => {
+    if (game.isPromotion(piece, position)) {
+      game.setPendingPromotion({
+        piece: piece,
+        position: position,
+        color: piece.color,
+      });
+    } else {
+      makeMove(piece.position, position, animation);
+    }
+  };
+
   const handleMouseDown = (e: React.MouseEvent) => {
     console.log('row', row, ', col', col);
     const active = getActivePiece();
@@ -73,7 +92,7 @@ const SquareComponent: React.FC<SquareProps> = ({
     if (active?.position) {
       const square = getTargetSquare(e.nativeEvent);
       if (!square) return;
-      tryMove(square, active.position, makeMove);
+      tryMove(square, game, active, handleMoveToSquare);
       setActivePiece(null);
       setAvailableMoves(null);
       if (!piece) return;
@@ -129,7 +148,7 @@ const SquareComponent: React.FC<SquareProps> = ({
       if (!square) return;
       const toRow = Number(square.dataset.row);
       const toCol = Number(square.dataset.col);
-      makeMove(position, { row: toRow, col: toCol });
+      handleMoveToSquare(game, piece, { row: toRow, col: toCol });
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -153,7 +172,7 @@ const SquareComponent: React.FC<SquareProps> = ({
       ) as HTMLElement | null;
       const square = dropTarget?.closest('.square') as HTMLElement | null;
       if (!square) return;
-      tryMove(square, active.position, makeMove);
+      tryMove(square, game, active, handleMoveToSquare);
       setActivePiece(null);
       setAvailableMoves(null);
       if (!piece) return;
@@ -212,7 +231,7 @@ const SquareComponent: React.FC<SquareProps> = ({
       if (square) {
         const toRow = Number(square.dataset.row);
         const toCol = Number(square.dataset.col);
-        makeMove(position, { row: toRow, col: toCol });
+        handleMoveToSquare(game, piece, { row: toRow, col: toCol });
       }
 
       clone.remove();

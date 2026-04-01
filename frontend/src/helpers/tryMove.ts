@@ -1,13 +1,21 @@
+import Game from '../models/Game';
+import Piece from '../models/Piece';
 import { Position } from '../types/types';
 
 const tryMove = (
   square: HTMLElement | null,
-  position: Position,
-  makeMove: (from: Position, to: Position, animation?: boolean) => void,
+  game: Game,
+  piece: Piece,
+  handleMoveToSquare: (
+    game: Game,
+    piece: Piece,
+    position: Position,
+    animation: boolean,
+  ) => void,
 ) => {
   if (!square) return;
   const toRow = Number(square.dataset.row);
   const toCol = Number(square.dataset.col);
-  makeMove(position, { row: toRow, col: toCol }, true);
+  handleMoveToSquare(game, piece, { row: toRow, col: toCol }, true);
 };
 export default tryMove;

@@ -183,7 +183,7 @@ export class AppService {
   }
 
   async makeMove(id: number, dto: MakeMoveDto, server: Server) {
-    const { from, to, highlightLastMove } = dto;
+    const { from, to, highlightLastMove, promotionPiece } = dto;
     let nextTimeLeft: number | null = null;
     let nextTimeoutWinner: string = '';
     let isActiveGame: boolean = false;
@@ -205,7 +205,7 @@ export class AppService {
       let turnStartedAt: Date | null = null;
       let timeLeft: number;
       const fen = new Chess(game.fen);
-      const res = validateMove(fen, from, to);
+      const res = validateMove(fen, from, to, promotionPiece);
       console.log('makeMove res: ', res.valid);
       if (!res.valid) {
         console.log('Invalid move');

@@ -198,6 +198,7 @@ class Game {
     from: Position,
     to: Position,
     animation = false,
+    promotionPiece?: PieceType | null,
   ): Promise<void> => {
     const piece = this.getPiece(from);
     const side = from.col < to.col ? 'right' : 'left';
@@ -209,19 +210,12 @@ class Game {
       console.warn('Invalid move');
       return;
     }
-    if (this.isPromotion(piece, to)) {
-      this.setPendingPromotion({
-        piece: piece,
-        position: to,
-        color: piece.color,
-      });
-      return;
-    }
 
     const MakeMoveDto = {
       from,
       to,
       highlightLastMove: { from, to },
+      promotionPiece: promotionPiece,
     };
     if (animation) {
       this.animateMove = { from, to };
@@ -340,6 +334,7 @@ class Game {
 
     piece.hasMoved = true;
     this.setActivePiece(null);
+    this.setPendingPromotion(null);
     this.availableMoves = [];
     this.highlightLastMove = { from, to };
     this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
@@ -360,31 +355,6 @@ class Game {
 
   isPromotion = (piece: Piece, to: Position) => {
     return this.store.chessMoveValidator.isLastRow(piece, to);
-  };
-
-  @action
-  promotePiece = (oldPiece: Piece, piece: Piece) => {
-    const square = this.board.find(
-      (el) =>
-        el.position.col === piece.position.col &&
-        el.position.row === piece.position.row,
-    );
-    if (square) {
-      square.piece = piece;
-      this.updateTimer(piece.color);
-      new Audio(soundMove).play();
-
-      this.setPendingPromotion(null);
-      this.setActivePiece(null);
-      this.availableMoves = [];
-      this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
-      this.setPiece(oldPiece.position, null);
-      if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
-        this.store.timer.deactiveTimer();
-        this.gameStatus = 'checkmate';
-        this.setModalActive(true);
-      }
-    }
   };
 
   @computed

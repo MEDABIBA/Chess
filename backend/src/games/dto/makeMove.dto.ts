@@ -1,4 +1,5 @@
 import { IsInt, IsString } from 'class-validator';
+import { PieceType } from 'src/types/board';
 
 class PositionDto {
   @IsInt()
@@ -13,4 +14,5 @@ export class MakeMoveDto {
   from: PositionDto;
   to: PositionDto;
   highlightLastMove: { from: PositionDto; to: PositionDto };
+  promotionPiece?: PieceType;
 }

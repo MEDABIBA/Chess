@@ -27,7 +27,12 @@ const PromotionPiece = ({
           (e.pointerType === 'touch' || e.pointerType === 'mouse') &&
           games.currentGame
         ) {
-          games.currentGame.promotePiece(oldPiece, piece);
+          games.currentGame.makeMove(
+            oldPiece.position,
+            piece.position,
+            false,
+            piece.pieceType,
+          );
         }
       }}
       style={{ cursor: 'pointer', userSelect: 'none' }}
@@ -36,8 +41,8 @@ const PromotionPiece = ({
 };
 const PromotionPicker = ({ oldPiece, color, position }: Promotion) => {
   const pos = {
-    left: `${(position.col - 1) * 12.5}%`,
-    top: `${position.row === 8 ? 0 : 49.7}%`,
+    left: `${(color == 'white' ? position.col - 1 : 8 - position.col) * 12.5}%`, // alignment
+    top: `${(color === 'white' ? position.row === 8 : position.row === 1) ? 0 : 49.7}%`, // alignment
   };
   return (
     <div className="promotion-window" style={pos}>

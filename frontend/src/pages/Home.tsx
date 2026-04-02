@@ -4,11 +4,18 @@ import { observer } from 'mobx-react-lite';
 
 const Home = () => {
   const store = useStore();
+  enum filters {
+    all = '0',
+    active = '1',
+    waiting = '2',
+    archive = '3',
+  }
   const { navigate, games } = store;
-  const [filter, setFilter] = useState<
-    'all' | 'active' | 'waiting' | 'archive'
-  >('all');
+  const [filter, setFilter] = useState<keyof typeof filters>('all');
   const [friendCode, setFriendCode] = useState('');
+  const [animClass, setAnimClass] = useState<'slide-left' | 'slide-right'>(
+    'slide-left',
+  );
   const [isError, setIsError] = useState(false);
   const allGames = games.getAllGames();
   const ITEMS_PER_PAGE = 8;
@@ -68,17 +75,31 @@ const Home = () => {
           </div>
           <div className="filter">
             <span className="filter-title">FILTER: </span>
-            {(['all', 'active', 'waiting', 'archive'] as const).map((f, i) => (
+            {(
+              [
+                'all',
+                'active',
+                'waiting',
+                'archive',
+              ] as (keyof typeof filters)[]
+            ).map((f, i) => (
               <button
                 key={i}
-                onClick={() => setFilter(f)}
+                onClick={() => {
+                  if (filters[filter] > filters[f]) {
+                    setAnimClass('slide-left');
+                  } else if (filters[filter] < filters[f]) {
+                    setAnimClass('slide-right');
+                  }
+                  setFilter(f);
+                }}
                 className={`${filter === f ? 'filter-btn-active' : 'filter-btn'}`}
               >
                 {f.toUpperCase()}
               </button>
             ))}
           </div>
-          <table className="home-table">
+          <table key={filter} className={`home-table ${animClass}`}>
             <thead>
               <tr>
                 <th>Created</th>

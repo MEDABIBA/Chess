@@ -85,6 +85,7 @@ body {
   }
   .home {
     width: 85% !important;
+    overflow: hidden;
   }
   .home-buttons {
     flex-direction: column;
@@ -513,7 +514,7 @@ body {
 }
 .home {
   width: 60%;
-  overflow: auto;
+  overflow: hidden;
 }
 .home-buttons {
   display: flex;
@@ -599,6 +600,38 @@ body {
   background: #333;
   margin-bottom: 15px;
 }
+tr {
+  transition: all 0.1s ease;
+}
+tr:hover {
+  background: #4444444f;
+}
+@keyframes slideFromLeft {
+  0% {
+    transform: translateX(-60px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes slideFromRight {
+  0% {
+    transform: translateX(60px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.slide-left {
+  animation: slideFromRight 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.slide-right {
+  animation: slideFromLeft 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
 td,
 th {
   border: 1px solid #999;
@@ -617,7 +650,7 @@ th {
 }
 .connect-game-btn:hover {
   cursor: pointer;
-  background: #777;
+  background: #777 !important;
 }
 
 .pagination {

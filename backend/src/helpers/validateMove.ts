@@ -20,7 +20,12 @@ export const validateMove = (
   promotionPiece?: PieceType,
 ):
   | { valid: false }
-  | { valid: true; newFen: string; isCheck: boolean; isCheckmate: boolean } => {
+  | {
+      valid: true;
+      newFen: string;
+      isStalemate: boolean;
+      isCheckmate: boolean;
+    } => {
   try {
     const promotion = promotionPiece
       ? formattedPiece[promotionPiece as keyof typeof formattedPiece]
@@ -37,7 +42,7 @@ export const validateMove = (
     return {
       valid: true,
       newFen: chess.fen(),
-      isCheck: chess.isCheck(),
+      isStalemate: chess.isStalemate(),
       isCheckmate: chess.isCheckmate(),
     };
   } catch {

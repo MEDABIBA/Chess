@@ -17,10 +17,10 @@ enum PlayerColor {
 enum gameStatus {
   waiting
   playing
-  check
   checkmate
   timeout
   resign
+  stalemate
 }
 
 model User {

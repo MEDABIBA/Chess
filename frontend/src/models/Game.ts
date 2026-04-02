@@ -61,7 +61,9 @@ class Game {
     this.createdAt = game.createdAt;
 
     this.modalActive =
-      this.gameStatus === 'resign' || this.gameStatus === 'checkmate'
+      this.gameStatus === 'resign' ||
+      this.gameStatus === 'checkmate' ||
+      this.gameStatus === 'stalemate'
         ? true
         : false;
   }
@@ -161,6 +163,7 @@ class Game {
   isFinished() {
     return (
       this.gameStatus === 'checkmate' ||
+      this.gameStatus === 'stalemate' ||
       this.gameStatus === 'timeout' ||
       this.gameStatus === 'resign'
     );
@@ -192,6 +195,32 @@ class Game {
       this.grab = position;
     }
   };
+
+  // isPat(color: Color) {
+  //   const allPieces = this.getAllPieces(color);
+  //   let isPat = true;
+  //   for (let i = 0; i < allPieces.length; i++) {
+  //     const piece = allPieces[i];
+  //     if (!piece) continue;
+  //     this.board.forEach((square) => {
+  //       const side =
+  //         piece.position.col < square.position.col ? 'right' : 'left';
+  //       const condition = this.isValidMove(
+  //         piece,
+  //         piece?.position,
+  //         square.position,
+  //         side,
+  //       );
+  //       if (condition === true) {
+  //         isPat = false;
+  //       }
+  //     });
+  //     if (!isPat) break;
+  //   }
+  //   if (isPat && !this.store.chessMoveValidator.isKingUnderAttack(color)) {
+  //     return true;
+  //   } else return false;
+  // }
 
   @action
   makeMove = async (
@@ -233,6 +262,7 @@ class Game {
     if (!args) return;
     if (
       this.gameStatus === 'checkmate' ||
+      this.gameStatus === 'stalemate' ||
       this.gameStatus === 'timeout' ||
       this.gameStatus === 'resign'
     )

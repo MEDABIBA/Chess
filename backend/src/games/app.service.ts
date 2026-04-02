@@ -215,6 +215,9 @@ export class AppService {
         if (game.gameStatus !== 'playing') {
           game.gameStatus = 'playing';
         }
+        if (res.isStalemate) {
+          game.gameStatus = 'stalemate';
+        }
         if (res.isCheckmate) {
           game.winner =
             game.currentPlayer === 'white'
@@ -246,8 +249,7 @@ export class AppService {
         game.currentPlayer === 'white'
           ? game.whitePlayer.username
           : game.blackPlayer!.username;
-      isActiveGame =
-        game.gameStatus === 'check' || game.gameStatus === 'playing';
+      isActiveGame = game.gameStatus === 'playing';
 
       return await prisma.game.update({
         where: { id: id },

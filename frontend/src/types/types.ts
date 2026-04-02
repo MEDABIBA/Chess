@@ -10,7 +10,8 @@ export type GameStatus =
   | 'checkmate'
   | 'timeout'
   | 'waiting'
-  | 'resign';
+  | 'resign'
+  | 'stalemate';
 
 export interface Position {
   row: number;

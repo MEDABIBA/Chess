@@ -32,11 +32,12 @@ const Board = () => {
   return (
     <div className="app">
       {(currentGame.gameStatus === 'checkmate' ||
+        currentGame.gameStatus === 'stalemate' ||
         currentGame.gameStatus === 'timeout' ||
         currentGame.gameStatus === 'resign') &&
         isModalActive && (
           <Modal
-            title={`${currentGame.winner} won`}
+            title={`${currentGame.gameStatus === 'checkmate' ? `Stalemate` : `${currentGame.winner} won`}`}
             setIsActive={currentGame.setModalActive}
             action={() => navigate(`home`)}
             text="Navigate to home"
@@ -53,6 +54,7 @@ const Board = () => {
         />
       )}
       {(currentGame.gameStatus === 'checkmate' ||
+        currentGame.gameStatus === 'stalemate' ||
         currentGame.gameStatus === 'timeout' ||
         currentGame.gameStatus === 'resign') && (
         <button

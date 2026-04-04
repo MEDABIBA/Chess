@@ -55,6 +55,36 @@ class ChessMoveValidator {
     }
   };
 
+  @action
+  isValidPremove = (piece: Piece, from: Position, to: Position) => {
+    if (from.col === to.col && from.row === to.row) return false;
+
+    let valid = false;
+    switch (piece.pieceType) {
+      case 'pawn':
+        valid = this.isValidPawnPremove(piece, from, to);
+        break;
+      case 'rook':
+        valid = this.isValidRookPremove(from, to);
+        break;
+      case 'knight':
+        valid = this.isValidKnightMove(from, to);
+        break;
+      case 'bishop':
+        valid = this.isValidBishopPremove(from, to);
+        break;
+      case 'queen':
+        valid = this.isValidQueenPremove(from, to);
+        break;
+      case 'king':
+        valid = this.isValidKingPremove(piece, from, to);
+        break;
+      default:
+        return false;
+    }
+    return valid;
+  };
+
   private isAttackedField = (position: Position, byColor: Color) => {
     if (this.store.games.currentGame === null) return false;
     for (const square of this.store.games.currentGame.board) {
@@ -190,6 +220,50 @@ class ChessMoveValidator {
     this.store.games.currentGame?.setPiece(to, originalToPiece ?? null);
     piece.position = originalPosition;
     return rowDiff <= 1 && colDiff <= 1 && !stillUnderAttack;
+  };
+  private isValidPawnPremove = (
+    figure: Piece,
+    from: Position,
+    to: Position,
+  ) => {
+    const dir = figure.color === 'white' ? 1 : -1;
+    const startingPos = figure.color === 'white' ? 2 : 7;
+    if (from.col === to.col) {
+      if (to.row === from.row + dir) {
+        return true;
+      } else if (from.row === startingPos && to.row === from.row + 2 * dir) {
+        return true;
+      } else return false;
+    } else if (
+      to.row === from.row + dir &&
+      (from.col === to.col + 1 || from.col === to.col - 1)
+    ) {
+      return true;
+    } else return false;
+  };
+
+  private isValidRookPremove = (from: Position, to: Position) => {
+    return from.row === to.row || from.col === to.col;
+  };
+
+  private isValidBishopPremove = (from: Position, to: Position) => {
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
+    return rowDiff === colDiff;
+  };
+
+  private isValidQueenPremove = (from: Position, to: Position) => {
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
+    return rowDiff === colDiff || from.row === to.row || from.col === to.col;
+  };
+
+  private isValidKingPremove = (piece: Piece, from: Position, to: Position) => {
+    const side = from.col < to.col ? 'right' : 'left';
+    if (this.isCastlingAvailable(side, piece, from, to)) return true;
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
+    return rowDiff <= 1 && colDiff <= 1;
   };
 
   isCastlingAvailable = (

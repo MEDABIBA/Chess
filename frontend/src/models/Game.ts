@@ -32,6 +32,7 @@ class Game {
   lastDoubleStepPawn: null | { color: Color; position: Position } = null;
   pendingPromotion: { piece: Piece; position: Position; color: Color } | null =
     null;
+  pendingPremove: { from: Position; to: Position } | null = null;
   createdAt: Date;
 
   constructor(store: RootStore, game: GameInterface) {
@@ -113,9 +114,11 @@ class Game {
 
   @action
   getPiece = (from: Position) => {
-    return this.board.find(
+    const res = this.board.find(
       (el) => el.position.col === from.col && el.position.row === from.row,
-    )?.piece;
+    );
+    if (!res) return null;
+    return res.piece;
   };
 
   @action
@@ -296,6 +299,31 @@ class Game {
     });
   };
 
+  setAvailablePremoves = (args: [Piece, Position] | null) => {
+    this.availableMoves = [];
+    if (!args) return;
+    if (
+      this.gameStatus === 'checkmate' ||
+      this.gameStatus === 'stalemate' ||
+      this.gameStatus === 'timeout' ||
+      this.gameStatus === 'resign'
+    )
+      return;
+    const [piece, position] = args;
+    if (piece.color !== this.yourColor) return false;
+    this.board.forEach((el) => {
+      if (
+        this.store.chessMoveValidator.isValidPremove(
+          piece,
+          position,
+          el.position,
+        )
+      ) {
+        this.availableMoves.push(el.position);
+      }
+    });
+  };
+
   updateTimer = (color: Color) => {
     if (color === 'white') {
       const timer = this.store.timer;
@@ -315,6 +343,7 @@ class Game {
     side: 'right' | 'left',
   ) => {
     if (!this.store.chessMoveValidator.isValidMove(piece, from, to)) {
+      console.warn('isValidMove fall');
       return false;
     }
     if (
@@ -337,6 +366,7 @@ class Game {
           this.store.chessMoveValidator.isKingUnderAttack,
         )
       ) {
+        console.warn('simulating move fall');
         return false;
       }
     } else if (
@@ -365,7 +395,7 @@ class Game {
     piece.hasMoved = true;
     this.setActivePiece(null);
     this.setPendingPromotion(null);
-    this.availableMoves = [];
+    this.setAvailableMoves(null);
     this.highlightLastMove = { from, to };
     this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
     this.animateMove = null;
@@ -382,6 +412,16 @@ class Game {
       this.setModalActive(true);
     }
   };
+
+  finalizePremove() {
+    if (this.pendingPremove) {
+      const piece = this.getPiece(this.pendingPremove.from);
+
+      if (!piece) return;
+      this.makeMove(piece.position, this.pendingPremove.to);
+      this.setPendingPremove(null);
+    }
+  }
 
   isPromotion = (piece: Piece, to: Position) => {
     return this.store.chessMoveValidator.isLastRow(piece, to);
@@ -408,6 +448,20 @@ class Game {
   setModalActive = (value: boolean) => {
     this.modalActive = value;
   };
+
+  @action
+  setPendingPremove(value: { from: Position; to: Position } | null) {
+    if (
+      value &&
+      this.availableMoves.some(
+        (pos) => pos.row === value.to.row && pos.col === value.to.col,
+      )
+    ) {
+      this.pendingPremove = value;
+    } else {
+      this.pendingPremove = null;
+    }
+  }
 
   // reloadGame = () => {
   //   this.board = [];

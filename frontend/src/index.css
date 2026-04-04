@@ -181,6 +181,13 @@ body {
   transition: all 0.3s ease;
 }
 
+.square-premove-from {
+  background-color: #c81e1e !important;
+}
+.square-premove-to {
+  background-color: #b41414 !important;
+}
+
 .last-move::before {
   content: '';
   position: absolute;

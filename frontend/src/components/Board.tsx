@@ -61,14 +61,34 @@ const Board = observer(() => {
               : availableMovesSet.has(`${position.row}-${position.col}`)
                 ? 'square-active'
                 : '';
+          const premove = !game.pendingPremove
+            ? ''
+            : game.pendingPremove.from.col === position.col &&
+                game.pendingPremove.from.row === position.row
+              ? 'square-premove-from'
+              : game.pendingPremove.to.col === position.col &&
+                  game.pendingPremove.to.row === position.row
+                ? 'square-premove-to'
+                : '';
+          const premovePiece =
+            game.pendingPremove &&
+            game.pendingPremove.from.col === position.col &&
+            game.pendingPremove.from.row === position.row
+              ? null
+              : game.pendingPremove &&
+                  game.pendingPremove.to.col === position.col &&
+                  game.pendingPremove.to.row === position.row
+                ? game.getPiece(game.pendingPremove?.from)
+                : piece;
           return (
             <Square
               key={`${position.row}-${position.col}`}
               color={color}
               position={position}
-              piece={piece}
+              piece={premovePiece}
               isLastMove={isLastMove}
               isActiveField={isActiveField}
+              premove={premove}
               hightlightKingAttacked={
                 piece?.color === 'white' && piece.pieceType === 'king'
                   ? whiteKingUnerAttack

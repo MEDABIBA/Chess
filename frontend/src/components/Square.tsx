@@ -12,6 +12,7 @@ interface SquareProps {
   isActiveField?: '' | 'square-active' | 'square-attack';
   piece?: Piece | null;
   isLastMove?: 'last-move' | '';
+  premove?: 'square-premove-from' | 'square-premove-to' | '';
   hightlightKingAttacked?: boolean;
   grabbed?: boolean;
   animationTarget?: { from: Position; to: Position } | null;
@@ -22,13 +23,15 @@ const SquareComponent: React.FC<SquareProps> = ({
   piece,
   isLastMove = '',
   isActiveField = '',
+  premove = '',
   hightlightKingAttacked = false,
   grabbed = false,
   animationTarget = null,
 }) => {
   const { row, col } = position;
   const imgRef = useRef<HTMLImageElement | null>(null);
-  const { games } = useStore();
+  const store = useStore();
+  const { games } = store;
   const { currentGame: game } = games;
 
   useEffect(() => {
@@ -59,6 +62,7 @@ const SquareComponent: React.FC<SquareProps> = ({
     getActivePiece,
     setActivePiece,
     setAvailableMoves,
+    setAvailablePremoves,
     setGrab,
     setPendingPromotion,
   } = game;
@@ -69,6 +73,8 @@ const SquareComponent: React.FC<SquareProps> = ({
     position: Position,
     animation = false,
   ) => {
+    if (!game.blackPlayerNickname || game.currentPlayer !== game.yourColor)
+      return;
     if (game.isPromotion(piece, position)) {
       game.setPendingPromotion({
         piece: piece,
@@ -83,6 +89,8 @@ const SquareComponent: React.FC<SquareProps> = ({
   const handleMouseDown = (e: React.MouseEvent) => {
     console.log('row', row, ', col', col);
     const active = getActivePiece();
+    game.setPendingPremove(null);
+
     if (
       game.pendingPromotionValue &&
       (!piece || piece.color === game.pendingPromotionValue.piece.color)
@@ -94,15 +102,28 @@ const SquareComponent: React.FC<SquareProps> = ({
       if (!square) return;
       tryMove(square, game, active, handleMoveToSquare);
       setActivePiece(null);
-      setAvailableMoves(null);
+      if (
+        !game.moveAvailableForPiece(active) &&
+        (active.position.col !== position.col ||
+          active.position.row !== position.row)
+      ) {
+        game.setPendingPremove({ from: active.position, to: position });
+        setAvailableMoves(null);
+      } else {
+        setAvailableMoves(null);
+        setAvailablePremoves(null);
+      }
+
       if (!piece) return;
     }
     if (!piece || !imgRef.current) return;
 
-    if (!game.moveAvailableForPiece(piece)) return;
-
     e.preventDefault();
-    setAvailableMoves([piece, position]);
+    if (game.moveAvailableForPiece(piece)) {
+      setAvailableMoves([piece, position]);
+    } else {
+      game.setAvailablePremoves([piece, position]);
+    }
     setActivePiece(piece);
 
     const img = imgRef.current;
@@ -148,6 +169,16 @@ const SquareComponent: React.FC<SquareProps> = ({
       if (!square) return;
       const toRow = Number(square.dataset.row);
       const toCol = Number(square.dataset.col);
+      if (
+        !game.moveAvailableForPiece(piece) &&
+        (piece.position.col !== toCol || piece.position.row !== toRow)
+      ) {
+        game.setPendingPremove({
+          from: piece.position,
+          to: { row: toRow, col: toCol },
+        });
+        setAvailableMoves(null);
+      }
       handleMoveToSquare(game, piece, { row: toRow, col: toCol });
     };
 
@@ -244,7 +275,7 @@ const SquareComponent: React.FC<SquareProps> = ({
 
   return (
     <div
-      className={`square ${color} ${isLastMove} ${isActiveField} ${grabbed ? 'grabbed' : ''}`}
+      className={`square ${color} ${isLastMove} ${isActiveField} ${premove} ${grabbed ? 'grabbed' : ''}`}
       data-row={row}
       data-col={col}
       onMouseDown={handleMouseDown}
@@ -273,6 +304,7 @@ const Square = memo(SquareComponent, (prev, next) => {
     prev.position.col === next.position.col &&
     prev.isLastMove === next.isLastMove &&
     prev.isActiveField === next.isActiveField &&
+    prev.premove === next.premove &&
     prev.hightlightKingAttacked === next.hightlightKingAttacked &&
     prev.grabbed === next.grabbed &&
     prev.animationTarget === next.animationTarget

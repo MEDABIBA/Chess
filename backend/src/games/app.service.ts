@@ -40,6 +40,17 @@ export class AppService {
       .emit('timeout', { winer: game.winner, gameStatus: game.gameStatus });
   }
 
+  async checkIsCurrentPlayer(id: number, clientId: number) {
+    const game = await this.prisma.game.findUnique({ where: { id: id } });
+    if (!game) throw new Error('Cannot find game');
+    if (game.currentPlayer === 'white') {
+      return game.whitePlayerId === clientId;
+    } else if (game.currentPlayer === 'black') {
+      return game.blackPlayerId === clientId;
+    }
+    return false;
+  }
+
   async checkIfTimeoutWin(id: number): Promise<string | null> {
     const game = await this.prisma.game.findUnique({
       where: { id },

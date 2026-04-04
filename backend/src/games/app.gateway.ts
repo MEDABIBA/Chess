@@ -151,6 +151,10 @@ export class GameGateway {
     @ConnectedSocket() client: Socket,
   ) {
     try {
+      const userId = await client.data.user.userId;
+      if (!this.appService.checkIsCurrentPlayer(dto.id, userId)) {
+        throw new Error('You are not allowed to make move!');
+      }
       const { from, to } = dto.moveData;
       const isTimeoutWinner = await this.appService.checkIfTimeoutWin(dto.id);
       if (isTimeoutWinner !== null) {

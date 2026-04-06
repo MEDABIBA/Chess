@@ -1,14 +1,16 @@
 import maybeReverse from '../helpers/maybeReverse';
+import Piece from '../models/Piece';
 import { useStore } from '../provider/context';
 import PromotionPicker from './PromotionPicker';
 import Square from './Square';
 import { observer } from 'mobx-react-lite';
 
 const Board = observer(() => {
-  const { games, chessMoveValidator } = useStore();
+  const store = useStore();
+  const { games, chessMoveValidator } = store;
   const { currentGame: game } = games;
   if (game === null) return;
-  const { availableMovesSet, pendingPromotionValue } = game;
+  const { availableMovesSet } = game;
   const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack('white');
   const blackKingUnerAttack = chessMoveValidator.isKingUnderAttack('black');
   const grab = game.getGrab();
@@ -18,7 +20,7 @@ const Board = observer(() => {
         <div className="numeration">
           {maybeReverse(
             [1, 2, 3, 4, 5, 6, 7, 8],
-            game.blackPlayerNickname === useStore().getNickname(), // useStore because of loss of context (this)
+            game.blackPlayerNickname === store.getNickname(), // useStore because of loss of context (this)
           ).map((e) => (
             <span key={e}>{e}</span>
           ))}
@@ -26,21 +28,23 @@ const Board = observer(() => {
         <div className="alphanumeric-numbering">
           {maybeReverse(
             ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
-            game.blackPlayerNickname === useStore().getNickname(), // useStore because of loss of context (this)
+            game.blackPlayerNickname === store.getNickname(), // useStore because of loss of context (this)
           ).map((e) => (
             <span key={e}>{e}</span>
           ))}
         </div>
-        {pendingPromotionValue && (
-          <PromotionPicker
-            oldPiece={pendingPromotionValue.piece}
-            color={pendingPromotionValue.color}
-            position={pendingPromotionValue.position}
-          />
-        )}
+        {store.games.currentGame &&
+          store.games.currentGame.pendingPromotionPiece &&
+          !store.games.currentGame.pendingPremove && (
+            <PromotionPicker
+              from={store.games.currentGame.pendingPromotionPiece.from}
+              to={store.games.currentGame.pendingPromotionPiece.to}
+              color={store.games.currentGame.pendingPromotionPiece.color}
+            />
+          )}
         {maybeReverse(
           game.board,
-          game.blackPlayerNickname === useStore().getNickname(), // useStore because of loss of context (this)
+          game.blackPlayerNickname === store.getNickname(), // useStore because of loss of context (this)
         ).map(({ color, position, piece }) => {
           const grabbed =
             grab?.col === position.col && grab.row === position.row;
@@ -78,7 +82,13 @@ const Board = observer(() => {
               : game.pendingPremove &&
                   game.pendingPremove.to.col === position.col &&
                   game.pendingPremove.to.row === position.row
-                ? game.getPiece(game.pendingPremove?.from)
+                ? game.pendingPremove.promotionPiece
+                  ? new Piece(
+                      game.pendingPremove.promotionPiece,
+                      position,
+                      game.yourColor ?? 'white',
+                    )
+                  : game.getPiece(game.pendingPremove.from)
                 : piece;
           return (
             <Square

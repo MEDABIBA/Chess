@@ -64,25 +64,26 @@ const SquareComponent: React.FC<SquareProps> = ({
     setAvailableMoves,
     setAvailablePremoves,
     setGrab,
-    setPendingPromotion,
   } = game;
 
   const handleMoveToSquare = (
     game: Game,
     piece: Piece,
-    position: Position,
+    to: Position,
     animation = false,
   ) => {
-    if (!game.blackPlayerNickname || game.currentPlayer !== game.yourColor)
-      return;
-    if (game.isPromotion(piece, position)) {
-      game.setPendingPromotion({
-        piece: piece,
-        position: position,
+    if (game.isPromotion(piece, to)) {
+      game.setPendingPremove(null);
+      game.setPendingPromotionPiece({
+        piece: null,
+        from: piece.position,
+        to: to,
         color: piece.color,
       });
     } else {
-      makeMove(piece.position, position, animation);
+      if (!game.blackPlayerNickname || game.currentPlayer !== game.yourColor)
+        return;
+      makeMove(piece.position, to, animation);
     }
   };
 
@@ -92,18 +93,22 @@ const SquareComponent: React.FC<SquareProps> = ({
     game.setPendingPremove(null);
 
     if (
-      game.pendingPromotionValue &&
-      (!piece || piece.color === game.pendingPromotionValue.piece.color)
+      game.pendingPromotionPiece &&
+      (!piece || piece.color === game.pendingPromotionPiece.color)
     ) {
-      setPendingPromotion(null);
+      games?.currentGame?.setPendingPromotionPiece(null);
     }
     if (active?.position) {
       const square = getTargetSquare(e.nativeEvent);
       if (!square) return;
       tryMove(square, game, active, handleMoveToSquare);
       setActivePiece(null);
+
+      if (game.pendingPromotionPiece) return;
+
       if (
         !game.moveAvailableForPiece(active) &&
+        !game.isPromotion(active, position) &&
         (active.position.col !== position.col ||
           active.position.row !== position.row)
       ) {
@@ -113,7 +118,6 @@ const SquareComponent: React.FC<SquareProps> = ({
         setAvailableMoves(null);
         setAvailablePremoves(null);
       }
-
       if (!piece) return;
     }
     if (!piece || !imgRef.current) return;
@@ -171,6 +175,7 @@ const SquareComponent: React.FC<SquareProps> = ({
       const toCol = Number(square.dataset.col);
       if (
         !game.moveAvailableForPiece(piece) &&
+        !game.isPromotion(piece, { row: toRow, col: toCol }) &&
         (piece.position.col !== toCol || piece.position.row !== toRow)
       ) {
         game.setPendingPremove({
@@ -189,10 +194,10 @@ const SquareComponent: React.FC<SquareProps> = ({
   const handleTouchStart = (e: React.TouchEvent<HTMLImageElement>) => {
     const active = getActivePiece();
     if (
-      game.pendingPromotionValue &&
-      (!piece || piece.color === game.pendingPromotionValue.piece.color)
+      game.pendingPromotionPiece &&
+      (!piece || piece.color === game.pendingPromotionPiece.color)
     ) {
-      setPendingPromotion(null);
+      games?.currentGame?.setPendingPromotionPiece(null);
     }
     if (active?.position) {
       if (!e.changedTouches[0]?.clientX || !e.changedTouches[0]?.clientY)

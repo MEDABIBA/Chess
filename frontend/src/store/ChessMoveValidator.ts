@@ -439,7 +439,13 @@ class ChessMoveValidator {
   };
   isLastRow = (piece: Piece, position: Position) => {
     const row = piece.color === 'white' ? 8 : 1;
-    if (position.row === row && piece.pieceType === 'pawn') return true;
+    const secondToLastRow = piece.color === 'white' ? 7 : 2;
+    if (
+      position.row === row &&
+      piece.pieceType === 'pawn' &&
+      piece.position.row === secondToLastRow
+    )
+      return true;
     return false;
   };
 }

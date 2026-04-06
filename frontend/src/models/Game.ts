@@ -30,9 +30,17 @@ class Game {
   animateMove: { from: Position; to: Position } | null = null;
   modalActive: boolean;
   lastDoubleStepPawn: null | { color: Color; position: Position } = null;
-  pendingPromotion: { piece: Piece; position: Position; color: Color } | null =
-    null;
-  pendingPremove: { from: Position; to: Position } | null = null;
+  pendingPromotionPieceValue: {
+    piece: Piece | null;
+    from: Position;
+    to: Position;
+    color: Color;
+  } | null = null;
+  pendingPremove: {
+    from: Position;
+    to: Position;
+    promotionPiece?: PieceType;
+  } | null = null;
   createdAt: Date;
 
   constructor(store: RootStore, game: GameInterface) {
@@ -230,7 +238,6 @@ class Game {
     from: Position,
     to: Position,
     animation = false,
-    promotionPiece?: PieceType | null,
   ): Promise<void> => {
     const piece = this.getPiece(from);
     const side = from.col < to.col ? 'right' : 'left';
@@ -247,8 +254,11 @@ class Game {
       from,
       to,
       highlightLastMove: { from, to },
-      promotionPiece: promotionPiece,
+      promotionPiece:
+        this.pendingPremove?.promotionPiece ??
+        this.pendingPromotionPiece?.piece?.pieceType,
     };
+    console.log(MakeMoveDto);
     if (animation) {
       this.animateMove = { from, to };
     }
@@ -343,7 +353,7 @@ class Game {
     side: 'right' | 'left',
   ) => {
     if (!this.store.chessMoveValidator.isValidMove(piece, from, to)) {
-      console.warn('isValidMove fall');
+      console.warn('isValidMove fall', from, to, piece.pieceType);
       return false;
     }
     if (
@@ -394,7 +404,6 @@ class Game {
 
     piece.hasMoved = true;
     this.setActivePiece(null);
-    this.setPendingPromotion(null);
     this.setAvailableMoves(null);
     this.highlightLastMove = { from, to };
     this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
@@ -414,13 +423,17 @@ class Game {
   };
 
   finalizePremove() {
-    if (this.pendingPremove) {
-      const piece = this.getPiece(this.pendingPremove.from);
+    if (!this.pendingPremove) return;
 
-      if (!piece) return;
-      this.makeMove(piece.position, this.pendingPremove.to);
-      this.setPendingPremove(null);
-    }
+    const piece = this.getPiece(this.pendingPremove.from);
+    if (!piece) return;
+
+    // if (this.isPromotion(piece, this.pendingPremove.to)) {
+    //   this.setPendingPremove(null);
+    //   return;
+    // }
+    this.makeMove(piece.position, this.pendingPremove.to);
+    this.setPendingPremove(null);
   }
 
   isPromotion = (piece: Piece, to: Position) => {
@@ -428,16 +441,21 @@ class Game {
   };
 
   @computed
-  get pendingPromotionValue() {
-    return this.pendingPromotion;
+  get pendingPromotionPiece() {
+    return this.pendingPromotionPieceValue;
   }
 
   @action
-  setPendingPromotion = (
-    value: { piece: Piece; position: Position; color: Color } | null,
-  ) => {
-    this.pendingPromotion = value;
-  };
+  setPendingPromotionPiece(
+    value: {
+      piece: Piece | null;
+      from: Position;
+      to: Position;
+      color: Color;
+    } | null,
+  ) {
+    this.pendingPromotionPieceValue = value;
+  }
 
   @action
   getModalActive = () => {
@@ -450,12 +468,15 @@ class Game {
   };
 
   @action
-  setPendingPremove(value: { from: Position; to: Position } | null) {
+  setPendingPremove(
+    value: { from: Position; to: Position; promotionPiece?: PieceType } | null,
+  ) {
     if (
       value &&
-      this.availableMoves.some(
-        (pos) => pos.row === value.to.row && pos.col === value.to.col,
-      )
+      (this.pendingPromotionPiece ||
+        this.availableMoves.some(
+          (pos) => pos.row === value.to.row && pos.col === value.to.col,
+        ))
     ) {
       this.pendingPremove = value;
     } else {

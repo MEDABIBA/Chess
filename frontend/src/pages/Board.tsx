@@ -96,14 +96,14 @@ const Board = () => {
             currentGame.gameStatus === 'playing' && (
               <GameButton
                 img={whiteFlag}
-                alt="resign"
+                text="resign"
                 setModal={setResignModal}
               />
             )}
           {currentGame.gameStatus === 'waiting' && (
             <GameButton
               img={bin}
-              alt="remove game"
+              text="remove game"
               setModal={setRemoveGameModal}
             />
           )}

@@ -6,6 +6,10 @@ export interface ICreateGame {
   initialTime: number;
 }
 
+export interface IRemoveGame {
+  gameId: number;
+}
+
 export interface IJoinRoom {
   gameId: number;
 }

@@ -42,6 +42,10 @@ class Games {
     this.gamesList?.push(new Game(this.appStore, game));
   }
 
+  removeGame(gameId: number) {
+    this.gamesList.filter((el) => el.id != gameId);
+  }
+
   setAllGames(games: GameInterface[]) {
     this.gamesList = [];
     games.forEach((game) => {

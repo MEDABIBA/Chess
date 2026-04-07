@@ -13,6 +13,7 @@ import {
   IJoinRoom,
   ILeaveRoom,
   IMakeMove,
+  IRemoveGame,
   ITimeout,
 } from '../types/api.types';
 
@@ -76,6 +77,13 @@ class WebSocketService {
     this.socket?.on('game-created-you', (res: { id: number }) => {
       console.log('game-created-you', res);
       this.store?.navigate(`game/${res.id}`);
+    });
+    this.socket.on('game-removed', (gameId: number) => {
+      this.store.games.removeGame(gameId);
+    });
+    this.socket.on('game-removed-lobby', (gameId: number) => {
+      this.store?.navigate(`home`);
+      console.log(`game ${gameId} was removed!`);
     });
     this.socket?.on('guest-joined', (game: GameInterface) => {
       console.log('guest-joined', game);
@@ -197,6 +205,12 @@ class WebSocketService {
     if (!this.socket?.connected) return;
     this.pendingEvent = { event: 'create-game', data };
     this.socket.emit('create-game', data);
+  }
+  public removeGame(data: IRemoveGame) {
+    if (!this.socket) throw new Error('Socket not initialized');
+    if (!this.socket?.connected) return;
+    this.pendingEvent = { event: 'remove-game', data };
+    this.socket.emit('remove-game', data);
   }
   public joinRoom(data: IJoinRoom) {
     console.log('joinRoom func');

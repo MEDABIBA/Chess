@@ -44,6 +44,28 @@ export class GameGateway {
     }
   }
 
+  @SubscribeMessage('remove-game')
+  async removeGame(
+    @MessageBody() data: { gameId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { gameId } = data;
+    try {
+      const userId = await client.data.user.userId;
+      const removedGame = await this.appService.removeGame({ gameId, userId });
+      this.server
+        .to(`game/${gameId}`)
+        .emit('game-removed-lobby', { gameId: removedGame.id });
+      this.server.emit('game-removed', { gameId: removedGame.id });
+    } catch (err) {
+      if (err.code === 'P2025') {
+        client.emit('error', { message: `Game ${gameId} not found` });
+      } else {
+        client.emit('error', { message: err.message });
+      }
+    }
+  }
+
   @SubscribeMessage('join-room')
   joinRoom(
     @MessageBody() data: { gameId: number },

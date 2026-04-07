@@ -9,6 +9,7 @@ import { validateMove } from 'src/helpers/validateMove';
 import { generateInviteCode } from 'src/helpers/generateInviteCode';
 import { joinGameByCodeDto } from './dto/joinGameByCode';
 import { Server } from 'socket.io';
+import { removeGameDto } from './dto/removeGame';
 
 @Injectable()
 export class AppService {
@@ -108,6 +109,19 @@ export class AppService {
         inviteCode,
       },
     });
+  }
+
+  async removeGame(dto: removeGameDto) {
+    const { gameId, userId } = dto;
+    const game = await this.prisma.game.findUnique({ where: { id: gameId } });
+    if (!game) throw new Error(`Cannot find game with id ${gameId}`);
+    if (game.gameStatus !== 'waiting')
+      throw new Error(
+        "You can remove game only if its hasn't been started yet!",
+      );
+    if (game.whitePlayerId !== userId && game.blackPlayerId == userId)
+      throw new Error('Only participants can delete the game!');
+    return await this.prisma.game.delete({ where: { id: gameId } });
   }
 
   async joinGame(dto: JoinGameDto) {

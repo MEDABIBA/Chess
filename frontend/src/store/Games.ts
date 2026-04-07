@@ -43,7 +43,7 @@ class Games {
   }
 
   removeGame(gameId: number) {
-    this.gamesList.filter((el) => el.id != gameId);
+    this.gamesList = this.gamesList.filter((el) => el.id != gameId);
   }
 
   setAllGames(games: GameInterface[]) {

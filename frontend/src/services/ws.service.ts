@@ -78,10 +78,13 @@ class WebSocketService {
       console.log('game-created-you', res);
       this.store?.navigate(`game/${res.id}`);
     });
-    this.socket.on('game-removed', (gameId: number) => {
+    this.socket.on('game-removed', (res: { gameId: number }) => {
+      const { gameId } = res;
+      console.log('game-removed', gameId);
       this.store.games.removeGame(gameId);
     });
-    this.socket.on('game-removed-lobby', (gameId: number) => {
+    this.socket.on('game-removed-lobby', (res: { gameId: number }) => {
+      const { gameId } = res;
       this.store?.navigate(`home`);
       console.log(`game ${gameId} was removed!`);
     });

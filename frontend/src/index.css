@@ -132,14 +132,20 @@ body {
   margin-bottom: 15px;
 }
 
-.resign-btn {
+.game-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.game-btn {
   padding: 15px;
   background-color: #555;
   border-radius: 13px;
   cursor: pointer;
   transition: all 0.1s ease-in-out;
 }
-.resign-btn:hover {
+.game-btn:hover {
   background-color: #666;
 }
 

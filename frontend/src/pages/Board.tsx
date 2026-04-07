@@ -5,7 +5,10 @@ import { observer } from 'mobx-react-lite';
 import PlayerCard from '../components/PlayerCard';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import ResignButton from '../components/ResignButton';
+import GameButton from '../components/GameButton';
+
+import whiteFlag from '../assets/white-flag.png';
+import bin from '../assets/bin.png';
 
 const Board = () => {
   const { id } = useParams();
@@ -13,6 +16,7 @@ const Board = () => {
   games.setCurrentGame(Number(id));
   const { currentGame } = games;
   const [resignModal, setResignModal] = useState<boolean>(false);
+  const [removeGameModal, setRemoveGameModal] = useState<boolean>(false);
 
   useEffect(() => {
     if (currentGame === null || !id || !socket || !socket.isConnected) return;
@@ -53,6 +57,16 @@ const Board = () => {
           text="Resign"
         />
       )}
+      {removeGameModal && (
+        <Modal
+          title="Are you sure you want to remove this game?"
+          setIsActive={setRemoveGameModal}
+          action={() => {
+            socket.removeGame({ gameId: currentGame.id });
+          }}
+          text="Remove game"
+        />
+      )}
       {(currentGame.gameStatus === 'checkmate' ||
         currentGame.gameStatus === 'stalemate' ||
         currentGame.gameStatus === 'timeout' ||
@@ -77,11 +91,23 @@ const Board = () => {
             getPlayerTime={timer.getFirstPlayerTime}
           />
         </div>
-        {currentGame.blackPlayerNickname !== null &&
-          (currentGame.gameStatus === 'waiting' ||
-            currentGame.gameStatus === 'playing') && (
-            <ResignButton game={currentGame} setResignModal={setResignModal} />
+        <div className="game-buttons">
+          {currentGame.blackPlayerNickname !== null &&
+            currentGame.gameStatus === 'playing' && (
+              <GameButton
+                img={whiteFlag}
+                alt="resign"
+                setModal={setResignModal}
+              />
+            )}
+          {currentGame.gameStatus === 'waiting' && (
+            <GameButton
+              img={bin}
+              alt="remove game"
+              setModal={setRemoveGameModal}
+            />
           )}
+        </div>
       </div>
     </div>
   );

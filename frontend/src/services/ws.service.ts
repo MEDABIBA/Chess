@@ -7,6 +7,7 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import Piece from '../models/Piece';
 import {
   ICreateGame,
+  IDrawOffer,
   IGetGame,
   IJoinGame,
   IJoinGameByCode,
@@ -108,6 +109,15 @@ class WebSocketService {
       this.store?.games?.currentGame?.setWinner(res.winner);
       this.store?.games?.currentGame?.setStatus(res.gameStatus);
       console.log('timeout', res);
+    });
+    this.socket?.on('draw-offer', (res: IDrawOffer) => {
+      const { drawOfferedBy } = res;
+      this.store.games.currentGame?.setDrawOfferedBy(drawOfferedBy);
+      console.log('draw-offer', res);
+    });
+    this.socket?.on('draw-response', (res: GameInterface) => {
+      this.store?.games?.currentGame?.setBoard(res);
+      console.log('draw-response', res);
     });
     this.socket?.on(
       'update-game-status',
@@ -256,6 +266,20 @@ class WebSocketService {
     console.log('called makeMove');
     this.pendingEvent = { event: 'make-move', data };
     this.socket.emit('make-move', data);
+  }
+  public drawOffer(data: { gameId: number }) {
+    if (!this.socket) throw new Error('Socket not initialized');
+    if (!this.socket?.connected) return;
+    console.log('called draw offer');
+    this.pendingEvent = { event: 'draw-offer', data };
+    this.socket?.emit('draw-offer', data);
+  }
+  public drawResponse(data: { gameId: number; response: boolean }) {
+    if (!this.socket) throw new Error('Socket not initialized');
+    if (!this.socket?.connected) return;
+    console.log('called draw response');
+    this.pendingEvent = { event: 'draw-response', data };
+    this.socket?.emit('draw-response', data);
   }
   public resign(data: { id: number }) {
     if (!this.socket) throw new Error('Socket not initialized');

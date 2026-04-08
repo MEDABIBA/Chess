@@ -16,6 +16,8 @@ class Game {
   private store: RootStore;
   id: number;
   board: SquareData[] = [];
+  whitePlayerId: number;
+  blackPlayerId: number;
   whitePlayerNickname: string | null = null;
   blackPlayerNickname: string | null = null;
   currentPlayer: Color = 'white';
@@ -30,6 +32,7 @@ class Game {
   animateMove: { from: Position; to: Position } | null = null;
   modalActive: boolean;
   lastDoubleStepPawn: null | { color: Color; position: Position } = null;
+  drawOfferedBy: number | null = null;
   pendingPromotionPieceValue: {
     piece: Piece | null;
     from: Position;
@@ -46,7 +49,6 @@ class Game {
   constructor(store: RootStore, game: GameInterface) {
     this.store = store;
     makeAutoObservable(this);
-
     this.board = game.boardState.flat();
     this.id = game.id;
     this.hydratePieceClassesFromServer(this.board);
@@ -55,6 +57,7 @@ class Game {
     this.currentPlayer = game.currentPlayer;
     this.winner = game.winner;
     this.gameStatus = game.gameStatus;
+    this.drawOfferedBy = game.drawOfferedBy;
     this.inviteCode = game.inviteCode;
     if (game.fromX && game.fromY && game.toX && game.toY) {
       this.highlightLastMove = {
@@ -65,6 +68,8 @@ class Game {
     this.initialTime = game.initialTime;
     this.lastDoubleStepPawn =
       game.lastDoubleStepPawn || this.lastDoubleStepPawn;
+    this.whitePlayerId = Number(game.whitePlayerId);
+    this.blackPlayerId = Number(game.blackPlayerId);
     this.whitePlayerNickname = game.whitePlayer.username;
     this.blackPlayerNickname = game?.blackPlayer?.username ?? null;
     this.createdAt = game.createdAt;
@@ -72,7 +77,9 @@ class Game {
     this.modalActive =
       this.gameStatus === 'resign' ||
       this.gameStatus === 'checkmate' ||
-      this.gameStatus === 'stalemate'
+      this.gameStatus === 'stalemate' ||
+      this.gameStatus === 'draw' ||
+      this.gameStatus === 'timeout'
         ? true
         : false;
   }
@@ -86,6 +93,7 @@ class Game {
     this.store.timer.setSecondPlayerTime(game.blackTimeLeft);
     this.currentPlayer = game.currentPlayer;
     this.gameStatus = game.gameStatus;
+    this.drawOfferedBy = game.drawOfferedBy;
     this.inviteCode = game.inviteCode;
     if (game.fromX && game.fromY && game.toX && game.toY) {
       this.highlightLastMove = {
@@ -100,12 +108,22 @@ class Game {
     this.createdAt = game.createdAt;
   }
 
+  get playerId() {
+    return this.store.getNickname() === this.whitePlayerNickname
+      ? this.whitePlayerId
+      : this.blackPlayerId;
+  }
+
   setWinner(winner: string) {
     this.winner = winner;
   }
 
   setStatus(status: GameStatus) {
     this.gameStatus = status;
+  }
+
+  setDrawOfferedBy(userId: number) {
+    this.drawOfferedBy = userId;
   }
 
   @action
@@ -176,6 +194,7 @@ class Game {
       this.gameStatus === 'checkmate' ||
       this.gameStatus === 'stalemate' ||
       this.gameStatus === 'timeout' ||
+      this.gameStatus === 'draw' ||
       this.gameStatus === 'resign'
     );
   }
@@ -277,6 +296,7 @@ class Game {
       this.gameStatus === 'checkmate' ||
       this.gameStatus === 'stalemate' ||
       this.gameStatus === 'timeout' ||
+      this.gameStatus === 'draw' ||
       this.gameStatus === 'resign'
     )
       return;
@@ -316,6 +336,7 @@ class Game {
       this.gameStatus === 'checkmate' ||
       this.gameStatus === 'stalemate' ||
       this.gameStatus === 'timeout' ||
+      this.gameStatus === 'draw' ||
       this.gameStatus === 'resign'
     )
       return;
@@ -359,6 +380,7 @@ class Game {
     if (
       this.gameStatus === 'checkmate' ||
       this.gameStatus === 'timeout' ||
+      this.gameStatus === 'draw' ||
       this.gameStatus === 'resign'
     )
       return false;

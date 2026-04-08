@@ -28,6 +28,8 @@ const Home = () => {
       (filter === 'archive' &&
         (game.gameStatus === 'checkmate' ||
           game.gameStatus === 'stalemate' ||
+          game.gameStatus === 'draw' ||
+          game.gameStatus === 'resign' ||
           game.gameStatus === 'timeout')),
   );
   const paginated =

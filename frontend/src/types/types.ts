@@ -11,6 +11,7 @@ export type GameStatus =
   | 'timeout'
   | 'waiting'
   | 'resign'
+  | 'draw'
   | 'stalemate';
 
 export interface Position {
@@ -52,6 +53,7 @@ type Nicknames = {
 };
 
 interface Game {
+  whitePlayerId: string | null;
   blackPlayerId: string | null;
   blackTimeLeft: number;
   boardState: SquareData[][];
@@ -70,6 +72,7 @@ interface Game {
   updatedAt: string;
   whitePlayerUsername: string;
   whiteTimeLeft: number;
+  drawOfferedBy: number;
   winner: string;
 }
 

@@ -3,11 +3,13 @@ const Modal = ({
   setIsActive,
   action,
   text,
+  secondAction,
 }: {
   title: string;
   setIsActive: (value: boolean) => void;
   action: () => void;
   text?: string;
+  secondAction?: () => void;
 }) => (
   <div className="modal" role="dialog">
     <div className="modal-dialog" role="document">
@@ -40,7 +42,10 @@ const Modal = ({
 
           <button
             type="button"
-            onClick={() => setIsActive(false)}
+            onClick={() => {
+              secondAction?.();
+              setIsActive(false);
+            }}
             className="btn btn-secondary"
             data-dismiss="modal"
           >

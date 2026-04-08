@@ -9,14 +9,28 @@ import GameButton from '../components/GameButton';
 
 import whiteFlag from '../assets/white-flag.png';
 import bin from '../assets/bin.png';
+import draw from '../assets/draw.png';
 
 const Board = () => {
   const { id } = useParams();
-  const { socket, games, timer, navigate } = useStore();
+  const store = useStore();
+  const { socket, games, timer, navigate } = store;
   games.setCurrentGame(Number(id));
   const { currentGame } = games;
   const [resignModal, setResignModal] = useState<boolean>(false);
   const [removeGameModal, setRemoveGameModal] = useState<boolean>(false);
+  const [drawModal, setDrawModal] = useState<boolean>(false);
+  const [drawResponseModal, setDrawResponseModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (
+      currentGame?.drawOfferedBy &&
+      currentGame?.gameStatus === 'playing' &&
+      currentGame.drawOfferedBy !== currentGame.playerId
+    ) {
+      setDrawResponseModal(true);
+    }
+  }, [currentGame?.drawOfferedBy]);
 
   useEffect(() => {
     if (currentGame === null || !id || !socket || !socket.isConnected) return;
@@ -38,6 +52,7 @@ const Board = () => {
       {(currentGame.gameStatus === 'checkmate' ||
         currentGame.gameStatus === 'stalemate' ||
         currentGame.gameStatus === 'timeout' ||
+        currentGame.gameStatus === 'draw' ||
         currentGame.gameStatus === 'resign') &&
         isModalActive && (
           <Modal
@@ -67,9 +82,33 @@ const Board = () => {
           text="Remove game"
         />
       )}
+      {drawModal && (
+        <Modal
+          title="Do you want to offer a draw?"
+          setIsActive={setDrawModal}
+          action={() => {
+            socket.drawOffer({ gameId: currentGame.id });
+          }}
+          text="Draw offer"
+        />
+      )}
+      {drawResponseModal && (
+        <Modal
+          title="Your opponent offers a draw?"
+          setIsActive={setDrawResponseModal}
+          action={() => {
+            socket.drawResponse({ gameId: currentGame.id, response: true });
+          }}
+          secondAction={() => {
+            socket.drawResponse({ gameId: currentGame.id, response: false });
+          }}
+          text="Accept"
+        />
+      )}
       {(currentGame.gameStatus === 'checkmate' ||
         currentGame.gameStatus === 'stalemate' ||
         currentGame.gameStatus === 'timeout' ||
+        currentGame.gameStatus === 'draw' ||
         currentGame.gameStatus === 'resign') && (
         <button
           type="button"
@@ -107,6 +146,10 @@ const Board = () => {
               setModal={setRemoveGameModal}
             />
           )}
+          {currentGame.gameStatus === 'playing' &&
+            currentGame.drawOfferedBy === null && (
+              <GameButton img={draw} text="draw" setModal={setDrawModal} />
+            )}
         </div>
       </div>
     </div>

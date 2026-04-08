@@ -37,6 +37,10 @@ export interface ITimeout {
   gameStatus: GameStatus;
 }
 
+export interface IDrawOffer {
+  drawOfferedBy: number;
+}
+
 export type IMakeMove = {
   id: number;
   moveData: {

@@ -19,7 +19,10 @@ const Modal = ({
           <button
             type="button"
             className="close"
-            onClick={() => setIsActive(false)}
+            onClick={() => {
+              secondAction?.();
+              setIsActive(false);
+            }}
             data-dismiss="modal"
             aria-label="Close"
           >

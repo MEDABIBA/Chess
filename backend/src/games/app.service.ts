@@ -25,6 +25,7 @@ export class AppService {
     server: Server,
   ) {
     clearTimeout(this.gameTimers.get(gameId));
+    this.gameTimers.delete(gameId);
 
     const timeout = setTimeout(async () => {
       this.setTimeoutWin(gameId, timeoutWinner, server);
@@ -307,6 +308,7 @@ export class AppService {
       this.scheduleTimeout(id, nextTimeLeft * 1000, nextTimeoutWinner, server);
     else {
       clearTimeout(this.gameTimers.get(id));
+      this.gameTimers.delete(id);
     }
     return result;
   }
@@ -344,14 +346,24 @@ export class AppService {
     )
       throw new Error('Only a participant this game can accept a draw!');
     if (response) {
+      clearTimeout(this.gameTimers.get(gameId));
+      this.gameTimers.delete(gameId);
       return await this.prisma.game.update({
         where: { id: gameId },
         data: { gameStatus: 'draw' },
+        include: {
+          whitePlayer: { select: { username: true } },
+          blackPlayer: { select: { username: true } },
+        },
       });
     } else {
       return await this.prisma.game.update({
         where: { id: gameId },
         data: { drawOfferedBy: null },
+        include: {
+          whitePlayer: { select: { username: true } },
+          blackPlayer: { select: { username: true } },
+        },
       });
     }
   }

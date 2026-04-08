@@ -144,7 +144,9 @@ export class GameGateway {
       const game = await this.appService.getGame(dto.id);
       const boardState = fenToBoard(game.fen);
       game.whiteTimeLeft =
-        game.currentPlayer === 'white' && game.whiteTurnStarterAt
+        game.gameStatus === 'playing' &&
+        game.currentPlayer === 'white' &&
+        game.whiteTurnStarterAt
           ? Math.max(
               0,
               Math.floor(
@@ -154,7 +156,9 @@ export class GameGateway {
             )
           : Math.floor(game.whiteTimeLeft);
       game.blackTimeLeft =
-        game.currentPlayer === 'black' && game.blackTurnStarterAt
+        game.gameStatus === 'playing' &&
+        game.currentPlayer === 'black' &&
+        game.blackTurnStarterAt
           ? Math.max(
               0,
               Math.floor(
@@ -220,12 +224,13 @@ export class GameGateway {
     @MessageBody() dto: DrawOfferDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const { gameId, offeredById } = dto;
+    const { gameId } = dto;
     try {
-      const res = await this.appService.handleDrawOffer(gameId, offeredById);
+      const userId: number = client.data.user.userId;
+      const res = await this.appService.handleDrawOffer(gameId, userId);
       this.server
         .to(`game/${gameId}`)
-        .emit('draw-offer', { offeredById: res.drawOfferedBy });
+        .emit('draw-offer', { drawOfferedBy: res.drawOfferedBy });
     } catch (err) {
       client.emit('error', { message: err.message });
     }
@@ -236,14 +241,18 @@ export class GameGateway {
     @MessageBody() dto: DrawResponseDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const { gameId, response, responsedById } = dto;
+    const { gameId, response } = dto;
     try {
-      const res = await this.appService.handleDrawResponse(
+      const userId: number = client.data.user.userId;
+      const game = await this.appService.handleDrawResponse(
         gameId,
-        responsedById,
+        userId,
         response,
       );
-      this.server.to(`game/${gameId}`).emit('draw-response', { res: res });
+      const boardState = fenToBoard(game.fen);
+      this.server
+        .to(`game/${gameId}`)
+        .emit('draw-response', { ...game, boardState });
     } catch (err) {
       client.emit('error', { message: err.message });
     }

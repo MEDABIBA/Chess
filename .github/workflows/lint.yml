@@ -1,5 +1,9 @@
 name: Check types and lint
 
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
 on:
   push:
     branches: [main, multiplayer]

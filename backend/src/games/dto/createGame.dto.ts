@@ -13,34 +13,34 @@ import {
 
 class PositionDto {
   @IsNumber()
-  row: number;
+  row!: number;
 
   @IsNumber()
-  col: number;
+  col!: number;
 }
 
 class PieceDto {
   @IsEnum(['pawn', 'rook', 'knight', 'bishop', 'queen', 'king'])
-  pieceType: 'pawn' | 'rook' | 'knight' | 'bishop' | 'queen' | 'king';
+  pieceType!: 'pawn' | 'rook' | 'knight' | 'bishop' | 'queen' | 'king';
 
   @IsEnum(['white', 'black'])
-  color: 'white' | 'black';
+  color!: 'white' | 'black';
 
   @ValidateNested()
   @Type(() => PositionDto)
-  position: PositionDto;
+  position!: PositionDto;
 
   @IsBoolean()
-  hasMoved: boolean;
+  hasMoved!: boolean;
 }
 
 class SquareDto {
   @IsEnum(['white', 'black'])
-  color: 'white' | 'black';
+  color!: 'white' | 'black';
 
   @ValidateNested()
   @Type(() => PositionDto)
-  position: PositionDto;
+  position!: PositionDto;
 
   @Type(() => PieceDto)
   @IsOptional()
@@ -51,15 +51,15 @@ export class CreateGameDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => SquareDto)
-  boardState: SquareDto[];
+  boardState!: SquareDto[];
 
   // @IsEnum(["white", "black"])
   // currentPlayer: "white" | "black";
 
   @IsString()
-  whitePlayerUsername: string;
+  whitePlayerUsername!: string;
 
   @IsInt()
   @Min(0)
-  initialTime: number;
+  initialTime!: number;
 }

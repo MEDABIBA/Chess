@@ -2,8 +2,8 @@ import { IsNumber, IsString } from 'class-validator';
 
 export class JoinGameDto {
   @IsNumber()
-  id: number;
+  id!: number;
 
   @IsString()
-  username: string;
+  username!: string;
 }

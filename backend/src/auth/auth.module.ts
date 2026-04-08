@@ -9,9 +9,7 @@ import { PrismaModule } from 'prisma/prisma.module';
     PrismaModule,
     JwtModule.register({
       global: true,
-      secret:
-        process.env.JWT_SECRET ||
-        `I<FL*C3HI\>Kl^elh5&+GIo]"x~yGT=gJAN]-i0n[*Q<wf:SE&`, // Random key
+      secret: process.env.JWT_SECRET,
     }),
   ],
   controllers: [AuthController],

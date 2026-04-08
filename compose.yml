@@ -31,6 +31,8 @@ services:
     command: sh -c "npx prisma generate && npx prisma db push && yarn start:dev"
     environment:
       DATABASE_URL: 'postgresql://postgres:postgres@postgresql:5432/chess'
+      JWT_SECRET: 'ugr0tRfIdo6D3LOfjJpzT85IVxZUcO2y4AOFbkn4jjoxg7etqh'
+      PORT: '3030'
       CHOKIDAR_USEPOLLING: 'true'
       WATCHPACK_POLLING: 'true'
     depends_on:

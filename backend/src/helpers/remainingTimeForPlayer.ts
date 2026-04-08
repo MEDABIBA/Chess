@@ -1,7 +1,7 @@
 import { Color } from 'src/types/board';
 
 export default function remaningTimeForPlayer(game, player: Color) {
-  if (game.currentPlayer === player) {
+  if (player === 'white') {
     return game.gameStatus === 'playing' && game.whiteTurnStarterAt
       ? Math.max(
           0,
@@ -11,7 +11,7 @@ export default function remaningTimeForPlayer(game, player: Color) {
           ),
         )
       : Math.floor(game.whiteTimeLeft);
-  } else if (game.currentPlayer === player) {
+  } else if (player === 'black') {
     return game.gameStatus === 'playing' && game.blackTurnStarterAt
       ? Math.max(
           0,

@@ -17,12 +17,14 @@ import { WsJwtGuard } from 'src/auth/ws-gwt.guard';
 import { joinGameByCodeDto } from './dto/joinGameByCode.dto';
 import { DrawOfferDto } from './dto/drawOffer.dto';
 import { DrawResponseDto } from './dto/drawResponse.dto';
+import remaningTimeForPlayer from 'src/helpers/remainingTimeForPlayer';
+import { Prisma } from '@prisma/client';
 
 @WebSocketGateway({ cors: true })
 @UseGuards(WsJwtGuard)
 export class GameGateway {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   constructor(private readonly appService: AppService) {}
 
@@ -42,7 +44,11 @@ export class GameGateway {
       this.server.emit('game-created', { ...gameWithNicknames, boardState });
       client.emit('game-created-you', { id: game.id });
     } catch (err) {
-      client.emit('error', { message: err.message });
+      if (err instanceof Error) {
+        client.emit('error', { message: err.message });
+      } else {
+        client.emit('error', { message: err });
+      }
     }
   }
 
@@ -60,10 +66,16 @@ export class GameGateway {
         .emit('game-removed-lobby', { gameId: removedGame.id });
       this.server.emit('game-removed', { gameId: removedGame.id });
     } catch (err) {
-      if (err.code === 'P2025') {
-        client.emit('error', { message: `Game ${gameId} not found` });
-      } else {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2025') {
+          client.emit('error', { message: `Game ${gameId} not found` });
+        } else {
+          client.emit('error', { message: err.message });
+        }
+      } else if (err instanceof Error) {
         client.emit('error', { message: err.message });
+      } else {
+        client.emit('error', { message: String(err) });
       }
     }
   }
@@ -100,7 +112,11 @@ export class GameGateway {
       client.join(`game/${game.id}`);
       this.server.emit('guest-joined', { ...game, boardState });
     } catch (err) {
-      client.emit('error', { message: err.message });
+      if (err instanceof Error) {
+        client.emit('error', { message: err.message });
+      } else {
+        client.emit('error', { message: err });
+      }
     }
   }
   @SubscribeMessage('join-game-code')
@@ -117,7 +133,11 @@ export class GameGateway {
       client.emit('game-joined-by-code-you', { id: game.id });
       this.server.emit('guest-joined', { ...game, boardState });
     } catch (err) {
-      client.emit('error', { message: err.message });
+      if (err instanceof Error) {
+        client.emit('error', { message: err.message });
+      } else {
+        client.emit('error', { message: err });
+      }
     }
   }
 
@@ -131,7 +151,11 @@ export class GameGateway {
       }));
       client.emit('get-games', gamesWithBoard);
     } catch (err) {
-      client.emit('error', { message: err.message });
+      if (err instanceof Error) {
+        client.emit('error', { message: err.message });
+      } else {
+        client.emit('error', { message: err });
+      }
     }
   }
 
@@ -143,33 +167,15 @@ export class GameGateway {
     try {
       const game = await this.appService.getGame(dto.id);
       const boardState = fenToBoard(game.fen);
-      game.whiteTimeLeft =
-        game.gameStatus === 'playing' &&
-        game.currentPlayer === 'white' &&
-        game.whiteTurnStarterAt
-          ? Math.max(
-              0,
-              Math.floor(
-                game.whiteTimeLeft -
-                  (Date.now() - game.whiteTurnStarterAt.getTime()) / 1000,
-              ),
-            )
-          : Math.floor(game.whiteTimeLeft);
-      game.blackTimeLeft =
-        game.gameStatus === 'playing' &&
-        game.currentPlayer === 'black' &&
-        game.blackTurnStarterAt
-          ? Math.max(
-              0,
-              Math.floor(
-                game.blackTimeLeft -
-                  (Date.now() - game.blackTurnStarterAt.getTime()) / 1000,
-              ),
-            )
-          : Math.floor(game.blackTimeLeft);
+      game.whiteTimeLeft = remaningTimeForPlayer(game, 'white');
+      game.blackTimeLeft = remaningTimeForPlayer(game, 'black');
       client.emit('game-state', { ...game, boardState });
     } catch (err) {
-      client.emit('error', { message: err.message });
+      if (err instanceof Error) {
+        client.emit('error', { message: err.message });
+      } else {
+        client.emit('error', { message: err });
+      }
     }
   }
 
@@ -215,7 +221,11 @@ export class GameGateway {
         blackTimeLeft: Math.round(res.blackTimeLeft),
       });
     } catch (err) {
-      client.emit('error', { message: err.message });
+      if (err instanceof Error) {
+        client.emit('error', { message: err.message });
+      } else {
+        client.emit('error', { message: err });
+      }
     }
   }
 
@@ -232,7 +242,11 @@ export class GameGateway {
         .to(`game/${gameId}`)
         .emit('draw-offer', { drawOfferedBy: res.drawOfferedBy });
     } catch (err) {
-      client.emit('error', { message: err.message });
+      if (err instanceof Error) {
+        client.emit('error', { message: err.message });
+      } else {
+        client.emit('error', { message: err });
+      }
     }
   }
 
@@ -254,7 +268,11 @@ export class GameGateway {
         .to(`game/${gameId}`)
         .emit('draw-response', { ...game, boardState });
     } catch (err) {
-      client.emit('error', { message: err.message });
+      if (err instanceof Error) {
+        client.emit('error', { message: err.message });
+      } else {
+        client.emit('error', { message: err });
+      }
     }
   }
 
@@ -272,7 +290,11 @@ export class GameGateway {
         winner: game.winner,
       });
     } catch (err) {
-      client.emit('error', { message: err.message });
+      if (err instanceof Error) {
+        client.emit('error', { message: err.message });
+      } else {
+        client.emit('error', { message: err });
+      }
     }
   }
 }

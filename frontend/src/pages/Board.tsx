@@ -30,7 +30,7 @@ const Board = () => {
     ) {
       setDrawResponseModal(true);
     }
-  }, [currentGame?.drawOfferedBy]);
+  }, [currentGame?.drawOfferedBy, currentGame?.gameStatus]);
 
   useEffect(() => {
     if (currentGame === null || !id || !socket || !socket.isConnected) return;
@@ -49,19 +49,14 @@ const Board = () => {
 
   return (
     <div className="app">
-      {(currentGame.gameStatus === 'checkmate' ||
-        currentGame.gameStatus === 'stalemate' ||
-        currentGame.gameStatus === 'timeout' ||
-        currentGame.gameStatus === 'draw' ||
-        currentGame.gameStatus === 'resign') &&
-        isModalActive && (
-          <Modal
-            title={`${currentGame.gameStatus === 'checkmate' ? `Stalemate` : `${currentGame.winner} won`}`}
-            setIsActive={currentGame.setModalActive}
-            action={() => navigate(`home`)}
-            text="Navigate to home"
-          />
-        )}
+      {currentGame.isFinished() && isModalActive && (
+        <Modal
+          title={`${currentGame.gameStatus === 'checkmate' ? `Stalemate` : `${currentGame.winner} won`}`}
+          setIsActive={currentGame.setModalActive}
+          action={() => navigate(`home`)}
+          text="Navigate to home"
+        />
+      )}
       {resignModal && (
         <Modal
           title="Are you sure you want to resign?"
@@ -105,11 +100,7 @@ const Board = () => {
           text="Accept"
         />
       )}
-      {(currentGame.gameStatus === 'checkmate' ||
-        currentGame.gameStatus === 'stalemate' ||
-        currentGame.gameStatus === 'timeout' ||
-        currentGame.gameStatus === 'draw' ||
-        currentGame.gameStatus === 'resign') && (
+      {currentGame.isFinished() && (
         <button
           type="button"
           onClick={() => currentGame.setModalActive(true)}

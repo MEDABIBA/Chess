@@ -25,12 +25,7 @@ const Home = () => {
       filter === 'all' ||
       (filter === 'active' && game.gameStatus === 'playing') ||
       (filter === 'waiting' && game.gameStatus === 'waiting') ||
-      (filter === 'archive' &&
-        (game.gameStatus === 'checkmate' ||
-          game.gameStatus === 'stalemate' ||
-          game.gameStatus === 'draw' ||
-          game.gameStatus === 'resign' ||
-          game.gameStatus === 'timeout')),
+      (filter === 'archive' && game.isFinished()),
   );
   const paginated =
     filteredGames.length > 0

@@ -36,8 +36,8 @@ const SquareComponent: React.FC<SquareProps> = ({
 
   useEffect(() => {
     if (animationTarget) {
-      const movingFrom = animationTarget?.from;
-      const movingTo = animationTarget?.to;
+      const movingFrom = animationTarget.from;
+      const movingTo = animationTarget.to;
       const isMovingPiece =
         movingFrom?.row === position.row && movingFrom?.col === position.col;
       if (!isMovingPiece) return;

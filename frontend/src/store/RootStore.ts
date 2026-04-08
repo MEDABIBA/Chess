@@ -25,8 +25,6 @@ export class RootStore {
     this.timer = new Timer(this);
     this.newGame = new NewGame(this);
     this.socket = new WebSocketService(this);
-
-    // this.init();
   }
 
   async initWs() {

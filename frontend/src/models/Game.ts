@@ -74,14 +74,7 @@ class Game {
     this.blackPlayerNickname = game?.blackPlayer?.username ?? null;
     this.createdAt = game.createdAt;
 
-    this.modalActive =
-      this.gameStatus === 'resign' ||
-      this.gameStatus === 'checkmate' ||
-      this.gameStatus === 'stalemate' ||
-      this.gameStatus === 'draw' ||
-      this.gameStatus === 'timeout'
-        ? true
-        : false;
+    this.modalActive = this.isFinished() ? true : false;
   }
 
   @action
@@ -226,32 +219,6 @@ class Game {
     }
   };
 
-  // isPat(color: Color) {
-  //   const allPieces = this.getAllPieces(color);
-  //   let isPat = true;
-  //   for (let i = 0; i < allPieces.length; i++) {
-  //     const piece = allPieces[i];
-  //     if (!piece) continue;
-  //     this.board.forEach((square) => {
-  //       const side =
-  //         piece.position.col < square.position.col ? 'right' : 'left';
-  //       const condition = this.isValidMove(
-  //         piece,
-  //         piece?.position,
-  //         square.position,
-  //         side,
-  //       );
-  //       if (condition === true) {
-  //         isPat = false;
-  //       }
-  //     });
-  //     if (!isPat) break;
-  //   }
-  //   if (isPat && !this.store.chessMoveValidator.isKingUnderAttack(color)) {
-  //     return true;
-  //   } else return false;
-  // }
-
   @action
   makeMove = async (
     from: Position,
@@ -292,14 +259,7 @@ class Game {
   setAvailableMoves = (args: [Piece, Position] | null) => {
     this.availableMoves = [];
     if (!args) return;
-    if (
-      this.gameStatus === 'checkmate' ||
-      this.gameStatus === 'stalemate' ||
-      this.gameStatus === 'timeout' ||
-      this.gameStatus === 'draw' ||
-      this.gameStatus === 'resign'
-    )
-      return;
+    if (this.isFinished()) return;
     const [piece, position] = args;
     this.board.forEach((el) => {
       if (
@@ -332,14 +292,7 @@ class Game {
   setAvailablePremoves = (args: [Piece, Position] | null) => {
     this.availableMoves = [];
     if (!args) return;
-    if (
-      this.gameStatus === 'checkmate' ||
-      this.gameStatus === 'stalemate' ||
-      this.gameStatus === 'timeout' ||
-      this.gameStatus === 'draw' ||
-      this.gameStatus === 'resign'
-    )
-      return;
+    if (this.isFinished()) return;
     const [piece, position] = args;
     if (piece.color !== this.yourColor) return false;
     this.board.forEach((el) => {
@@ -377,13 +330,7 @@ class Game {
       console.warn('isValidMove fall', from, to, piece.pieceType);
       return false;
     }
-    if (
-      this.gameStatus === 'checkmate' ||
-      this.gameStatus === 'timeout' ||
-      this.gameStatus === 'draw' ||
-      this.gameStatus === 'resign'
-    )
-      return false;
+    if (this.isFinished()) return false;
     if (
       piece.pieceType !== 'king' &&
       this.store.chessMoveValidator.isKingUnderAttack(piece.color)
@@ -449,11 +396,6 @@ class Game {
 
     const piece = this.getPiece(this.pendingPremove.from);
     if (!piece) return;
-
-    // if (this.isPromotion(piece, this.pendingPremove.to)) {
-    //   this.setPendingPremove(null);
-    //   return;
-    // }
     this.makeMove(piece.position, this.pendingPremove.to);
     this.setPendingPremove(null);
   }
@@ -505,18 +447,5 @@ class Game {
       this.pendingPremove = null;
     }
   }
-
-  // reloadGame = () => {
-  //   this.board = [];
-  //   initializeBoard();
-  //   this.currentPlayer = 'white';
-  //   this.gameStatus = 'playing';
-  //   this.activePiece = null;
-  //   this.highlightLastMove = null;
-  //   this.availableMoves = [];
-  //   this.grab = null;
-  //   this.animateMove = null;
-  //   this.store.timer.resetTimer(1800);
-  // };
 }
 export default Game;

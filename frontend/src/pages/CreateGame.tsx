@@ -21,10 +21,6 @@ const CreateGame = () => {
       setTimeout(() => setIsVisible(false), 300);
     }
   }, [activeTimer]);
-  // useEffect(() => {
-  //   if (nickname.length === 0 || /^[A-Za-z0-9 ]{1,30}$/.test(nickname)) setNicknameError(false);
-  //   else setNicknameError(true);
-  // }, [nickname]);
   return (
     <>
       <div className="backgound-image">

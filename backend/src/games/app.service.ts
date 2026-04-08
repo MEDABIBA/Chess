@@ -7,9 +7,10 @@ import { boardToFen } from 'src/helpers';
 import { Chess } from 'chess.js';
 import { validateMove } from 'src/helpers/validateMove';
 import { generateInviteCode } from 'src/helpers/generateInviteCode';
-import { joinGameByCodeDto } from './dto/joinGameByCode';
+import { joinGameByCodeDto } from './dto/joinGameByCode.dto';
 import { Server } from 'socket.io';
-import { removeGameDto } from './dto/removeGame';
+import { removeGameDto } from './dto/removeGame.dto';
+import { Game } from '@prisma/client';
 
 @Injectable()
 export class AppService {
@@ -308,6 +309,51 @@ export class AppService {
       clearTimeout(this.gameTimers.get(id));
     }
     return result;
+  }
+
+  async handleDrawOffer(gameId: number, offeredById: number): Promise<Game> {
+    const game = await this.prisma.game.findUnique({ where: { id: gameId } });
+    if (!game) throw new Error('Game not found!');
+    if (game.drawOfferedBy !== null) throw new Error('Draw already offered');
+    if (game.gameStatus !== 'playing') throw new Error('Game is not active');
+    if (
+      game?.whitePlayerId !== offeredById &&
+      game?.blackPlayerId !== offeredById
+    )
+      throw new Error('Only a participant this game can propose a draw!');
+    return await this.prisma.game.update({
+      where: { id: gameId },
+      data: { drawOfferedBy: offeredById },
+    });
+  }
+
+  async handleDrawResponse(
+    gameId: number,
+    responsedBy: number,
+    response: boolean,
+  ): Promise<Game> {
+    const game = await this.prisma.game.findUnique({ where: { id: gameId } });
+    if (!game) throw new Error('Game not found!');
+    if (game.gameStatus !== 'playing') throw new Error('Game is not active');
+    if (game.drawOfferedBy === null) throw new Error('No pending draw offer');
+    if (responsedBy === game.drawOfferedBy)
+      throw new Error('Cannot respond to your own draw offer');
+    if (
+      responsedBy !== game.whitePlayerId &&
+      responsedBy !== game.blackPlayerId
+    )
+      throw new Error('Only a participant this game can accept a draw!');
+    if (response) {
+      return await this.prisma.game.update({
+        where: { id: gameId },
+        data: { gameStatus: 'draw' },
+      });
+    } else {
+      return await this.prisma.game.update({
+        where: { id: gameId },
+        data: { drawOfferedBy: null },
+      });
+    }
   }
 
   async resign(id: number, loserId: number) {

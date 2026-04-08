@@ -14,7 +14,9 @@ import { Server, Socket } from 'socket.io';
 import { fenToBoard } from 'src/helpers';
 import { UseGuards } from '@nestjs/common';
 import { WsJwtGuard } from 'src/auth/ws-gwt.guard';
-import { joinGameByCodeDto } from './dto/joinGameByCode';
+import { joinGameByCodeDto } from './dto/joinGameByCode.dto';
+import { DrawOfferDto } from './dto/drawOffer.dto';
+import { DrawResponseDto } from './dto/drawResponse.dto';
 
 @WebSocketGateway({ cors: true })
 @UseGuards(WsJwtGuard)
@@ -208,6 +210,40 @@ export class GameGateway {
         whiteTimeLeft: Math.round(res.whiteTimeLeft),
         blackTimeLeft: Math.round(res.blackTimeLeft),
       });
+    } catch (err) {
+      client.emit('error', { message: err.message });
+    }
+  }
+
+  @SubscribeMessage('draw-offer')
+  async drawOffer(
+    @MessageBody() dto: DrawOfferDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { gameId, offeredById } = dto;
+    try {
+      const res = await this.appService.handleDrawOffer(gameId, offeredById);
+      this.server
+        .to(`game/${gameId}`)
+        .emit('draw-offer', { offeredById: res.drawOfferedBy });
+    } catch (err) {
+      client.emit('error', { message: err.message });
+    }
+  }
+
+  @SubscribeMessage('draw-response')
+  async drawResponse(
+    @MessageBody() dto: DrawResponseDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { gameId, response, responsedById } = dto;
+    try {
+      const res = await this.appService.handleDrawResponse(
+        gameId,
+        responsedById,
+        response,
+      );
+      this.server.to(`game/${gameId}`).emit('draw-response', { res: res });
     } catch (err) {
       client.emit('error', { message: err.message });
     }

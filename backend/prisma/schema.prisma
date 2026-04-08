@@ -19,6 +19,7 @@ enum gameStatus {
   playing
   checkmate
   timeout
+  draw
   resign
   stalemate
 }
@@ -53,6 +54,7 @@ model Game {
   whiteTurnStarterAt DateTime?
   blackTimeLeft Int @default(180)
   blackTurnStarterAt DateTime?
+  drawOfferedBy Int?
 
   lastDoubleStepPawn Json?
 

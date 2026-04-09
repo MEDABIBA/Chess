@@ -118,14 +118,14 @@ const SquareComponent: React.FC<SquareProps> = ({
         setAvailableMoves(null);
         setAvailablePremoves(null);
       }
-      if (!piece) return;
+      return;
     }
     if (!piece || !imgRef.current) return;
 
     e.preventDefault();
     if (game.moveAvailableForPiece(piece)) {
       setAvailableMoves([piece, position]);
-    } else {
+    } else if (!premove) {
       game.setAvailablePremoves([piece, position]);
     }
     setActivePiece(piece);

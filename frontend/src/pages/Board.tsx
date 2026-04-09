@@ -53,7 +53,7 @@ const Board = () => {
     <div className="app">
       {currentGame.isFinished() && isModalActive && (
         <Modal
-          title={`${currentGame.gameStatus === 'checkmate' ? `Stalemate` : `${currentGame.winner} won`}`}
+          title={`${currentGame.gameStatus === 'checkmate' ? `Stalemate` : currentGame.gameStatus === 'draw' ? `Draw!` : `${currentGame.winner} won`}`}
           setIsActive={currentGame.setModalActive}
           action={() => navigate(`home`)}
           text="Navigate to home"

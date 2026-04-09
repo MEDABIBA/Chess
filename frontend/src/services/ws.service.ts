@@ -17,6 +17,7 @@ import {
   IRemoveGame,
   ITimeout,
 } from '../types/api.types';
+import notify from '../components/ui/notify';
 
 class WebSocketService {
   store: RootStore;
@@ -76,7 +77,7 @@ class WebSocketService {
       this.store?.games.addGame(game);
     });
     this.socket?.on('game-created-you', (res: { id: number }) => {
-      console.log('game-created-you', res);
+      notify('game created successfully!', 'success');
       this.store?.navigate(`game/${res.id}`);
     });
     this.socket.on('game-removed', (res: { gameId: number }) => {
@@ -86,15 +87,18 @@ class WebSocketService {
     });
     this.socket.on('game-removed-lobby', (res: { gameId: number }) => {
       const { gameId } = res;
+      notify(`game with id ${gameId} removed!`, 'success');
       this.store?.navigate(`home`);
-      console.log(`game ${gameId} was removed!`);
     });
     this.socket?.on('guest-joined', (game: GameInterface) => {
+      if (game.blackPlayer === this.store.getNickname()) {
+        notify('Joined game successfully!', 'success');
+      }
       console.log('guest-joined', game);
       this.store?.games.updateGame(game);
     });
     this.socket?.on('game-joined-by-code-you', (res: { id: number }) => {
-      console.log('game-created-you', res);
+      notify(`You successfully joined the game by code`, 'success');
       this.store?.navigate(`game/${res.id}`);
     });
     this.socket?.on('get-games', (games: GameInterface[]) => {
@@ -115,10 +119,17 @@ class WebSocketService {
       this.store.games.currentGame?.setDrawOfferedBy(drawOfferedBy);
       console.log('draw-offer', res);
     });
-    this.socket?.on('draw-response', (res: GameInterface) => {
-      this.store?.games?.currentGame?.setBoard(res);
-      console.log('draw-response', res);
-    });
+    this.socket?.on(
+      'draw-response',
+      (res: GameInterface | { error: string }) => {
+        if ('error' in res) {
+          notify(res.error, 'error');
+        } else {
+          this.store?.games?.currentGame?.setBoard(res);
+          console.log('draw-response', res);
+        }
+      },
+    );
     this.socket?.on(
       'update-game-status',
       (res: { id: number; gameStatus: GameStatus; winner: string }) => {

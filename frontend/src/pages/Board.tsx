@@ -10,6 +10,7 @@ import GameButton from '../components/GameButton';
 import whiteFlag from '../assets/white-flag.png';
 import bin from '../assets/bin.png';
 import draw from '../assets/draw.png';
+import notify from '../components/ui/notify';
 
 const Board = () => {
   const { id } = useParams();
@@ -20,7 +21,6 @@ const Board = () => {
   const [resignModal, setResignModal] = useState<boolean>(false);
   const [removeGameModal, setRemoveGameModal] = useState<boolean>(false);
   const [drawModal, setDrawModal] = useState<boolean>(false);
-  const [drawResponseModal, setDrawResponseModal] = useState<boolean>(false);
 
   useEffect(() => {
     if (
@@ -28,7 +28,9 @@ const Board = () => {
       currentGame?.gameStatus === 'playing' &&
       currentGame.drawOfferedBy !== currentGame.playerId
     ) {
-      setDrawResponseModal(true);
+      notify('Your opponent offers a draw', 'info', (res: boolean) => {
+        socket.drawResponse({ gameId: currentGame.id, response: res });
+      });
     }
   }, [currentGame?.drawOfferedBy, currentGame?.gameStatus]);
 
@@ -87,7 +89,7 @@ const Board = () => {
           text="Draw offer"
         />
       )}
-      {drawResponseModal && (
+      {/* {drawResponseModal && (
         <Modal
           title="Your opponent offers a draw?"
           setIsActive={setDrawResponseModal}
@@ -99,7 +101,7 @@ const Board = () => {
           }}
           text="Accept"
         />
-      )}
+      )} */}
       {currentGame.isFinished() && (
         <button
           type="button"

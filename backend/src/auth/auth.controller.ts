@@ -98,6 +98,7 @@ export class AuthController {
       sameSite: 'lax',
     }); // 7 days
     return {
+      message: 'User has successfully logged in',
       accessToken: tokens.accessToken,
     };
   }

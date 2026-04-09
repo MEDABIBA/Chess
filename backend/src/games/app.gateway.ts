@@ -269,9 +269,9 @@ export class GameGateway {
         .emit('draw-response', { ...game, boardState });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('error', { message: err.message });
+        client.emit('draw-response', { error: err.message });
       } else {
-        client.emit('error', { message: err });
+        client.emit('draw-response', { error: err });
       }
     }
   }

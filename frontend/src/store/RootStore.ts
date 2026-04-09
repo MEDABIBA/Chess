@@ -8,6 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 import { MyJwtPayload } from '../types/types';
 import Games from './Games';
 import WebSocketService from '../services/ws.service';
+import notify from '../components/ui/notify';
 
 export class RootStore {
   games: Games;
@@ -96,7 +97,7 @@ export class RootStore {
       tokenService.setAccessToken(data.accessToken);
       this.socket.accessToken = data.accessToken;
       this.socket.connect();
-      console.log('user created!');
+      notify(data.message, 'success');
       this.navigate('home');
     } catch (error) {
       if (error instanceof Error) {

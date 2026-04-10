@@ -49,7 +49,6 @@ class WebSocketService {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      reconnectionAttempts: 5,
       timeout: 5000,
     });
 
@@ -66,10 +65,10 @@ class WebSocketService {
         this.isConnected = true;
       });
       if (this.pendingEvent) {
+        notify('Reconnected!', 'success');
         this.socket?.emit(this.pendingEvent.event, this.pendingEvent.data);
         this.pendingEvent = null;
       }
-      console.log('WebSocket connected');
     });
 
     this.socket?.on('game-created', (game: GameInterface) => {
@@ -217,49 +216,49 @@ class WebSocketService {
       }
     });
 
-    this.socket.on('disconnect', (reason: Socket.DisconnectReason) => {
+    this.socket.on('disconnect', () => {
       runInAction(() => {
         this.isConnected = false;
       });
-      console.log('WebSocket disconnected:', reason);
+      notify('Connection lost! Reconnecting...', 'error');
     });
   }
 
   public createGame(data: ICreateGame) {
     if (!this.socket) throw new Error('Socket not initialized');
-    if (!this.socket?.connected) return;
     this.pendingEvent = { event: 'create-game', data };
+    if (!this.socket?.connected) return;
     this.socket.emit('create-game', data);
   }
   public removeGame(data: IRemoveGame) {
     if (!this.socket) throw new Error('Socket not initialized');
-    if (!this.socket?.connected) return;
     this.pendingEvent = { event: 'remove-game', data };
+    if (!this.socket?.connected) return;
     this.socket.emit('remove-game', data);
   }
   public joinRoom(data: IJoinRoom) {
     console.log('joinRoom func');
     if (!this.socket) throw new Error('Socket not initialized');
-    if (!this.socket?.connected) return;
     this.pendingEvent = { event: 'join-room', data };
+    if (!this.socket?.connected) return;
     this.socket.emit('join-room', data);
   }
   public leaveRoom(data: ILeaveRoom) {
     if (!this.socket) throw new Error('Socket not initialized');
-    if (!this.socket?.connected) return;
     this.pendingEvent = { event: 'leave-room', data };
+    if (!this.socket?.connected) return;
     this.socket.emit('leave-room', data);
   }
   public joinGame(data: IJoinGame) {
     if (!this.socket) throw new Error('Socket not initialized');
-    if (!this.socket?.connected) return;
     this.pendingEvent = { event: 'join-game', data };
+    if (!this.socket?.connected) return;
     this.socket.emit('join-game', data);
   }
   public joinGameByCode(data: IJoinGameByCode) {
     if (!this.socket) throw new Error('Socket not initialized');
-    if (!this.socket?.connected) return;
     this.pendingEvent = { event: 'join-game-code', data };
+    if (!this.socket?.connected) return;
     this.socket.emit('join-game-code', data);
   }
   public getAllGames() {
@@ -274,30 +273,30 @@ class WebSocketService {
   }
   public makeMove(data: IMakeMove) {
     if (!this.socket) throw new Error('Socket not initialized');
+    this.pendingEvent = { event: 'make-move', data };
     if (!this.socket?.connected) return;
     console.log('called makeMove');
-    this.pendingEvent = { event: 'make-move', data };
     this.socket.emit('make-move', data);
   }
   public drawOffer(data: { gameId: number }) {
     if (!this.socket) throw new Error('Socket not initialized');
+    this.pendingEvent = { event: 'draw-offer', data };
     if (!this.socket?.connected) return;
     console.log('called draw offer');
-    this.pendingEvent = { event: 'draw-offer', data };
     this.socket?.emit('draw-offer', data);
   }
   public drawResponse(data: { gameId: number; response: boolean }) {
     if (!this.socket) throw new Error('Socket not initialized');
+    this.pendingEvent = { event: 'draw-response', data };
     if (!this.socket?.connected) return;
     console.log('called draw response');
-    this.pendingEvent = { event: 'draw-response', data };
     this.socket?.emit('draw-response', data);
   }
   public resign(data: { id: number }) {
     if (!this.socket) throw new Error('Socket not initialized');
+    this.pendingEvent = { event: 'resign', data };
     if (!this.socket?.connected) return;
     console.log('called resign');
-    this.pendingEvent = { event: 'resign', data };
     this.socket?.emit('resign', data);
   }
 

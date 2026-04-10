@@ -121,7 +121,7 @@ export class AppService {
       throw new Error(
         "You can remove game only if its hasn't been started yet!",
       );
-    if (game.whitePlayerId !== userId && game.blackPlayerId == userId)
+    if (game.whitePlayerId !== userId && game.blackPlayerId !== userId)
       throw new Error('Only participants can delete the game!');
     return await this.prisma.game.delete({ where: { id: gameId } });
   }

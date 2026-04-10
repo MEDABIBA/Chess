@@ -507,6 +507,7 @@ p {
   background-color: #444;
   padding: 15px;
   width: max-content;
+  border-radius: 0 13px 13px 0;
 }
 
 .game-info-window-main-info {

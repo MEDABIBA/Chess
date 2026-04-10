@@ -27,37 +27,46 @@ const PlayersWindow = ({
         <Timer getPlayerTime={getFirstPlayerTime} />
         <div className="game-info-window-main">
           <div className="player-name">{whitePlayerNickname}</div>
-          <div className="game-info-window-main-info">
-            <img
-              src={info}
-              height={40}
-              width={40}
-              style={{ marginRight: '10px' }}
-              alt="info"
-            />
-            You play {currentGame.yourColor} pieces
-          </div>
-          <div className="game-buttons">
-            {currentGame.blackPlayerNickname !== null &&
-              currentGame.gameStatus === 'playing' && (
-                <GameButton
-                  img={whiteFlag}
-                  text="resign"
-                  setModal={setResignModal}
+          {currentGame.isParticipant() && (
+            <>
+              <div className="game-info-window-main-info">
+                <img
+                  src={info}
+                  height={40}
+                  width={40}
+                  style={{ marginRight: '10px' }}
+                  alt="info"
                 />
-              )}
-            {currentGame.gameStatus === 'waiting' && (
-              <GameButton
-                img={bin}
-                text="remove game"
-                setModal={setRemoveGameModal}
-              />
-            )}
-            {currentGame.gameStatus === 'playing' &&
-              currentGame.drawOfferedBy === null && (
-                <GameButton img={draw} text="draw" setModal={setDrawModal} />
-              )}
-          </div>
+                You play {currentGame.yourColor} pieces
+              </div>
+              <div className="game-buttons">
+                {currentGame.blackPlayerNickname !== null &&
+                  currentGame.gameStatus === 'playing' && (
+                    <GameButton
+                      img={whiteFlag}
+                      text="resign"
+                      setModal={setResignModal}
+                    />
+                  )}
+                {currentGame.gameStatus === 'waiting' && (
+                  <GameButton
+                    img={bin}
+                    text="remove game"
+                    setModal={setRemoveGameModal}
+                  />
+                )}
+                {currentGame.gameStatus === 'playing' &&
+                  currentGame.drawOfferedBy === null && (
+                    <GameButton
+                      img={draw}
+                      text="draw"
+                      setModal={setDrawModal}
+                    />
+                  )}
+              </div>
+            </>
+          )}
+
           <div className="player-name">{blackPlayerNickname ?? '...'}</div>
         </div>
         <Timer getPlayerTime={getSecondPlayerTime} />

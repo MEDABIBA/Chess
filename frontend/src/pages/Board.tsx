@@ -12,7 +12,19 @@ const Board = () => {
   const { id } = useParams();
   const store = useStore();
   const { socket, games, timer, navigate } = store;
-  games.setCurrentGame(Number(id));
+  useEffect(() => {
+    games.setCurrentGame(Number(id));
+  }, [id]);
+  useEffect(() => {
+    if (!id || !socket || !socket.isConnected) return;
+    socket.joinRoom({ gameId: Number(id) });
+    if (games.currentGame && games.currentGame.gameStatus === 'playing') {
+      timer.activateTimer(games.currentGame.currentPlayer);
+    }
+    return () => {
+      socket.leaveRoom({ gameId: Number(id) });
+    };
+  }, [timer, games.currentGame, id, socket, socket?.isConnected]);
   const { currentGame } = games;
   const [resignModal, setResignModal] = useState<boolean>(false);
   const [removeGameModal, setRemoveGameModal] = useState<boolean>(false);
@@ -29,18 +41,6 @@ const Board = () => {
       });
     }
   }, [currentGame?.drawOfferedBy, currentGame?.gameStatus]);
-
-  useEffect(() => {
-    if (currentGame === null || !id || !socket || !socket.isConnected) return;
-    currentGame.id = Number(id);
-    socket.joinRoom({ gameId: Number(id) });
-    if (currentGame.gameStatus === 'playing') {
-      timer.activateTimer(currentGame.currentPlayer);
-    }
-    return () => {
-      socket.leaveRoom({ gameId: Number(id) });
-    };
-  }, [currentGame, timer, games.currentGame, id, socket, socket?.isConnected]);
 
   if (currentGame === null) return;
   const isModalActive = currentGame.getModalActive();

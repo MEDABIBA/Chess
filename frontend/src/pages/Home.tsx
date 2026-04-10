@@ -148,14 +148,19 @@ const Home = () => {
                           className="connect-game-btn"
                           onClick={() => {
                             if (isParticipant) {
-                              games.setCurrentGame(game.id);
                               navigate(`game/${game.id}`);
-                            } else {
+                            } else if (!game.blackPlayerNickname) {
                               games.joinGame(game);
+                            } else {
+                              navigate(`game/${game.id}`);
                             }
                           }}
                         >
-                          {isParticipant ? 'Enter' : 'Join game'}
+                          {isParticipant
+                            ? 'Enter'
+                            : game.blackPlayerNickname
+                              ? 'Watch'
+                              : 'Join'}
                         </button>
                       </td>
                     </tr>

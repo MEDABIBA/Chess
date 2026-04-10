@@ -52,6 +52,7 @@ export class RootStore {
     const game = this.games.currentGame;
     if (!this.isAuthorized()) return false;
     if (!game) return true;
+    if (!this.games.currentGame?.isParticipant()) return true;
     if (
       this.games.currentGame?.isParticipant() &&
       this.games.currentGame.gameStatus !== 'playing'

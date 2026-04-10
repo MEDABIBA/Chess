@@ -200,7 +200,6 @@ class WebSocketService {
         this.isConnected = false;
         this.accessToken = null;
       });
-      console.log('error', err);
       if (err.message.includes('Unauthorized')) {
         const token = await this.refreshAccessToken();
         console.log('refreshed');
@@ -209,11 +208,13 @@ class WebSocketService {
           console.log('reconnecting..');
           this.connect();
         }
+        return;
       }
       if (err.message.includes('user didnt exist')) {
         localStorage.clear();
         this.store?.navigate('registration-form');
       }
+      notify(err.message as string, 'error');
     });
 
     this.socket.on('disconnect', () => {

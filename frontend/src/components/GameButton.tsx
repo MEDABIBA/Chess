@@ -15,7 +15,7 @@ const GameButton = ({
       return;
     }}
   >
-    <img height={40} width={40} src={img} alt={text} />
+    <img height={25} width={25} src={img} alt={text} />
   </div>
 );
 export default GameButton;

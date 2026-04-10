@@ -98,9 +98,10 @@ p {
 
 .main-content {
   position: relative;
-  max-width: 680px;
   display: flex;
-  align-items: end;
+  align-items: center;
+  width: 80%;
+  justify-content: center;
 }
 
 .game-container {
@@ -108,11 +109,11 @@ p {
   flex-direction: column;
   align-items: center;
   margin-right: 15px;
+  flex-grow: 0.5;
 }
 
 .board-container {
   width: 100%;
-  /* display: flex; */
   justify-content: center;
   align-items: center;
 }
@@ -137,8 +138,9 @@ p {
 
 .game-buttons {
   display: flex;
-  flex-direction: column;
   gap: 15px;
+  align-items: center;
+  justify-content: center;
 }
 
 .game-btn {
@@ -147,6 +149,7 @@ p {
   border-radius: 13px;
   cursor: pointer;
   transition: all 0.1s ease-in-out;
+  width: max-content;
 }
 .game-btn:hover {
   background-color: #666;
@@ -307,17 +310,18 @@ p {
   box-shadow: inset 0 0 0 3px rgba(255, 255, 0, 0.5);
 }
 
-.parent-timer {
-  display: flex;
-  flex-direction: column;
-  margin: 0 15px;
-  gap: 25px;
-}
-
 .timer {
-  font-size: 2em;
+  font-size: 3em;
   background-color: #444;
   color: #f5f5f5;
+  padding: 5px 15px;
+  width: max-content;
+}
+.game-info-window > .timer:first-child {
+  border-radius: 6px 6px 0 0;
+}
+.game-info-window > .timer:last-child {
+  border-radius: 0 0 6px 6px;
 }
 
 .modal {
@@ -503,9 +507,39 @@ p {
   gap: 1vw;
 }
 
+.game-info-window {
+  color: #f5f5f5;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
+  gap: 1vw;
+  flex-grow: 0.3;
+}
+.game-info-window-main {
+  background-color: #444;
+  padding: 15px;
+  width: max-content;
+}
+
+.game-info-window-main-info {
+  padding: 25px 15px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
 .player-name {
   font-size: 2em;
-  /* margin-bottom: 10px; */
+  max-width: max-content;
+}
+.player-name::before {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
+  background-color: green;
+  width: 10px;
+  height: 10px;
+  border-radius: 13px;
 }
 
 .auth-title {

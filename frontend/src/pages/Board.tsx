@@ -2,15 +2,11 @@ import BoardComponent from '../components/Board';
 import { useStore } from '../provider/context';
 import Modal from '../components/modalWindow';
 import { observer } from 'mobx-react-lite';
-import PlayerCard from '../components/PlayerCard';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import GameButton from '../components/GameButton';
 
-import whiteFlag from '../assets/white-flag.png';
-import bin from '../assets/bin.png';
-import draw from '../assets/draw.png';
 import notify from '../components/ui/notify';
+import PlayersWindow from '../components/PlayersWidow';
 
 const Board = () => {
   const { id } = useParams();
@@ -89,19 +85,6 @@ const Board = () => {
           text="Draw offer"
         />
       )}
-      {/* {drawResponseModal && (
-        <Modal
-          title="Your opponent offers a draw?"
-          setIsActive={setDrawResponseModal}
-          action={() => {
-            socket.drawResponse({ gameId: currentGame.id, response: true });
-          }}
-          secondAction={() => {
-            socket.drawResponse({ gameId: currentGame.id, response: false });
-          }}
-          text="Accept"
-        />
-      )} */}
       {currentGame.isFinished() && (
         <button
           type="button"
@@ -113,37 +96,13 @@ const Board = () => {
       )}
       <div className="main-content">
         <div className="game-container">
-          <PlayerCard
-            playerName={currentGame.blackPlayerNickname}
-            getPlayerTime={timer.getSecondPlayerTime}
-          />
           <BoardComponent />
-          <PlayerCard
-            playerName={currentGame.whitePlayerNickname}
-            getPlayerTime={timer.getFirstPlayerTime}
-          />
         </div>
-        <div className="game-buttons">
-          {currentGame.blackPlayerNickname !== null &&
-            currentGame.gameStatus === 'playing' && (
-              <GameButton
-                img={whiteFlag}
-                text="resign"
-                setModal={setResignModal}
-              />
-            )}
-          {currentGame.gameStatus === 'waiting' && (
-            <GameButton
-              img={bin}
-              text="remove game"
-              setModal={setRemoveGameModal}
-            />
-          )}
-          {currentGame.gameStatus === 'playing' &&
-            currentGame.drawOfferedBy === null && (
-              <GameButton img={draw} text="draw" setModal={setDrawModal} />
-            )}
-        </div>
+        <PlayersWindow
+          setDrawModal={setDrawModal}
+          setRemoveGameModal={setRemoveGameModal}
+          setResignModal={setResignModal}
+        />
       </div>
     </div>
   );

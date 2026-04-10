@@ -11,10 +11,6 @@ const Timer = observer(({ getPlayerTime }: { getPlayerTime: () => string }) => {
       deactiveTimer();
     }
   }, [getPlayerTime()]);
-  return (
-    <div className="parent-timer">
-      <div className="timer">{getPlayerTime()}</div>
-    </div>
-  );
+  return <div className="timer">{getPlayerTime()}</div>;
 });
 export default Timer;

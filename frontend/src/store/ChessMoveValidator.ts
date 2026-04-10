@@ -302,23 +302,16 @@ class ChessMoveValidator {
     return true;
   };
 
-  executeCastling = async (
-    king: Piece,
-    from: Position,
-    to: Position,
-  ): Promise<void> => {
+  executeCastling = async (from: Position, to: Position): Promise<void> => {
     const rookFromCol = from.col > to.col ? 1 : 8;
-    const rookToCol = king.position.col > to.col ? to.col + 1 : to.col - 1;
+    const rookToCol = from.col > to.col ? to.col + 1 : to.col - 1;
     const rook = this.store.games.currentGame?.getPiece({
       row: from.row,
       col: rookFromCol,
     });
     if (!rook) return;
     if (this.store.games.currentGame) {
-      this.store.games.currentGame.animateMove = {
-        from: { row: from.row, col: rookFromCol },
-        to: { row: to.row, col: rookToCol },
-      };
+      this.store.games.currentGame.isAnimateMove = true;
     }
 
     setTimeout(() => {

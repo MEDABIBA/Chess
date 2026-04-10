@@ -172,7 +172,7 @@ class WebSocketService {
         if (
           this.store?.games?.currentGame.yourColor !==
             this.store?.games?.currentGame.currentPlayer ||
-          this.store.games.currentGame.animateMove !== null
+          this.store.games.currentGame.isAnimateMove === true
         ) {
           this.store.games.currentGame.animateMove = { from, to };
           setTimeout(() => {
@@ -183,6 +183,7 @@ class WebSocketService {
             );
             if (this.store?.games?.currentGame?.animateMove) {
               this.store.games.currentGame.animateMove = null;
+              this.store.games.currentGame.isAnimateMove = false;
             } // Animate move for opponent and for us if we have animated move
             this.store.games.currentGame?.finalizePremove();
           }, 200);

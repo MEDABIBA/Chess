@@ -118,7 +118,9 @@ const SquareComponent: React.FC<SquareProps> = ({
         setAvailableMoves(null);
         setAvailablePremoves(null);
       }
-      return;
+      if (piece && piece?.color !== active.color) {
+        return;
+      }
     }
     if (!piece || !imgRef.current) return;
 

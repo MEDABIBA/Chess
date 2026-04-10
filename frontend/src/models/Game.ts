@@ -30,6 +30,7 @@ class Game {
   availableMoves: Position[] = [];
   grab: Position | null = null;
   animateMove: { from: Position; to: Position } | null = null;
+  isAnimateMove: boolean = false;
   modalActive: boolean;
   lastDoubleStepPawn: null | { color: Color; position: Position } = null;
   drawOfferedBy: number | null = null;
@@ -246,7 +247,7 @@ class Game {
     };
     console.log(MakeMoveDto);
     if (animation) {
-      this.animateMove = { from, to };
+      this.isAnimateMove = true;
     }
     this.store.socket?.makeMove({ id: this.id, moveData: MakeMoveDto });
   };
@@ -376,13 +377,14 @@ class Game {
     this.setAvailableMoves(null);
     this.highlightLastMove = { from, to };
     this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black';
+    this.isAnimateMove = false;
     this.animateMove = null;
     this.lastDoubleStepPawn = null;
     if (piece.pieceType === 'pawn' && Math.abs(from.row - to.row) === 2) {
       this.lastDoubleStepPawn = { color: piece.color, position: to };
     }
     if (piece.pieceType === PieceType.KING && Math.abs(from.col - to.col) > 1) {
-      this.store.chessMoveValidator.executeCastling(piece, from, to);
+      this.store.chessMoveValidator.executeCastling(from, to);
     }
     if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
       this.store.timer.deactiveTimer();

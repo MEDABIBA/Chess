@@ -1,3 +1,5 @@
+import notify from '../components/ui/notify';
+
 class ApiService {
   async register(username: string, password: string) {
     try {
@@ -11,7 +13,7 @@ class ApiService {
       });
       const parsed = await response.json();
       if (!response.ok) {
-        throw new Error(parsed.message);
+        notify(parsed.message, 'error');
       }
       return parsed;
     } catch (err) {
@@ -30,7 +32,7 @@ class ApiService {
     });
     const parsed = await response.json();
     if (!response.ok) {
-      throw new Error(parsed.message);
+      notify(parsed.message, 'error');
     }
     return parsed;
   }
@@ -44,7 +46,7 @@ class ApiService {
     });
     const parsed = await response.json();
     if (!response.ok) {
-      throw new Error(parsed.message);
+      notify(parsed.message, 'error');
     }
     return parsed.accessToken;
   }

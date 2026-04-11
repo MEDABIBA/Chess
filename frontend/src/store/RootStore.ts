@@ -93,7 +93,7 @@ export class RootStore {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || 'Request failed');
+        notify(data.message || 'Request failed', 'error');
       }
       tokenService.setAccessToken(data.accessToken);
       this.socket.accessToken = data.accessToken;

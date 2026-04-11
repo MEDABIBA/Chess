@@ -122,11 +122,11 @@ const SquareComponent: React.FC<SquareProps> = ({
         setAvailableMoves(null);
         setAvailablePremoves(null);
       }
-      if (piece && piece?.color !== activePiece.color) {
-        return;
-      }
     }
     if (!piece || !imgRef.current) return;
+    if (piece && piece?.color !== game.yourColor) {
+      return;
+    }
 
     e.preventDefault();
     if (game.moveAvailableForPiece(piece)) {

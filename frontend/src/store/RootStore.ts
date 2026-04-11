@@ -103,7 +103,7 @@ export class RootStore {
     } catch (error) {
       if (error instanceof Error) {
         console.error('Error processed');
-        throw new Error(error.message || 'Request failed');
+        notify(error.message || 'Request failed', 'error');
       }
     }
   };

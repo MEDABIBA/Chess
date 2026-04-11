@@ -14,7 +14,7 @@ const Board = () => {
   const { socket, games, timer, navigate } = store;
   useEffect(() => {
     games.setCurrentGame(Number(id));
-  }, [id]);
+  }, [id, games.gamesList]);
   useEffect(() => {
     if (!id || !socket || !socket.isConnected) return;
     socket.joinRoom({ gameId: Number(id) });

@@ -10,6 +10,7 @@ interface SquareProps {
   color: string;
   position: Position;
   isActiveField?: '' | 'square-active' | 'square-attack';
+  activePiece?: Piece | null;
   piece?: Piece | null;
   isLastMove?: 'last-move' | '';
   premove?: 'square-premove-from' | 'square-premove-to' | '';
@@ -23,6 +24,7 @@ const SquareComponent: React.FC<SquareProps> = ({
   piece,
   isLastMove = '',
   isActiveField = '',
+  activePiece = null,
   premove = '',
   hightlightKingAttacked = false,
   grabbed = false,
@@ -33,7 +35,19 @@ const SquareComponent: React.FC<SquareProps> = ({
   const store = useStore();
   const { games } = store;
   const { currentGame: game } = games;
-
+  if (game === null) return;
+  const {
+    makeMove,
+    setActivePiece,
+    setAvailableMoves,
+    setAvailablePremoves,
+    setGrab,
+  } = game;
+  const isActivePieceSquare =
+    position.col === activePiece?.position.col &&
+    position.row === activePiece?.position.row
+      ? 'active-piece'
+      : '';
   useEffect(() => {
     if (animationTarget) {
       const movingFrom = animationTarget.from;
@@ -56,15 +70,6 @@ const SquareComponent: React.FC<SquareProps> = ({
       imgRef.current.style.transition = 'transform 0.2s ease-out';
     }
   }, [animationTarget, position]);
-  if (game === null) return;
-  const {
-    makeMove,
-    getActivePiece,
-    setActivePiece,
-    setAvailableMoves,
-    setAvailablePremoves,
-    setGrab,
-  } = game;
 
   const handleMoveToSquare = (
     game: Game,
@@ -89,7 +94,6 @@ const SquareComponent: React.FC<SquareProps> = ({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     console.log('row', row, ', col', col);
-    const active = getActivePiece();
     game.setPendingPremove(null);
 
     if (
@@ -98,27 +102,27 @@ const SquareComponent: React.FC<SquareProps> = ({
     ) {
       games?.currentGame?.setPendingPromotionPiece(null);
     }
-    if (active?.position) {
+    if (activePiece?.position) {
       const square = getTargetSquare(e.nativeEvent);
       if (!square) return;
-      tryMove(square, game, active, handleMoveToSquare);
+      tryMove(square, game, activePiece, handleMoveToSquare);
       setActivePiece(null);
 
       if (game.pendingPromotionPiece) return;
 
       if (
-        !game.moveAvailableForPiece(active) &&
-        !game.isPromotion(active, position) &&
-        (active.position.col !== position.col ||
-          active.position.row !== position.row)
+        !game.moveAvailableForPiece(activePiece) &&
+        !game.isPromotion(activePiece, position) &&
+        (activePiece.position.col !== position.col ||
+          activePiece.position.row !== position.row)
       ) {
-        game.setPendingPremove({ from: active.position, to: position });
+        game.setPendingPremove({ from: activePiece.position, to: position });
         setAvailableMoves(null);
       } else {
         setAvailableMoves(null);
         setAvailablePremoves(null);
       }
-      if (piece && piece?.color !== active.color) {
+      if (piece && piece?.color !== activePiece.color) {
         return;
       }
     }
@@ -194,14 +198,13 @@ const SquareComponent: React.FC<SquareProps> = ({
   };
 
   const handleTouchStart = (e: React.TouchEvent<HTMLImageElement>) => {
-    const active = getActivePiece();
     if (
       game.pendingPromotionPiece &&
       (!piece || piece.color === game.pendingPromotionPiece.color)
     ) {
       games?.currentGame?.setPendingPromotionPiece(null);
     }
-    if (active?.position) {
+    if (activePiece?.position) {
       if (!e.changedTouches[0]?.clientX || !e.changedTouches[0]?.clientY)
         return null;
       const dropTarget = document.elementFromPoint(
@@ -210,7 +213,7 @@ const SquareComponent: React.FC<SquareProps> = ({
       ) as HTMLElement | null;
       const square = dropTarget?.closest('.square') as HTMLElement | null;
       if (!square) return;
-      tryMove(square, game, active, handleMoveToSquare);
+      tryMove(square, game, activePiece, handleMoveToSquare);
       setActivePiece(null);
       setAvailableMoves(null);
       if (!piece) return;
@@ -282,7 +285,7 @@ const SquareComponent: React.FC<SquareProps> = ({
 
   return (
     <div
-      className={`square ${color} ${isLastMove} ${isActiveField} ${premove} ${grabbed ? 'grabbed' : ''}`}
+      className={`square ${color} ${isLastMove} ${isActiveField} ${premove} ${grabbed ? 'grabbed' : ''} ${isActivePieceSquare}`}
       data-row={row}
       data-col={col}
       onMouseDown={handleMouseDown}
@@ -311,6 +314,7 @@ const Square = memo(SquareComponent, (prev, next) => {
     prev.position.col === next.position.col &&
     prev.isLastMove === next.isLastMove &&
     prev.isActiveField === next.isActiveField &&
+    prev.activePiece === next.activePiece &&
     prev.premove === next.premove &&
     prev.hightlightKingAttacked === next.hightlightKingAttacked &&
     prev.grabbed === next.grabbed &&

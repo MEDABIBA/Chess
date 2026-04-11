@@ -193,6 +193,11 @@ p {
   transition: all 0.3s ease;
 }
 
+.active-piece {
+  background-color: #4f7942 !important;
+  opacity: 1;
+}
+
 .square-premove-from {
   background-color: #c81e1e !important;
 }

@@ -65,6 +65,7 @@ const Board = observer(() => {
               : availableMovesSet.has(`${position.row}-${position.col}`)
                 ? 'square-active'
                 : '';
+          const activePiece = game.activePiece;
           const premove = !game.pendingPremove
             ? ''
             : game.pendingPremove.from.col === position.col &&
@@ -98,6 +99,7 @@ const Board = observer(() => {
               piece={premovePiece}
               isLastMove={isLastMove}
               isActiveField={isActiveField}
+              activePiece={activePiece}
               premove={premove}
               hightlightKingAttacked={
                 piece?.color === 'white' && piece.pieceType === 'king'

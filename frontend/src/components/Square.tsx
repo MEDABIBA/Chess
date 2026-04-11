@@ -295,6 +295,8 @@ const SquareComponent: React.FC<SquareProps> = ({
       {piece && (
         <img
           ref={imgRef}
+          height={40}
+          width={40}
           className={`piece-img  ${hightlightKingAttacked ? 'king-hightlight' : ''}`}
           src={piece.getPiece()}
           alt="#"

@@ -24,7 +24,10 @@ const PlayersWindow = ({
   return (
     <>
       <div className="game-info-window">
-        <Timer getPlayerTime={getFirstPlayerTime} />
+        <div style={{ display: 'flex', gap: '5px', alignItems: 'baseline' }}>
+          <Timer getPlayerTime={getFirstPlayerTime} />
+          {currentGame.additionalTime ? `+${currentGame.additionalTime}s` : ''}
+        </div>
         <div className="game-info-window-main">
           <div className="player-name">{whitePlayerNickname}</div>
           {currentGame.isParticipant() && (
@@ -69,7 +72,10 @@ const PlayersWindow = ({
 
           <div className="player-name">{blackPlayerNickname ?? '...'}</div>
         </div>
-        <Timer getPlayerTime={getSecondPlayerTime} />
+        <div style={{ display: 'flex', gap: '5px', alignItems: 'baseline' }}>
+          <Timer getPlayerTime={getSecondPlayerTime} />
+          {currentGame.additionalTime ? `+${currentGame.additionalTime}s` : ''}
+        </div>
       </div>
     </>
   );

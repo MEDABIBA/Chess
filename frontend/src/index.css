@@ -367,7 +367,7 @@ p {
   max-width: 90vw;
   background-color: #1e1e1e;
   border-radius: 3%;
-  padding: 3%;
+  padding: 2%;
   color: #e0e0e0;
   align-items: center;
   text-align: center;
@@ -418,9 +418,9 @@ p {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
+  justify-content: left;
   list-style: none;
-  gap: 8%;
+  gap: 4%;
   padding: 1% 0%;
   margin: 1% 0;
   border-radius: 12px;
@@ -428,19 +428,17 @@ p {
   margin-bottom: 20px;
   overflow: hidden;
 }
-.timer-list-active {
-  animation: slideDown 0.3s ease-out forwards;
-}
 
 .timer-element {
   min-width: 100px;
   cursor: pointer;
   padding: 5px;
-  border-radius: 12px;
-  width: 40%;
+  border-radius: 8px;
+  width: 30%;
   background-color: #2f2f2f;
   color: #fff;
   margin: 5% 0;
+  transition: all 0.2s ease-in-out;
 }
 .timer-element-active,
 .timer-element:hover {
@@ -475,6 +473,8 @@ p {
   font-weight: 800;
   font-size: large;
   margin-bottom: 1rem;
+  padding: 20px 15px;
+  transition: all 0.2s ease-in-out;
 }
 .submit-button:hover {
   background-color: #666;
@@ -579,7 +579,7 @@ p {
   color: #fff;
   background: #444;
   border-radius: 32px;
-  transition: all 0.2s;
+  transition: all 0.2s ease-in-out;
   max-width: max-content;
 }
 .home-button:hover {

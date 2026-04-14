@@ -65,7 +65,7 @@ class WebSocketService {
         this.isConnected = true;
       });
       if (this.pendingEvent) {
-        notify('Reconnected!', 'success');
+        // notify('Reconnected!', 'success');
         this.socket?.emit(this.pendingEvent.event, this.pendingEvent.data);
         this.pendingEvent = null;
       }

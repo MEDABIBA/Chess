@@ -18,6 +18,7 @@ import {
   ITimeout,
 } from '../types/api.types';
 import notify from '../components/ui/notify';
+import onSocket from '../helpers/onSocket';
 
 class WebSocketService {
   store: RootStore;
@@ -71,132 +72,122 @@ class WebSocketService {
       }
     });
 
-    this.socket?.on('game-created', (game: GameInterface) => {
-      console.log('game-created, game id: ', game.id);
-      this.store?.games.addGame(game);
+    onSocket<GameInterface>(this.socket, 'game-created', (data) => {
+      console.log('game-created, game id: ', data.id);
+      this.store?.games.addGame(data);
     });
-    this.socket?.on('game-created-you', (res: { id: number }) => {
+    onSocket<{ id: number }>(this.socket, 'game-created-you', (data) => {
       notify('game created successfully!', 'success');
-      this.store?.navigate(`game/${res.id}`);
+      this.store?.navigate(`game/${data.id}`);
     });
-    this.socket.on('game-removed', (res: { gameId: number }) => {
-      const { gameId } = res;
+    onSocket<{ gameId: number }>(this.socket, 'game-removed', (data) => {
+      const { gameId } = data;
       console.log('game-removed', gameId);
       this.store.games.removeGame(gameId);
     });
-    this.socket.on('game-removed-lobby', (res: { gameId: number }) => {
-      const { gameId } = res;
-      notify(`game with id ${gameId} removed!`, 'success');
-      this.store?.navigate(`home`);
+    onSocket<{ gameId: number }>(this.socket, 'game-removed-lobby', (data) => {
+      const { gameId } = data;
+      console.log('game-removed-lobby', gameId);
+      this.store.games.removeGame(gameId);
     });
-    this.socket?.on('guest-joined', (game: GameInterface) => {
-      if (game.blackPlayer === this.store.getNickname()) {
+    onSocket<GameInterface>(this.socket, 'guest-joined', (data) => {
+      if (data.blackPlayer === this.store.getNickname()) {
         notify('Joined game successfully!', 'success');
       }
-      console.log('guest-joined', game);
-      this.store?.games.updateGame(game);
+      console.log('guest-joined', data);
+      this.store?.games.updateGame(data);
     });
-    this.socket?.on('game-joined-by-code-you', (res: { id: number }) => {
+    onSocket<{ id: number }>(this.socket, 'game-joined-by-code-you', (data) => {
       notify(`You successfully joined the game by code`, 'success');
-      this.store?.navigate(`game/${res.id}`);
+      this.store?.navigate(`game/${data.id}`);
     });
-    this.socket?.on('get-games', (games: GameInterface[]) => {
-      this.store?.games.setAllGames(games);
-      console.log('get-games', games);
+    onSocket<GameInterface[]>(this.socket, 'get-games', (data) => {
+      this.store?.games.setAllGames(data);
+      console.log('get-games', data);
     });
-    this.socket?.on('game-state', (res: GameInterface) => {
-      this.store?.games?.currentGame?.setBoard(res);
-      console.log('game-state', res);
+
+    onSocket<GameInterface>(this.socket, 'game-state', (data) => {
+      this.store?.games?.currentGame?.setBoard(data);
+      console.log('game-state', data);
     });
-    this.socket?.on('timeout', (res: ITimeout) => {
-      this.store?.games?.currentGame?.setWinner(res.winner);
-      this.store?.games?.currentGame?.setStatus(res.gameStatus);
-      console.log('timeout', res);
+    onSocket<ITimeout>(this.socket, 'timeout', (data) => {
+      this.store?.games?.currentGame?.setWinner(data.winner);
+      this.store?.games?.currentGame?.setStatus(data.gameStatus);
+      console.log('timeout', data);
     });
-    this.socket?.on('draw-offer', (res: IDrawOffer) => {
-      const { drawOfferedBy } = res;
+    onSocket<IDrawOffer>(this.socket, 'draw-offer', (data) => {
+      const { drawOfferedBy } = data;
       this.store.games.currentGame?.setDrawOfferedBy(drawOfferedBy);
-      console.log('draw-offer', res);
+      console.log('draw-offer', data);
     });
-    this.socket?.on(
-      'draw-response',
-      (res: GameInterface | { error: string }) => {
-        if ('error' in res) {
-          notify(res.error, 'error');
-        } else {
-          this.store?.games?.currentGame?.setBoard(res);
-          console.log('draw-response', res);
-        }
-      },
-    );
-    this.socket?.on(
+    onSocket<GameInterface>(this.socket, 'draw-response', (data) => {
+      this.store?.games?.currentGame?.setBoard(data);
+      console.log('draw-response', data);
+    });
+    onSocket<{ id: number; gameStatus: GameStatus; winner: string }>(
+      this.socket,
       'update-game-status',
-      (res: { id: number; gameStatus: GameStatus; winner: string }) => {
-        const game = this.store?.games.gamesList.find((el) => el.id === res.id);
+      (data) => {
+        const game = this.store?.games.gamesList.find(
+          (el) => el.id === data.id,
+        );
         if (!game) return;
-        game.gameStatus = res.gameStatus;
-        game.winner = res.winner;
+        game.gameStatus = data.gameStatus;
+        game.winner = data.winner;
         if (game.gameStatus === 'resign') {
           game.setModalActive(true);
           if (game.isParticipant() && game.winner !== this.store.getNickname())
             return;
           notify('Opponent resigned!', 'default');
         }
-        console.log('update-game-status', res);
+        console.log('update-game-status', data);
       },
     );
-    this.socket?.on(
-      'state',
-      (res: {
-        success: boolean;
-        piece: Piece;
-        from: Position;
-        to: Position;
-        whiteTimeLeft: number;
-        blackTimeLeft: number;
-      }) => {
-        console.log('state called');
-        if (!res.success) return;
-        const { piece, from, to, whiteTimeLeft, blackTimeLeft } = res;
-        if (
-          !this.store?.games.currentGame ||
-          this.store?.games.currentGame === null
-        )
-          return;
-        console.log(piece);
-        const hydratedPiece = new Piece(
-          piece.pieceType,
-          piece.position,
-          piece.color,
-        );
-        this.store.timer.setFirstPlayerTime(whiteTimeLeft);
-        this.store.timer.setSecondPlayerTime(blackTimeLeft);
-        if (
-          this.store?.games?.currentGame.yourColor !==
-            this.store?.games?.currentGame.currentPlayer ||
-          this.store.games.currentGame.isAnimateMove === true
-        ) {
-          this.store.games.currentGame.animateMove = { from, to };
-          setTimeout(() => {
-            this.store?.games?.currentGame?.finalizeMove(
-              hydratedPiece,
-              from,
-              to,
-            );
-            if (this.store?.games?.currentGame?.animateMove) {
-              this.store.games.currentGame.animateMove = null;
-              this.store.games.currentGame.isAnimateMove = false;
-            } // Animate move for opponent and for us if we have animated move
-            this.store.games.currentGame?.finalizePremove();
-          }, 200);
-          this.store?.games?.currentGame?.updateTimer(hydratedPiece.color);
-        } else {
+    onSocket<{
+      success: boolean;
+      piece: Piece;
+      from: Position;
+      to: Position;
+      whiteTimeLeft: number;
+      blackTimeLeft: number;
+    }>(this.socket, 'state', (data) => {
+      console.log('state called');
+      if (!data.success) return;
+      const { piece, from, to, whiteTimeLeft, blackTimeLeft } = data;
+      if (
+        !this.store?.games.currentGame ||
+        this.store?.games.currentGame === null
+      )
+        return;
+      console.log(piece);
+      const hydratedPiece = new Piece(
+        piece.pieceType,
+        piece.position,
+        piece.color,
+      );
+      this.store.timer.setFirstPlayerTime(whiteTimeLeft);
+      this.store.timer.setSecondPlayerTime(blackTimeLeft);
+      if (
+        this.store?.games?.currentGame.yourColor !==
+          this.store?.games?.currentGame.currentPlayer ||
+        this.store.games.currentGame.isAnimateMove === true
+      ) {
+        this.store.games.currentGame.animateMove = { from, to };
+        setTimeout(() => {
           this.store?.games?.currentGame?.finalizeMove(hydratedPiece, from, to);
+          if (this.store?.games?.currentGame?.animateMove) {
+            this.store.games.currentGame.animateMove = null;
+            this.store.games.currentGame.isAnimateMove = false;
+          } // Animate move for opponent and for us if we have animated move
           this.store.games.currentGame?.finalizePremove();
-        }
-        console.log(res);
-      },
-    );
+        }, 200);
+        this.store?.games?.currentGame?.updateTimer(hydratedPiece.color);
+      } else {
+        this.store?.games?.currentGame?.finalizeMove(hydratedPiece, from, to);
+        this.store.games.currentGame?.finalizePremove();
+      }
+      console.log(data);
+    });
 
     this.socket.on('error', async (err) => {
       runInAction(() => {

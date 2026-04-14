@@ -45,9 +45,9 @@ export class GameGateway {
       client.emit('game-created-you', { id: game.id });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('error', { message: err.message });
+        client.emit('game-created-you', { message: err.message });
       } else {
-        client.emit('error', { message: err });
+        client.emit('game-created-you', { message: err });
       }
     }
   }
@@ -68,14 +68,16 @@ export class GameGateway {
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === 'P2025') {
-          client.emit('error', { message: `Game ${gameId} not found` });
+          client.emit('game-removed-lobby', {
+            message: `Game ${gameId} not found`,
+          });
         } else {
-          client.emit('error', { message: err.message });
+          client.emit('game-removed-lobby', { message: err.message });
         }
       } else if (err instanceof Error) {
-        client.emit('error', { message: err.message });
+        client.emit('game-removed-lobby', { message: err.message });
       } else {
-        client.emit('error', { message: String(err) });
+        client.emit('game-removed-lobby', { message: String(err) });
       }
     }
   }
@@ -113,9 +115,9 @@ export class GameGateway {
       this.server.emit('guest-joined', { ...game, boardState });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('error', { message: err.message });
+        client.emit('guest-joined', { message: err.message });
       } else {
-        client.emit('error', { message: err });
+        client.emit('guest-joined', { message: err });
       }
     }
   }
@@ -134,9 +136,9 @@ export class GameGateway {
       this.server.emit('guest-joined', { ...game, boardState });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('error', { message: err.message });
+        client.emit('guest-joined', { message: err.message });
       } else {
-        client.emit('error', { message: err });
+        client.emit('guest-joined', { message: err });
       }
     }
   }
@@ -152,9 +154,9 @@ export class GameGateway {
       client.emit('get-games', gamesWithBoard);
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('error', { message: err.message });
+        client.emit('get-games', { message: err.message });
       } else {
-        client.emit('error', { message: err });
+        client.emit('get-games', { message: err });
       }
     }
   }
@@ -172,9 +174,9 @@ export class GameGateway {
       client.emit('game-state', { ...game, boardState });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('error', { message: err.message });
+        client.emit('game-state', { message: err.message });
       } else {
-        client.emit('error', { message: err });
+        client.emit('game-state', { message: err });
       }
     }
   }
@@ -222,9 +224,9 @@ export class GameGateway {
       });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('error', { message: err.message });
+        client.emit('state', { message: err.message });
       } else {
-        client.emit('error', { message: err });
+        client.emit('state', { message: err });
       }
     }
   }
@@ -243,9 +245,9 @@ export class GameGateway {
         .emit('draw-offer', { drawOfferedBy: res.drawOfferedBy });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('error', { message: err.message });
+        client.emit('draw-offer', { message: err.message });
       } else {
-        client.emit('error', { message: err });
+        client.emit('draw-offer', { message: err });
       }
     }
   }
@@ -291,9 +293,9 @@ export class GameGateway {
       });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('error', { message: err.message });
+        client.emit('update-game-status', { message: err.message });
       } else {
-        client.emit('error', { message: err });
+        client.emit('update-game-status', { message: err });
       }
     }
   }

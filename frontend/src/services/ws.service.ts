@@ -87,8 +87,8 @@ class WebSocketService {
     });
     onSocket<{ gameId: number }>(this.socket, 'game-removed-lobby', (data) => {
       const { gameId } = data;
-      console.log('game-removed-lobby', gameId);
-      this.store.games.removeGame(gameId);
+      notify(`game with id ${gameId} removed!`, 'success');
+      this.store?.navigate(`home`);
     });
     onSocket<GameInterface>(this.socket, 'guest-joined', (data) => {
       if (data.blackPlayer === this.store.getNickname()) {
@@ -135,6 +135,7 @@ class WebSocketService {
         game.gameStatus = data.gameStatus;
         game.winner = data.winner;
         if (game.gameStatus === 'resign') {
+          game.endGameSound();
           game.setModalActive(true);
           if (game.isParticipant() && game.winner !== this.store.getNickname())
             return;

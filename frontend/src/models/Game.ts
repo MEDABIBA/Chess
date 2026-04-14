@@ -10,7 +10,12 @@ import {
 import Piece from './Piece';
 import { RootStore } from '../store/RootStore';
 import { simulateValidMove } from '../helpers/simulateMove';
-import soundMove from '../assets/sounds/move.mp3';
+import movePiece from '../assets/sounds/move.mp3';
+import capture from '../assets/sounds/capture.mp3';
+import castle from '../assets/sounds/castle.mp3';
+import check from '../assets/sounds/check.mp3';
+import endGame from '../assets/sounds/end-game.mp3';
+import promote from '../assets/sounds/promote.mp3';
 
 class Game {
   private store: RootStore;
@@ -362,18 +367,19 @@ class Game {
   };
 
   finalizeMove = async (piece: Piece, from: Position, to: Position) => {
+    const movedPiece = this.getPiece(from);
+    const capturedPiece = this.getPiece(to);
     piece.position = to;
     if (
       piece.pieceType === 'pawn' &&
       from.col !== to.col &&
-      !this.getPiece(to) &&
+      !capturedPiece &&
       this.lastDoubleStepPawn
     ) {
       this.setPiece(this.lastDoubleStepPawn.position, null);
     }
     this.setPiece(to, piece);
     this.setPiece(from, null);
-    new Audio(soundMove).play();
 
     piece.hasMoved = true;
     this.setActivePiece(null);
@@ -388,21 +394,42 @@ class Game {
     }
     if (piece.pieceType === PieceType.KING && Math.abs(from.col - to.col) > 1) {
       this.store.chessMoveValidator.executeCastling(from, to);
+      new Audio(castle).play();
+      return;
     }
     if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
       this.store.timer.deactiveTimer();
       this.gameStatus = 'checkmate';
+      this.endGameSound();
       this.setModalActive(true);
+      return;
     }
+    if (movedPiece && this.isPromotion(movedPiece, to)) {
+      new Audio(promote).play();
+      return;
+    }
+    if (capturedPiece) {
+      new Audio(capture).play();
+      return;
+    }
+    if (
+      this.store.chessMoveValidator.isKingUnderAttack('white') ||
+      this.store.chessMoveValidator.isKingUnderAttack('black')
+    ) {
+      new Audio(check).play();
+      return;
+    }
+    new Audio(movePiece).play();
   };
 
   finalizePremove() {
-    if (!this.pendingPremove) return;
-
-    const piece = this.getPiece(this.pendingPremove.from);
-    if (!piece) return;
-    this.makeMove(piece.position, this.pendingPremove.to);
-    this.setPendingPremove(null);
+    setTimeout(() => {
+      if (!this.pendingPremove) return;
+      const piece = this.getPiece(this.pendingPremove.from);
+      if (!piece) return;
+      this.makeMove(piece.position, this.pendingPremove.to);
+      this.setPendingPremove(null);
+    }, 200);
   }
 
   isPromotion = (piece: Piece, to: Position) => {
@@ -451,6 +478,10 @@ class Game {
     } else {
       this.pendingPremove = null;
     }
+  }
+
+  endGameSound() {
+    new Audio(endGame).play();
   }
 }
 export default Game;

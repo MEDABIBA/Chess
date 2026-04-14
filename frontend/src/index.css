@@ -414,18 +414,6 @@ p {
     max-height: 300px;
   }
 }
-@keyframes slideUp {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-    max-height: 300px;
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-10px);
-    max-height: 0;
-  }
-}
 .timer-list {
   display: flex;
   flex-wrap: wrap;
@@ -435,7 +423,6 @@ p {
   gap: 8%;
   padding: 1% 0%;
   margin: 1% 0;
-  background: #555;
   border-radius: 12px;
   width: 100%;
   margin-bottom: 20px;
@@ -443,9 +430,6 @@ p {
 }
 .timer-list-active {
   animation: slideDown 0.3s ease-out forwards;
-}
-.timer-list-hidden {
-  animation: slideUp 0.3s ease-out forwards;
 }
 
 .timer-element {

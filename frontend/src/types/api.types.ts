@@ -4,6 +4,7 @@ export interface ICreateGame {
   boardState: SquareData[];
   whitePlayerUsername: string;
   initialTime: number;
+  additionalTime: number;
 }
 
 export interface IRemoveGame {

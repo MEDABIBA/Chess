@@ -62,6 +62,7 @@ interface Game {
   gameStatus: GameStatus;
   inviteCode: string;
   initialTime: number;
+  additionalTime: number;
   fromX: number | null;
   fromY: number | null;
 

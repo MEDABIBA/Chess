@@ -137,7 +137,12 @@ const Home = () => {
                         )}
                       </td>
 
-                      <td>{game.initialTime / 60}:00</td>
+                      <td>
+                        {game.initialTime / 60}
+                        {game.additionalTime
+                          ? `+${game.additionalTime}`
+                          : `:00`}
+                      </td>
                       <td>
                         {game.whitePlayerNickname} |
                         {game.blackPlayerNickname ?? '...'}

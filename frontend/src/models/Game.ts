@@ -26,6 +26,7 @@ class Game {
   inviteCode: string | null = null;
   activePiece: Piece | null = null;
   initialTime: number;
+  additionalTime: number;
   highlightLastMove: { from: Position; to: Position } | null = null;
   availableMoves: Position[] = [];
   grab: Position | null = null;
@@ -67,6 +68,7 @@ class Game {
       };
     }
     this.initialTime = game.initialTime;
+    this.additionalTime = game.additionalTime;
     this.lastDoubleStepPawn =
       game.lastDoubleStepPawn || this.lastDoubleStepPawn;
     this.whitePlayerId = Number(game.whitePlayerId);
@@ -110,6 +112,7 @@ class Game {
 
   setWinner(winner: string) {
     this.winner = winner;
+    console.log(this.winner);
   }
 
   setStatus(status: GameStatus) {

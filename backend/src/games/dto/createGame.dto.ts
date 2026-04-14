@@ -62,4 +62,5 @@ export class CreateGameDto {
   @IsInt()
   @Min(0)
   initialTime!: number;
+  additionalTime!: number;
 }

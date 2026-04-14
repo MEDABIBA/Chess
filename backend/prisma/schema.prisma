@@ -42,6 +42,7 @@ model Game {
   currentPlayer PlayerColor @default(white)
   gameStatus gameStatus @default(waiting)
   initialTime Int
+  additionalTime Int
   inviteCode String @unique
  
   whitePlayerId Int //socketId or temporary ID

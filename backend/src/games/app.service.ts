@@ -40,7 +40,7 @@ export class AppService {
     });
     server
       .to(`game/${gameId}`)
-      .emit('timeout', { winer: game.winner, gameStatus: game.gameStatus });
+      .emit('timeout', { winner: game.winner, gameStatus: game.gameStatus });
   }
 
   async checkIsCurrentPlayer(id: number, clientId: number) {
@@ -86,7 +86,11 @@ export class AppService {
   }
 
   async createGame(dto: CreateGameDto) {
-    const { boardState, whitePlayerUsername, initialTime } = dto;
+    const { boardState, whitePlayerUsername, initialTime, additionalTime } =
+      dto;
+    if (!initialTime || additionalTime < 0 || additionalTime > 15)
+      // set additional time limit to 15 sec
+      throw new Error('Time is setted incorrect!');
     const fen = boardToFen(
       boardState.map((square) => ({
         color: square.color,
@@ -106,6 +110,7 @@ export class AppService {
         currentPlayer: 'white',
         whitePlayerId: user?.id,
         initialTime,
+        additionalTime,
         whiteTimeLeft: initialTime,
         blackTimeLeft: initialTime,
         inviteCode,
@@ -255,21 +260,25 @@ export class AppService {
         }
       }
       if (game.currentPlayer === 'white') {
+        let timeSpend = 0;
         turnStartedAt = game.whiteTurnStarterAt;
-        timeLeft = game.whiteTimeLeft;
+        if (turnStartedAt) {
+          timeSpend = (Date.now() - turnStartedAt.getTime()) / 1000;
+        }
+        timeLeft = game.whiteTimeLeft - timeSpend + game.additionalTime;
         nextTimeLeft = game.blackTimeLeft;
         game.blackTurnStarterAt = new Date();
       } else if (game.currentPlayer === 'black') {
+        let timeSpend = 0;
         turnStartedAt = game.blackTurnStarterAt;
-        timeLeft = game.blackTimeLeft;
+        if (turnStartedAt) {
+          timeSpend = (Date.now() - turnStartedAt.getTime()) / 1000;
+        }
+        timeLeft = game.blackTimeLeft - timeSpend + game.additionalTime;
         nextTimeLeft = game.whiteTimeLeft;
         game.whiteTurnStarterAt = new Date();
       } else {
         throw new Error(`Invalid player color ${game.currentPlayer}`);
-      }
-      if (turnStartedAt !== null) {
-        const timeSpend = (Date.now() - turnStartedAt.getTime()) / 1000;
-        timeLeft -= timeSpend;
       }
 
       nextTimeoutWinner =

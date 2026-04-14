@@ -2,6 +2,7 @@ import { action, makeAutoObservable } from 'mobx';
 import { RootStore } from './RootStore';
 import { initializeBoard } from '../helpers/initializeBoard';
 import notify from '../components/ui/notify';
+import parseTimer from '../helpers/parseTimer';
 
 class NewGame {
   store: RootStore;
@@ -12,19 +13,21 @@ class NewGame {
   }
 
   @action
-  createNewGame = async (time: number) => {
+  createNewGame = async (time: string) => {
     const nickname = this.store.getNickname();
     if (!nickname) {
       notify('You are not logged in', 'error');
       return;
     }
+    const { initialTime, additionalTime } = parseTimer(time);
 
     const board = initializeBoard();
     try {
       this.store.socket?.createGame({
         boardState: board,
         whitePlayerUsername: nickname,
-        initialTime: time * 60,
+        initialTime,
+        additionalTime,
       });
     } catch (error: unknown) {
       if (error instanceof Error) {

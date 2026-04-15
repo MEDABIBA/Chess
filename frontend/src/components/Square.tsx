@@ -17,6 +17,8 @@ interface SquareProps {
   hightlightKingAttacked?: boolean;
   grabbed?: boolean;
   animationTarget?: { from: Position; to: Position } | null;
+  onRightClick: (row: number, col: number, game: Game) => void;
+  annotatedCircle: 'annotated-circle' | '';
 }
 const SquareComponent: React.FC<SquareProps> = ({
   color,
@@ -29,6 +31,8 @@ const SquareComponent: React.FC<SquareProps> = ({
   hightlightKingAttacked = false,
   grabbed = false,
   animationTarget = null,
+  onRightClick,
+  annotatedCircle = false,
 }) => {
   const { row, col } = position;
   const imgRef = useRef<HTMLImageElement | null>(null);
@@ -95,6 +99,14 @@ const SquareComponent: React.FC<SquareProps> = ({
   const handleMouseDown = (e: React.MouseEvent) => {
     console.log('row', row, ', col', col);
     game.setPendingPremove(null);
+
+    if (e.button === 0) {
+      game.annotations.clearAnnoations();
+    }
+    if (e.button === 2) {
+      onRightClick(row, col, game);
+      return;
+    }
 
     if (
       game.pendingPromotionPiece &&
@@ -285,7 +297,7 @@ const SquareComponent: React.FC<SquareProps> = ({
 
   return (
     <div
-      className={`square ${color} ${isLastMove} ${isActiveField} ${premove} ${grabbed ? 'grabbed' : ''} ${isActivePieceSquare}`}
+      className={`square ${color} ${annotatedCircle} ${isLastMove} ${isActiveField} ${premove} ${grabbed ? 'grabbed' : ''} ${isActivePieceSquare}`}
       data-row={row}
       data-col={col}
       onMouseDown={handleMouseDown}
@@ -320,7 +332,8 @@ const Square = memo(SquareComponent, (prev, next) => {
     prev.premove === next.premove &&
     prev.hightlightKingAttacked === next.hightlightKingAttacked &&
     prev.grabbed === next.grabbed &&
-    prev.animationTarget === next.animationTarget
+    prev.animationTarget === next.animationTarget &&
+    prev.annotatedCircle === next.annotatedCircle
   );
 });
 export default Square;

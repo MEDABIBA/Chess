@@ -4,16 +4,22 @@ import { useStore } from '../provider/context';
 import PromotionPicker from './PromotionPicker';
 import Square from './Square';
 import { observer } from 'mobx-react-lite';
+import Arrows from './ui/Arrows';
+import { userAnnotationPreview } from '../hooks/useAnnotationPreview';
 
 const Board = observer(() => {
   const store = useStore();
   const { games, chessMoveValidator } = store;
   const { currentGame: game } = games;
   if (game === null) return;
+  const { start, previewCircle, previewArrow } = userAnnotationPreview();
   const { availableMovesSet } = game;
   const whiteKingUnerAttack = chessMoveValidator.isKingUnderAttack('white');
   const blackKingUnerAttack = chessMoveValidator.isKingUnderAttack('black');
   const grab = game.getGrab();
+  document.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+  });
   return (
     <>
       <div className="board">
@@ -42,6 +48,7 @@ const Board = observer(() => {
               color={store.games.currentGame.pendingPromotionPiece.color}
             />
           )}
+
         {maybeReverse(
           game.board,
           game.blackPlayerNickname === store.getNickname(), // useStore because of loss of context (this)
@@ -91,6 +98,14 @@ const Board = observer(() => {
                     )
                   : game.getPiece(game.pendingPremove.from)
                 : piece;
+          const annotated =
+            game.annotations.circles.some(
+              (el) => el.col === position.col && el.row === position.row,
+            ) ||
+            (previewCircle?.row === position.row &&
+              previewCircle?.col === position.col)
+              ? 'annotated-circle'
+              : '';
           return (
             <Square
               key={`${position.row}-${position.col}`}
@@ -116,9 +131,16 @@ const Board = observer(() => {
                   ? game.animateMove
                   : null
               }
+              onRightClick={start}
+              annotatedCircle={annotated}
             />
           );
         })}
+        <Arrows
+          game={game}
+          isFlipped={game.blackPlayerNickname === store.getNickname()}
+          previewArrow={previewArrow}
+        />
       </div>
     </>
   );

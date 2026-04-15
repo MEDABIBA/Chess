@@ -52,7 +52,18 @@ class Game {
     promotionPiece?: PieceType;
   } | null = null;
   createdAt: Date;
-
+  annotations: {
+    circles: Array<Position>;
+    arrows: Array<{ from: Position; to: Position }>;
+    clearAnnoations: () => void;
+  } = {
+    circles: [],
+    arrows: [],
+    clearAnnoations: () => {
+      this.annotations.arrows = [];
+      this.annotations.circles = [];
+    },
+  };
   constructor(store: RootStore, game: GameInterface) {
     this.store = store;
     makeAutoObservable(this);

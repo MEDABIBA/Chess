@@ -182,11 +182,13 @@ class WebSocketService {
           } // Animate move for opponent and for us if we have animated move
           this.store.games.currentGame?.finalizePremove();
         }, 200);
-        this.store?.games?.currentGame?.updateTimer(hydratedPiece.color);
+        this.store?.games?.currentGame.updateTimer(hydratedPiece.color);
       } else {
-        this.store?.games?.currentGame?.finalizeMove(hydratedPiece, from, to);
-        this.store.games.currentGame?.finalizePremove();
+        this.store?.games?.currentGame.finalizeMove(hydratedPiece, from, to);
+        this.store.games.currentGame.finalizePremove();
       }
+      this.store.games.currentGame.annotations.clearAnnoations();
+
       console.log(data);
     });
 

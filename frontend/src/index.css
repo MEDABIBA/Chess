@@ -205,6 +205,15 @@ p {
   background-color: #b41414 !important;
 }
 
+.annotated-circle::after {
+  content: '';
+  width: 90%;
+  height: 90%;
+  border: 5px solid;
+  border-radius: 50%;
+  color: forestgreen;
+}
+
 .last-move::before {
   content: '';
   position: absolute;

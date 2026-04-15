@@ -22,6 +22,7 @@ const Board = () => {
       timer.activateTimer(games.currentGame.currentPlayer);
     }
     return () => {
+      games.currentGame?.annotations.clearAnnoations();
       socket.leaveRoom({ gameId: Number(id) });
     };
   }, [timer, games.currentGame, id, socket, socket?.isConnected]);

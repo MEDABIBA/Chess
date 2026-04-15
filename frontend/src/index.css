@@ -330,6 +330,9 @@ p {
   padding: 5px 15px;
   width: max-content;
 }
+.timer-pulsive {
+  color: indianred !important;
+}
 .game-info-window > .timer:first-child {
   border-radius: 6px 6px 0 0;
 }

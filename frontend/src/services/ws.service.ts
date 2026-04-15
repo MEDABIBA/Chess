@@ -20,6 +20,8 @@ import {
 import notify from '../components/ui/notify';
 import onSocket from '../helpers/onSocket';
 
+import gameStart from '../assets/sounds/game-start.mp3';
+
 class WebSocketService {
   store: RootStore;
   socket: Socket | null = null;
@@ -78,6 +80,7 @@ class WebSocketService {
     });
     onSocket<{ id: number }>(this.socket, 'game-created-you', (data) => {
       notify('game created successfully!', 'success');
+      new Audio(gameStart).play();
       this.store?.navigate(`game/${data.id}`);
     });
     onSocket<{ gameId: number }>(this.socket, 'game-removed', (data) => {
@@ -100,6 +103,7 @@ class WebSocketService {
     onSocket<{ id: number }>(this.socket, 'game-joined-by-code-you', (data) => {
       notify(`You successfully joined the game by code`, 'success');
       this.store?.navigate(`game/${data.id}`);
+      new Audio(gameStart).play();
     });
     onSocket<GameInterface[]>(this.socket, 'get-games', (data) => {
       this.store?.games.setAllGames(data);
@@ -166,8 +170,7 @@ class WebSocketService {
         piece.position,
         piece.color,
       );
-      this.store.timer.setFirstPlayerTime(whiteTimeLeft);
-      this.store.timer.setSecondPlayerTime(blackTimeLeft);
+      this.store.timer.setTimes(whiteTimeLeft, blackTimeLeft);
       if (
         this.store?.games?.currentGame.yourColor !==
           this.store?.games?.currentGame.currentPlayer ||

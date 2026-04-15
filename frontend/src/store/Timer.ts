@@ -4,8 +4,8 @@ import { Color } from '../types/types';
 
 class Timer {
   store: RootStore;
-  p2: number | null = null; // in seconds
-  p1: number | null = null; // in seconds
+  whiteTime: number | null = null; // in seconds
+  blackTime: number | null = null; // in seconds
   interval: NodeJS.Timeout | number = 0;
   constructor(store: RootStore) {
     makeAutoObservable(this);
@@ -13,29 +13,19 @@ class Timer {
   }
 
   @action
-  getFirstPlayerTime = () => {
-    if (this.p1 === null) return '00:00';
-    const minutes = Math.floor(this.p1 / 60);
-    const seconds = Math.floor(this.p1 - minutes * 60);
+  getTime = (color: Color) => {
+    const time = color === 'white' ? this.whiteTime : this.blackTime;
+
+    if (time === null) return '00:00';
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time - minutes * 60);
     return `${minutes > 9 ? '' : 0}${minutes}:${seconds > 9 ? '' : 0}${seconds}`;
   };
 
   @action
-  setFirstPlayerTime = (time: number) => {
-    this.p1 = time;
-  };
-
-  @action
-  getSecondPlayerTime = () => {
-    if (this.p2 === null) return '00:00';
-    const minutes = Math.floor(this.p2 / 60);
-    const seconds = Math.floor(this.p2 - minutes * 60);
-    return `${minutes > 9 ? '' : 0}${minutes}:${seconds > 9 ? '' : 0}${seconds}`;
-  };
-
-  @action
-  setSecondPlayerTime = (time: number) => {
-    this.p2 = time;
+  setTimes = (whiteTime: number, blackTime: number) => {
+    this.whiteTime = whiteTime;
+    this.blackTime = blackTime;
   };
 
   activateTimer = (player: Color) => {
@@ -47,17 +37,17 @@ class Timer {
   };
 
   private decrementTime = (player: Color) => {
-    if (player === 'white' && this.p1 !== null) {
-      this.p1 -= 1;
-    } else if (player === 'black' && this.p2 !== null) {
-      this.p2 -= 1;
+    if (player === 'white' && this.whiteTime !== null) {
+      this.whiteTime -= 1;
+    } else if (player === 'black' && this.blackTime !== null) {
+      this.blackTime -= 1;
     }
   };
 
   checkIfTimesUp = () => {
     if (
-      (this.p1 !== null && this.p1 <= 0) ||
-      (this.p2 !== null && this.p2 <= 0)
+      (this.whiteTime !== null && this.whiteTime <= 0) ||
+      (this.blackTime !== null && this.blackTime <= 0)
     )
       return true;
     return false;
@@ -68,8 +58,8 @@ class Timer {
   };
 
   resetTimer = (time: number) => {
-    this.p1 = time;
-    this.p2 = time;
+    this.whiteTime = time;
+    this.blackTime = time;
   };
 }
 

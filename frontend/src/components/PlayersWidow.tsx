@@ -16,20 +16,31 @@ const PlayersWindow = ({
   setRemoveGameModal: (value: boolean) => void;
   setDrawModal: (value: boolean) => void;
 }) => {
-  const { games, timer } = useStore();
+  const { games } = useStore();
   const { currentGame } = games;
   if (!currentGame) return;
-  const { getFirstPlayerTime, getSecondPlayerTime } = timer;
   const { whitePlayerNickname, blackPlayerNickname } = currentGame;
+  const topColor = !currentGame.isParticipant()
+    ? 'black'
+    : currentGame.yourColor === 'white'
+      ? 'black'
+      : 'white';
+  const bottomColor = !currentGame.isParticipant()
+    ? 'white'
+    : currentGame.yourColor === 'white'
+      ? 'white'
+      : 'black';
   return (
     <>
       <div className="game-info-window">
         <div style={{ display: 'flex', gap: '5px', alignItems: 'baseline' }}>
-          <Timer getPlayerTime={getFirstPlayerTime} />
+          <Timer color={topColor} />
           {currentGame.additionalTime ? `+${currentGame.additionalTime}s` : ''}
         </div>
         <div className="game-info-window-main">
-          <div className="player-name">{whitePlayerNickname}</div>
+          <div className="player-name">
+            {topColor === 'white' ? whitePlayerNickname : blackPlayerNickname}
+          </div>
           {currentGame.isParticipant() && (
             <>
               <div className="game-info-window-main-info">
@@ -70,10 +81,14 @@ const PlayersWindow = ({
             </>
           )}
 
-          <div className="player-name">{blackPlayerNickname ?? '...'}</div>
+          <div className="player-name">
+            {bottomColor === 'white'
+              ? whitePlayerNickname
+              : (blackPlayerNickname ?? '...')}
+          </div>
         </div>
         <div style={{ display: 'flex', gap: '5px', alignItems: 'baseline' }}>
-          <Timer getPlayerTime={getSecondPlayerTime} />
+          <Timer color={bottomColor} />
           {currentGame.additionalTime ? `+${currentGame.additionalTime}s` : ''}
         </div>
       </div>

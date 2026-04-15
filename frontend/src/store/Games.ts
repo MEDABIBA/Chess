@@ -3,6 +3,8 @@ import { RootStore } from './RootStore';
 import { GameInterface } from '../types/types';
 import Game from '../models/Game';
 
+import gameStart from '../assets/sounds/game-start.mp3';
+
 class Games {
   private appStore: RootStore;
   gamesList: Game[] = [];
@@ -83,6 +85,7 @@ class Games {
     this.appStore.socket?.joinGame({ id: game.id, username });
     this.appStore.games.setCurrentGame(game.id);
     this.appStore.navigate(`game/${game.id}`);
+    new Audio(gameStart).play();
   }
   joinGameByCode(code: string) {
     const username = this.appStore.getNickname();

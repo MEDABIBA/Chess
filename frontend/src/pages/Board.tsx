@@ -18,14 +18,24 @@ const Board = () => {
   useEffect(() => {
     if (!id || !socket || !socket.isConnected) return;
     socket.joinRoom({ gameId: Number(id) });
-    if (games.currentGame && games.currentGame.gameStatus === 'playing') {
-      timer.activateTimer(games.currentGame.currentPlayer);
-    }
     return () => {
       games.currentGame?.annotations.clearAnnoations();
       socket.leaveRoom({ gameId: Number(id) });
     };
-  }, [timer, games.currentGame, id, socket, socket?.isConnected]);
+  }, [
+    games.currentGame,
+    games.currentGame?.currentPlayer,
+    id,
+    socket,
+    socket?.isConnected,
+  ]);
+  useEffect(() => {
+    if (games.currentGame && games.currentGame.gameStatus === 'playing') {
+      timer.activateTimer(games.currentGame.currentPlayer);
+    } else {
+      timer.deactiveTimer();
+    }
+  }, [games.currentGame?.gameStatus, games.currentGame?.currentPlayer]);
   const { currentGame } = games;
   const [resignModal, setResignModal] = useState<boolean>(false);
   const [removeGameModal, setRemoveGameModal] = useState<boolean>(false);

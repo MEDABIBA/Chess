@@ -70,8 +70,6 @@ class Game {
     this.board = game.boardState.flat();
     this.id = game.id;
     this.hydratePieceClassesFromServer(this.board);
-    this.store.timer.setFirstPlayerTime(game.whiteTimeLeft);
-    this.store.timer.setSecondPlayerTime(game.blackTimeLeft);
     this.currentPlayer = game.currentPlayer;
     this.winner = game.winner;
     this.gameStatus = game.gameStatus;
@@ -91,6 +89,7 @@ class Game {
     this.blackPlayerId = Number(game.blackPlayerId);
     this.whitePlayerNickname = game.whitePlayer.username;
     this.blackPlayerNickname = game?.blackPlayer?.username ?? null;
+    this.store.timer.setTimes(game.whiteTimeLeft, game.blackTimeLeft);
     this.createdAt = game.createdAt;
 
     this.modalActive = this.isFinished() ? true : false;
@@ -101,8 +100,6 @@ class Game {
     this.board = game.boardState.flat();
     this.id = game.id;
     this.hydratePieceClassesFromServer(this.board);
-    this.store.timer.setFirstPlayerTime(game.whiteTimeLeft);
-    this.store.timer.setSecondPlayerTime(game.blackTimeLeft);
     this.currentPlayer = game.currentPlayer;
     this.gameStatus = game.gameStatus;
     this.drawOfferedBy = game.drawOfferedBy;
@@ -118,6 +115,7 @@ class Game {
     this.blackPlayerNickname =
       game?.blackPlayer?.username ?? this.blackPlayerNickname;
     this.createdAt = game.createdAt;
+    this.store.timer.setTimes(game.whiteTimeLeft, game.blackTimeLeft);
   }
 
   get playerId() {
@@ -409,7 +407,6 @@ class Game {
       return;
     }
     if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
-      this.store.timer.deactiveTimer();
       this.gameStatus = 'checkmate';
       this.endGameSound();
       this.setModalActive(true);

@@ -38,6 +38,12 @@ export interface ITimeout {
   gameStatus: GameStatus;
 }
 
+export interface IExtraTime {
+  fromUserId: number;
+  whiteTimeLeft: number;
+  blackTimeLeft: number;
+}
+
 export interface IDrawOffer {
   drawOfferedBy: number;
 }

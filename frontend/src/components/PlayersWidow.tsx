@@ -38,8 +38,20 @@ const PlayersWindow = ({
           {currentGame.additionalTime ? `+${currentGame.additionalTime}s` : ''}
         </div>
         <div className="game-info-window-main">
-          <div className="player-name">
-            {topColor === 'white' ? whitePlayerNickname : blackPlayerNickname}
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+            <div className="player-name">
+              {topColor === 'white' ? whitePlayerNickname : blackPlayerNickname}
+            </div>
+            {currentGame.isParticipant() &&
+              currentGame.gameStatus === 'playing' && (
+                <button
+                  className="exta-time-btn"
+                  title="Add 15s to your opponent"
+                  onClick={() => currentGame.addExtraTimeToOpponent()}
+                >
+                  <span>+</span>
+                </button>
+              )}
           </div>
           {currentGame.isParticipant() && (
             <>

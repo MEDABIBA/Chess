@@ -14,7 +14,7 @@
 input,
 button {
   border: none;
-  outline: none;
+  outline: none !important;
   box-shadow: none;
   background: transparent;
   -webkit-appearance: none;
@@ -150,9 +150,42 @@ p {
   cursor: pointer;
   transition: all 0.1s ease-in-out;
   width: max-content;
+  user-select: none;
 }
 .game-btn:hover {
   background-color: #666;
+}
+.game-btn:active {
+  transform: scale(0.92);
+}
+
+.exta-time-btn {
+  background-color: #a1c1df;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  transition:
+    all 0.15s,
+    color 0.15s,
+    transform 0.1s;
+  user-select: none;
+  border-radius: 13%;
+  outline: none !important;
+}
+.exta-time-btn:hover {
+  background-color: #a1c1dfa9;
+}
+.exta-time-btn:active {
+  transform: scale(0.92);
+}
+.exta-time-btn span {
+  font-size: 48px;
+  transform: translateY(-5px);
+  display: block;
+  line-height: 1;
 }
 
 .square {
@@ -348,7 +381,7 @@ p {
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1050;
   overflow: visible;
-  outline: 0;
+  outline: none !important;
 }
 
 .modal-dialog {
@@ -402,7 +435,7 @@ p {
   font-size: 24px;
   font-weight: 600;
   border: none;
-  outline: none;
+  outline: none !important;
   margin-bottom: 20px;
 }
 .timer-button:hover,
@@ -411,7 +444,7 @@ p {
   background: #666;
 }
 .timer-button:focus {
-  outline: none;
+  outline: none !important;
 }
 
 @keyframes slideDown {

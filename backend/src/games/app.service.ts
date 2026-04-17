@@ -322,6 +322,64 @@ export class AppService {
     return result;
   }
 
+  async addExtraTime(
+    gameId: number,
+    fromUserId: number,
+    server: Server,
+  ): Promise<Game> {
+    const game = await this.prisma.game.findUnique({
+      where: { id: gameId },
+      include: { whitePlayer: true, blackPlayer: true },
+    });
+    if (!game) throw new Error('Game not found!');
+    console.log(game.blackTimeLeft);
+    const nextTimeoutWinner =
+      game.currentPlayer === 'black'
+        ? game.blackPlayer!.username
+        : game.whitePlayer.username;
+    if (game?.gameStatus !== 'playing') {
+      throw new Error('Game is not active!');
+    }
+    if (game.blackTimeLeft <= 0 || game.whiteTimeLeft <= 0) {
+      throw new Error("Time's up!");
+    }
+    if (game.whitePlayerId === fromUserId) {
+      const updated = await this.prisma.game.update({
+        where: { id: gameId },
+        data: { blackTimeLeft: { increment: 15 } },
+      });
+      const nextTimeLeft =
+        updated.currentPlayer === 'black'
+          ? updated.whiteTimeLeft
+          : updated.blackTimeLeft;
+      this.scheduleTimeout(
+        gameId,
+        nextTimeLeft * 1000,
+        nextTimeoutWinner,
+        server,
+      );
+      return updated;
+    } else if (game.blackPlayerId === fromUserId) {
+      const updated = await this.prisma.game.update({
+        where: { id: gameId },
+        data: { whiteTimeLeft: { increment: 15 } },
+      });
+      const nextTimeLeft =
+        updated.currentPlayer === 'black'
+          ? updated.whiteTimeLeft
+          : updated.blackTimeLeft;
+      this.scheduleTimeout(
+        gameId,
+        nextTimeLeft * 1000,
+        nextTimeoutWinner,
+        server,
+      );
+      return updated;
+    } else {
+      throw new Error('Only participants in this game can add extra time!');
+    }
+  }
+
   async handleDrawOffer(gameId: number, offeredById: number): Promise<Game> {
     const game = await this.prisma.game.findUnique({ where: { id: gameId } });
     if (!game) throw new Error('Game not found!');

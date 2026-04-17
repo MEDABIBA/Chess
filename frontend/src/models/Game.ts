@@ -133,6 +133,10 @@ class Game {
     this.gameStatus = status;
   }
 
+  addExtraTimeToOpponent() {
+    this.store.socket.addExtraTime({ gameId: this.id });
+  }
+
   setDrawOfferedBy(userId: number) {
     this.drawOfferedBy = userId;
   }

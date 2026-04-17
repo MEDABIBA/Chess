@@ -8,6 +8,7 @@ import Piece from '../models/Piece';
 import {
   ICreateGame,
   IDrawOffer,
+  IExtraTime,
   IGetGame,
   IJoinGame,
   IJoinGameByCode,
@@ -118,6 +119,16 @@ class WebSocketService {
       this.store?.games?.currentGame?.setWinner(data.winner);
       this.store?.games?.currentGame?.setStatus(data.gameStatus);
       console.log('timeout', data);
+    });
+    onSocket<IExtraTime>(this.socket, 'add-extra-time', (data) => {
+      const { fromUserId, blackTimeLeft, whiteTimeLeft } = data;
+      const currGame = this.store.games.currentGame;
+      this.store.timer.setTimes(whiteTimeLeft, blackTimeLeft);
+      notify(
+        `Player ${currGame?.whitePlayerId === fromUserId ? currGame?.blackPlayerNickname : currGame?.whitePlayerNickname} was gifted an extra time `,
+        'success',
+      );
+      console.log('add-extra-time', data);
     });
     onSocket<IDrawOffer>(this.socket, 'draw-offer', (data) => {
       const { drawOfferedBy } = data;
@@ -270,6 +281,13 @@ class WebSocketService {
     console.log('called makeMove');
     this.socket.emit('make-move', data);
   }
+  public addExtraTime(data: { gameId: number }) {
+    this.pendingEvent = { event: 'add-extra-time', data };
+    if (!this.socket?.connected) return;
+    console.log('called add extra time');
+    this.socket?.emit('add-extra-time', data);
+  }
+
   public drawOffer(data: { gameId: number }) {
     this.pendingEvent = { event: 'draw-offer', data };
     if (!this.socket?.connected) return;

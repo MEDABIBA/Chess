@@ -47,7 +47,7 @@ export class GameGateway {
       if (err instanceof Error) {
         client.emit('game-created-you', { message: err.message });
       } else {
-        client.emit('game-created-you', { message: err });
+        client.emit('game-created-you', { error: err });
       }
     }
   }
@@ -72,12 +72,12 @@ export class GameGateway {
             message: `Game ${gameId} not found`,
           });
         } else {
-          client.emit('game-removed-lobby', { message: err.message });
+          client.emit('game-removed-lobby', { error: err.message });
         }
       } else if (err instanceof Error) {
-        client.emit('game-removed-lobby', { message: err.message });
+        client.emit('game-removed-lobby', { error: err.message });
       } else {
-        client.emit('game-removed-lobby', { message: String(err) });
+        client.emit('game-removed-lobby', { error: String(err) });
       }
     }
   }
@@ -115,9 +115,9 @@ export class GameGateway {
       this.server.emit('guest-joined', { ...game, boardState });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('guest-joined', { message: err.message });
+        client.emit('guest-joined', { error: err.message });
       } else {
-        client.emit('guest-joined', { message: err });
+        client.emit('guest-joined', { error: err });
       }
     }
   }
@@ -136,9 +136,9 @@ export class GameGateway {
       this.server.emit('guest-joined', { ...game, boardState });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('guest-joined', { message: err.message });
+        client.emit('guest-joined', { error: err.message });
       } else {
-        client.emit('guest-joined', { message: err });
+        client.emit('guest-joined', { error: err });
       }
     }
   }
@@ -154,9 +154,9 @@ export class GameGateway {
       client.emit('get-games', gamesWithBoard);
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('get-games', { message: err.message });
+        client.emit('get-games', { error: err.message });
       } else {
-        client.emit('get-games', { message: err });
+        client.emit('get-games', { error: err });
       }
     }
   }
@@ -174,9 +174,9 @@ export class GameGateway {
       client.emit('game-state', { ...game, boardState });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('game-state', { message: err.message });
+        client.emit('game-state', { error: err.message });
       } else {
-        client.emit('game-state', { message: err });
+        client.emit('game-state', { error: err });
       }
     }
   }
@@ -224,9 +224,37 @@ export class GameGateway {
       });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('state', { message: err.message });
+        client.emit('state', { error: err.message });
       } else {
-        client.emit('state', { message: err });
+        client.emit('state', { error: err });
+      }
+    }
+  }
+
+  @SubscribeMessage('add-extra-time')
+  async addExtraTime(
+    @MessageBody() dto: { gameId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { gameId } = dto;
+    const userId: number = client.data.user.userId;
+    try {
+      const res = await this.appService.addExtraTime(
+        gameId,
+        userId,
+        this.server,
+      );
+
+      this.server.to(`game/${gameId}`).emit('add-extra-time', {
+        fromUserId: userId,
+        whiteTimeLeft: remaningTimeForPlayer(res, 'white'),
+        blackTimeLeft: remaningTimeForPlayer(res, 'black'),
+      });
+    } catch (err) {
+      if (err instanceof Error) {
+        client.emit('add-extra-time', { error: err.message });
+      } else {
+        client.emit('add-extra-time', { error: err });
       }
     }
   }
@@ -245,9 +273,9 @@ export class GameGateway {
         .emit('draw-offer', { drawOfferedBy: res.drawOfferedBy });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('draw-offer', { message: err.message });
+        client.emit('draw-offer', { error: err.message });
       } else {
-        client.emit('draw-offer', { message: err });
+        client.emit('draw-offer', { error: err });
       }
     }
   }

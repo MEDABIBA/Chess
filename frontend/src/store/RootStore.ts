@@ -94,6 +94,10 @@ export class RootStore {
 
       if (!res.ok) {
         notify(data.message || 'Request failed', 'error');
+        return;
+      } else if (data.error) {
+        notify(data.message || 'Request failed', 'error');
+        return;
       }
       tokenService.setAccessToken(data.accessToken);
       this.socket.accessToken = data.accessToken;

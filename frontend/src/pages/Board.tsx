@@ -1,6 +1,6 @@
 import BoardComponent from '../components/Board';
 import { useStore } from '../provider/context';
-import Modal from '../components/modalWindow';
+import Modal from '../components/ModalWindow';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -20,6 +20,9 @@ const Board = () => {
     socket.joinRoom({ gameId: Number(id) });
     return () => {
       games.currentGame?.annotations.clearAnnoations();
+      if (currentGame && currentGame.isFinished()) {
+        currentGame.setModalActive(true);
+      }
       socket.leaveRoom({ gameId: Number(id) });
     };
   }, [
@@ -60,7 +63,7 @@ const Board = () => {
     <div className="app">
       {currentGame.isFinished() && isModalActive && (
         <Modal
-          title={`${currentGame.gameStatus === 'checkmate' ? `Stalemate` : currentGame.gameStatus === 'draw' ? `Draw!` : `${currentGame.winner} won`}`}
+          title={`${currentGame.gameStatus === 'checkmate' ? `Checkmate` : currentGame.gameStatus === 'stalemate' ? 'Stalemate' : currentGame.gameStatus === 'draw' ? `Draw!` : `${currentGame.winner} won`}`}
           setIsActive={currentGame.setModalActive}
           action={() => navigate(`home`)}
           text="Navigate to home"
@@ -95,15 +98,6 @@ const Board = () => {
           }}
           text="Draw offer"
         />
-      )}
-      {currentGame.isFinished() && (
-        <button
-          type="button"
-          onClick={() => currentGame.setModalActive(true)}
-          className="btn btn-primary btn-lg"
-        >
-          Open modal
-        </button>
       )}
       <div className="main-content">
         <div className="game-container">

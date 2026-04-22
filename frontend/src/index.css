@@ -100,7 +100,7 @@ p {
   position: relative;
   display: flex;
   align-items: center;
-  width: 80%;
+  width: 75%;
   justify-content: center;
 }
 
@@ -384,10 +384,46 @@ p {
   outline: none !important;
 }
 
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .modal-dialog {
   display: flex;
   align-items: center;
   height: 85%;
+  animation: modalFade 0.2s ease;
+}
+
+.modal-content {
+  background-color: #444444;
+  border-radius: 13px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  border-bottom: 1px solid #666;
+}
+
+.modal-footer {
+  border-top: 1px solid #666;
+}
+
+.close {
+  opacity: 0.7;
+  transition: all 0.1s ease-in-out;
+}
+
+.close:hover {
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 .promotion-window {
@@ -447,18 +483,6 @@ p {
   outline: none !important;
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    max-height: 300px;
-  }
-}
 .timer-list {
   display: flex;
   flex-wrap: wrap;

@@ -26,7 +26,9 @@ const Modal = ({
             data-dismiss="modal"
             aria-label="Close"
           >
-            <span aria-hidden="true">&times;</span>
+            <span style={{ color: '#FFF' }} aria-hidden="true">
+              &times;
+            </span>
           </button>
         </div>
         <div className="modal-footer">
@@ -37,7 +39,7 @@ const Modal = ({
                 setIsActive(false);
               }}
               type="button"
-              className="btn btn-primary"
+              className="btn btn-secondary"
             >
               {text}
             </button>
@@ -49,7 +51,7 @@ const Modal = ({
               secondAction?.();
               setIsActive(false);
             }}
-            className="btn btn-secondary"
+            className="btn btn-dark"
             data-dismiss="modal"
           >
             Close

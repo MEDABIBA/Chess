@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useStore } from '../provider/context';
 import checkValidValue from '../helpers/checkValidNickname';
 
@@ -7,17 +7,6 @@ const AuthForm = () => {
   const [auth, setAuth] = useState<'login' | 'registration'>('registration');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isError, setIsError] = useState(false);
-
-  useEffect(() => {
-    if (isError) {
-      if (checkValidValue(username) && checkValidValue(password)) {
-        setIsError(false);
-      } else {
-        setIsError(true);
-      }
-    }
-  }, [isError, username, password]);
 
   return (
     <div className="backgound-image">
@@ -25,10 +14,7 @@ const AuthForm = () => {
         onSubmit={async (e) => {
           e.preventDefault();
           if (checkValidValue(username) && checkValidValue(password)) {
-            setIsError(false);
             await handleAuthSubmit(auth, username, password);
-          } else {
-            setIsError(true);
           }
         }}
         className="modal-window"
@@ -58,15 +44,9 @@ const AuthForm = () => {
             value={password}
           />
         </label>
-        <button disabled={isError} className="submit-button">
-          {' '}
+        <button className="submit-button">
           {auth === 'login' ? 'Login' : 'Create account'}
         </button>
-        {isError && (
-          <div className="input-error">
-            Maximum 30 characters (Latin letters only)
-          </div>
-        )}
         <p>
           {auth === 'login'
             ? 'Dont have account? '

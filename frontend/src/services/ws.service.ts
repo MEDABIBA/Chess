@@ -118,6 +118,7 @@ class WebSocketService {
     onSocket<ITimeout>(this.socket, 'timeout', (data) => {
       this.store?.games?.currentGame?.setWinner(data.winner);
       this.store?.games?.currentGame?.setStatus(data.gameStatus);
+      this.store?.games?.currentGame?.setModalActive(true);
       console.log('timeout', data);
     });
     onSocket<IExtraTime>(this.socket, 'add-extra-time', (data) => {

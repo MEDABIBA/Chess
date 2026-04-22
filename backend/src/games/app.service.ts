@@ -143,8 +143,8 @@ export class AppService {
       where: { id: id },
     });
     if (!game) {
-      console.log('Game with code not founded');
-      throw new Error('Game with code not founded ');
+      console.log('No game with that code was found');
+      throw new Error('No game with that code was found');
     }
     if (game.blackPlayerId) {
       throw new Error('Game is already full');
@@ -171,8 +171,8 @@ export class AppService {
       where: { inviteCode: code },
     });
     if (!game) {
-      console.log('Game with code not founded');
-      throw new Error('Game with code not founded ');
+      console.log('No game with that code was found');
+      throw new Error('No game with that code was found');
     }
     if (game.blackPlayerId) {
       throw new Error('Game is already full');

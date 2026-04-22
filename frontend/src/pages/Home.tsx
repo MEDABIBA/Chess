@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../provider/context';
 import { observer } from 'mobx-react-lite';
+import notify from '../components/ui/notify';
 
 const Home = () => {
   const store = useStore();
@@ -16,7 +17,6 @@ const Home = () => {
   const [animClass, setAnimClass] = useState<'slide-left' | 'slide-right'>(
     'slide-left',
   );
-  const [isError, setIsError] = useState(false);
   const allGames = games.getAllGames();
   const ITEMS_PER_PAGE = 8;
   const [page, setPage] = useState(1);
@@ -45,10 +45,8 @@ const Home = () => {
                 placeholder="Enter friend code"
                 onChange={(el) => {
                   setFriendCode(el.target.value);
-                  setIsError(false);
                 }}
               />
-              {isError && <div className="input-error">Error</div>}
 
               <button
                 className="button"
@@ -56,7 +54,7 @@ const Home = () => {
                   if (friendCode.length === 6) {
                     games.joinGameByCode(friendCode);
                   } else {
-                    setIsError(true);
+                    notify('Game code must be 6 symbols!', 'error');
                   }
                 }}
               >

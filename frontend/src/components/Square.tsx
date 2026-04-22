@@ -200,6 +200,7 @@ const SquareComponent: React.FC<SquareProps> = ({
           from: piece.position,
           to: { row: toRow, col: toCol },
         });
+        setActivePiece(null);
         setAvailableMoves(null);
       }
       handleMoveToSquare(game, piece, { row: toRow, col: toCol });

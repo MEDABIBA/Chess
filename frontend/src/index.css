@@ -334,7 +334,7 @@ p {
   width: 100%;
   height: 100%;
   cursor: grab;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.4s ease;
 }
 
 .piece-img:active {
@@ -399,7 +399,7 @@ p {
   display: flex;
   align-items: center;
   height: 85%;
-  animation: modalFade 0.2s ease;
+  animation: modalFade 0.4s ease;
 }
 
 .modal-content {
@@ -507,7 +507,7 @@ p {
   background-color: #2f2f2f;
   color: #fff;
   margin: 5% 0;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.4s ease-in-out;
 }
 .timer-element-active,
 .timer-element:hover {
@@ -543,7 +543,7 @@ p {
   font-size: large;
   margin-bottom: 1rem;
   padding: 20px 15px;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.4s ease-in-out;
 }
 .submit-button:hover {
   background-color: #666;
@@ -650,6 +650,7 @@ p {
   border-radius: 32px;
   transition: all 0.2s ease-in-out;
   max-width: max-content;
+  cursor: pointer;
 }
 .home-button:hover {
   color: #fff !important;
@@ -742,7 +743,7 @@ th {
   border-radius: 32px;
   color: #fff;
   background: #444;
-  transition: all 0.2s;
+  transition: all 0.4s;
 }
 .connect-game-btn:hover {
   cursor: pointer;

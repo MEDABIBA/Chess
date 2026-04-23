@@ -411,7 +411,6 @@ class Game {
       return;
     }
     if (this.store.chessMoveValidator.isCheckmate(this.currentPlayer)) {
-      this.gameStatus = 'checkmate';
       this.endGameSound();
       this.setModalActive(true);
       return;

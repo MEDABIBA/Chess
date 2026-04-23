@@ -1,10 +1,12 @@
 import React, { memo, useEffect, useRef } from 'react';
 import { useStore } from '../provider/context';
 import Piece from '../models/Piece';
-import { Position } from '../types/types';
+import { PieceType, Position } from '../types/types';
 import getTargetSquare from '../helpers/getTargetSquare';
 import tryMove from '../helpers/tryMove';
 import Game from '../models/Game';
+import MateAnimationIcon from './MateAnimationIcon';
+import { observer } from 'mobx-react-lite';
 
 interface SquareProps {
   color: string;
@@ -305,6 +307,21 @@ const SquareComponent: React.FC<SquareProps> = ({
       onTouchStart={handleTouchStart}
       style={{ position: 'relative' }}
     >
+      {piece?.pieceType === PieceType.KING &&
+        (game.gameStatus === 'checkmate' ||
+          game.gameStatus === 'draw' ||
+          game.gameStatus === 'stalemate') && (
+          <MateAnimationIcon
+            kingColor={piece.color}
+            winner={
+              game.winner
+                ? game.winner === game.whitePlayerNickname
+                  ? 'white'
+                  : 'black'
+                : null
+            }
+          />
+        )}
       {piece && (
         <img
           ref={imgRef}
@@ -321,7 +338,7 @@ const SquareComponent: React.FC<SquareProps> = ({
   );
 };
 
-const Square = memo(SquareComponent, (prev, next) => {
+const Square = memo(observer(SquareComponent), (prev, next) => {
   return (
     prev.piece === next.piece &&
     prev.color === next.color &&

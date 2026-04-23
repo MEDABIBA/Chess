@@ -22,6 +22,7 @@ import notify from '../components/ui/notify';
 import onSocket from '../helpers/onSocket';
 
 import gameStart from '../assets/sounds/game-start.mp3';
+import endGame from '../assets/sounds/end-game.mp3';
 
 class WebSocketService {
   store: RootStore;
@@ -138,6 +139,10 @@ class WebSocketService {
     });
     onSocket<GameInterface>(this.socket, 'draw-response', (data) => {
       this.store?.games?.currentGame?.setBoard(data);
+      if (data.gameStatus === 'draw') {
+        this.store?.games?.currentGame?.setModalActive(true);
+        new Audio(endGame).play();
+      }
       console.log('draw-response', data);
     });
     onSocket<{ id: number; gameStatus: GameStatus; winner: string }>(
@@ -148,8 +153,8 @@ class WebSocketService {
           (el) => el.id === data.id,
         );
         if (!game) return;
-        game.gameStatus = data.gameStatus;
-        game.winner = data.winner;
+        game.setStatus(data.gameStatus);
+        game.setWinner(data.winner);
         if (game.gameStatus === 'resign') {
           game.endGameSound();
           game.setModalActive(true);

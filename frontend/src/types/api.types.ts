@@ -1,8 +1,9 @@
-import { Position, SquareData, GameStatus } from './types';
+import { Position, SquareData, GameStatus, Color } from './types';
 
 export interface ICreateGame {
   boardState: SquareData[];
   creatorUserName: string;
+  selectedColor: Color;
   initialTime: number;
   additionalTime: number;
 }

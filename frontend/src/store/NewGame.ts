@@ -3,6 +3,7 @@ import { RootStore } from './RootStore';
 import { initializeBoard } from '../helpers/initializeBoard';
 import notify from '../components/ui/notify';
 import parseTimer from '../helpers/parseTimer';
+import { Color } from '../types/types';
 
 class NewGame {
   store: RootStore;
@@ -13,7 +14,7 @@ class NewGame {
   }
 
   @action
-  createNewGame = async (time: string) => {
+  createNewGame = async (time: string, selectedColor: Color) => {
     const nickname = this.store.getNickname();
     if (!nickname) {
       notify('You are not logged in', 'error');
@@ -26,6 +27,7 @@ class NewGame {
       this.store.socket?.createGame({
         boardState: board,
         creatorUserName: nickname,
+        selectedColor,
         initialTime,
         additionalTime,
       });

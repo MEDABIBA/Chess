@@ -89,7 +89,7 @@ class Game {
     this.gameCreatorId = Number(game.gameCreatorId);
     this.whitePlayerId = Number(game.whitePlayerId);
     this.blackPlayerId = Number(game.blackPlayerId);
-    this.whitePlayerNickname = game.whitePlayer.username;
+    this.whitePlayerNickname = game.whitePlayer?.username ?? null;
     this.blackPlayerNickname = game?.blackPlayer?.username ?? null;
     this.store.timer.setTimes(game.whiteTimeLeft, game.blackTimeLeft);
     this.createdAt = game.createdAt;
@@ -113,7 +113,8 @@ class Game {
       };
     }
     this.lastDoubleStepPawn = game.lastDoubleStepPawn || null;
-    this.whitePlayerNickname = game.whitePlayer.username;
+    this.whitePlayerNickname =
+      game?.whitePlayer?.username ?? this.whitePlayerNickname;
     this.blackPlayerNickname =
       game?.blackPlayer?.username ?? this.blackPlayerNickname;
     this.createdAt = game.createdAt;

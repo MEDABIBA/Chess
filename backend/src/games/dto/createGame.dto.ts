@@ -58,6 +58,7 @@ export class CreateGameDto {
 
   @IsString()
   creatorUserName!: string;
+  selectedColor!: 'white' | 'black';
 
   @IsInt()
   @Min(0)

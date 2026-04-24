@@ -46,10 +46,10 @@ model Game {
   inviteCode String @unique
  
   gameCreatorId Int
-  whitePlayerId Int //socketId or temporary ID
+  whitePlayerId Int? //socketId or temporary ID
   blackPlayerId Int? //socketId or temporary ID
 
-  whitePlayer User  @relation("whitePlayer", fields: [whitePlayerId], references: [id])
+  whitePlayer User?  @relation("whitePlayer", fields: [whitePlayerId], references: [id])
   blackPlayer User? @relation("blackPlayer", fields: [blackPlayerId], references: [id])
 
   whiteTimeLeft Int @default(180)

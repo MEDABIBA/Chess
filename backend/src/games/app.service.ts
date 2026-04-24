@@ -97,7 +97,13 @@ export class AppService {
     });
   }
   async createGame(dto: CreateGameDto) {
-    const { boardState, creatorUserName, initialTime, additionalTime } = dto;
+    const {
+      boardState,
+      creatorUserName,
+      selectedColor,
+      initialTime,
+      additionalTime,
+    } = dto;
     if (!initialTime || additionalTime < 0 || additionalTime > 15)
       // set additional time limit to 15 sec
       throw new Error('Time is setted incorrect!');
@@ -119,7 +125,8 @@ export class AppService {
         fen: fen,
         currentPlayer: 'white',
         gameCreatorId: creator.id,
-        whitePlayerId: creator.id, // To change in the future
+        whitePlayerId: selectedColor === 'white' ? creator.id : undefined,
+        blackPlayerId: selectedColor === 'black' ? creator.id : undefined,
         initialTime,
         additionalTime,
         whiteTimeLeft: initialTime,
@@ -157,17 +164,25 @@ export class AppService {
       console.log('No game with that code was found');
       throw new Error('No game with that code was found');
     }
-    if (game.blackPlayerId) {
+    if (game.whitePlayerId && game.blackPlayerId) {
       throw new Error('Game is already full');
     }
-    if (game.whitePlayerId === user.id) {
+    if (game.whitePlayerId === user.id || game.blackPlayerId === user.id) {
       throw new Error('You cannot join your own game');
     }
-    return await this.prisma.game.update({
-      where: { id: id },
-      data: { blackPlayerId: Number(user.id) },
-      include: { whitePlayer: true, blackPlayer: true },
-    });
+    if (game.gameCreatorId == game.whitePlayerId) {
+      return await this.prisma.game.update({
+        where: { id: id },
+        data: { blackPlayerId: Number(user.id) },
+        include: { whitePlayer: true, blackPlayer: true },
+      });
+    } else {
+      return await this.prisma.game.update({
+        where: { id: id },
+        data: { whitePlayerId: Number(user.id) },
+        include: { whitePlayer: true, blackPlayer: true },
+      });
+    }
   }
 
   async joinGameByCode(dto: joinGameByCodeDto) {
@@ -185,17 +200,25 @@ export class AppService {
       console.log('No game with that code was found');
       throw new Error('No game with that code was found');
     }
-    if (game.blackPlayerId) {
+    if (game.whitePlayerId && game.blackPlayerId) {
       throw new Error('Game is already full');
     }
-    if (game.whitePlayerId === user.id) {
+    if (game.whitePlayerId === user.id || game.blackPlayerId === user.id) {
       throw new Error('You cannot join your own game');
     }
-    return await this.prisma.game.update({
-      where: { id: game.id },
-      data: { blackPlayerId: Number(user.id) },
-      include: { whitePlayer: true, blackPlayer: true },
-    });
+    if (game.gameCreatorId == game.whitePlayerId) {
+      return await this.prisma.game.update({
+        where: { id: game.id },
+        data: { blackPlayerId: Number(user.id) },
+        include: { whitePlayer: true, blackPlayer: true },
+      });
+    } else {
+      return await this.prisma.game.update({
+        where: { id: game.id },
+        data: { whitePlayerId: Number(user.id) },
+        include: { whitePlayer: true, blackPlayer: true },
+      });
+    }
   }
 
   async getGames() {
@@ -264,7 +287,7 @@ export class AppService {
         if (res.isCheckmate) {
           game.winner =
             game.currentPlayer === 'white'
-              ? game.whitePlayer.username
+              ? game.whitePlayer!.username
               : game.blackPlayer!.username;
           if (!game.winner) throw new Error('Winner was not found');
           game.gameStatus = 'checkmate';
@@ -294,7 +317,7 @@ export class AppService {
 
       nextTimeoutWinner =
         game.currentPlayer === 'white'
-          ? game.whitePlayer.username
+          ? game.whitePlayer!.username
           : game.blackPlayer!.username;
       isActiveGame = game.gameStatus === 'playing';
 
@@ -347,10 +370,10 @@ export class AppService {
     const nextTimeoutWinner =
       game.currentPlayer === 'black'
         ? game.blackPlayer!.username
-        : game.whitePlayer.username;
+        : game.whitePlayer!.username;
     if (game?.gameStatus !== 'playing') {
       throw new Error('Game is not active!');
-    }
+    } //
     if (game.blackTimeLeft <= 0 || game.whiteTimeLeft <= 0) {
       throw new Error("Time's up!");
     }

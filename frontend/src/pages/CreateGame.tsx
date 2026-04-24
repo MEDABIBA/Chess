@@ -4,6 +4,7 @@ import { useStore } from '../provider/context';
 import { ReactComponent as Bullet } from '../assets/icons/bullet.svg';
 import { ReactComponent as Blitz } from '../assets/icons/blitz.svg';
 import { ReactComponent as Rapid } from '../assets/icons/rapid.svg';
+import { Color } from '../types/types';
 
 const CreateGame = () => {
   const { newGame } = useStore();
@@ -20,6 +21,7 @@ const CreateGame = () => {
   };
   type TimerValue = (typeof timerValues)[keyof typeof timerValues][number];
   const [timerValue, setTimerValue] = useState<TimerValue>('15+10');
+  const [color, setColor] = useState<Color>('white');
   const selectTime = timerValue.replace('min', '').trim();
   return (
     <>
@@ -55,8 +57,12 @@ const CreateGame = () => {
               </div>
             );
           })}
+          <div>
+            <button onClick={() => setColor('white')}>white</button>
+            <button onClick={() => setColor('black')}>black</button>
+          </div>
           <button
-            onClick={async () => await createNewGame(selectTime)}
+            onClick={async () => await createNewGame(selectTime, color)}
             className="submit-button"
           >
             Create game

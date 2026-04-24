@@ -152,7 +152,10 @@ const Home = () => {
                           onClick={() => {
                             if (isParticipant) {
                               navigate(`game/${game.id}`);
-                            } else if (!game.blackPlayerNickname) {
+                            } else if (
+                              !game.blackPlayerNickname ||
+                              !game.whitePlayerNickname
+                            ) {
                               games.joinGame(game);
                             } else {
                               navigate(`game/${game.id}`);
@@ -161,7 +164,8 @@ const Home = () => {
                         >
                           {isParticipant
                             ? 'Enter'
-                            : game.blackPlayerNickname
+                            : game.blackPlayerNickname &&
+                                game.whitePlayerNickname
                               ? 'Watch'
                               : 'Join'}
                         </button>

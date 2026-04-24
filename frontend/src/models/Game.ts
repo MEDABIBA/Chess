@@ -21,6 +21,7 @@ class Game {
   private store: RootStore;
   id: number;
   board: SquareData[] = [];
+  gameCreatorId: number;
   whitePlayerId: number;
   blackPlayerId: number;
   whitePlayerNickname: string | null = null;
@@ -85,6 +86,7 @@ class Game {
     this.additionalTime = game.additionalTime;
     this.lastDoubleStepPawn =
       game.lastDoubleStepPawn || this.lastDoubleStepPawn;
+    this.gameCreatorId = Number(game.gameCreatorId);
     this.whitePlayerId = Number(game.whitePlayerId);
     this.blackPlayerId = Number(game.blackPlayerId);
     this.whitePlayerNickname = game.whitePlayer.username;

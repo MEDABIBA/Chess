@@ -2,7 +2,7 @@ import { Position, SquareData, GameStatus } from './types';
 
 export interface ICreateGame {
   boardState: SquareData[];
-  whitePlayerUsername: string;
+  creatorUserName: string;
   initialTime: number;
   additionalTime: number;
 }

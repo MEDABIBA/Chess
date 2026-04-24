@@ -32,7 +32,7 @@ class ApiService {
     });
     const parsed = await response.json();
     if (!response.ok) {
-      notify(parsed.message, 'error');
+      throw new Error(parsed.message);
     }
     return parsed;
   }
@@ -46,7 +46,7 @@ class ApiService {
     });
     const parsed = await response.json();
     if (!response.ok) {
-      notify(parsed.message, 'error');
+      throw new Error(parsed.message);
     }
     return parsed.accessToken;
   }

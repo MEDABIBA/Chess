@@ -84,10 +84,20 @@ export class AppService {
 
     return timeLeft <= 0 ? timeoutWinner : null;
   }
-
+  async checkIfHasExistingGame(username: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { username: username },
+    });
+    if (!user) throw new Error('user didnt exist');
+    return await this.prisma.game.findFirst({
+      where: {
+        gameCreatorId: user.id,
+        gameStatus: { in: ['waiting', 'playing'] },
+      },
+    });
+  }
   async createGame(dto: CreateGameDto) {
-    const { boardState, whitePlayerUsername, initialTime, additionalTime } =
-      dto;
+    const { boardState, creatorUserName, initialTime, additionalTime } = dto;
     if (!initialTime || additionalTime < 0 || additionalTime > 15)
       // set additional time limit to 15 sec
       throw new Error('Time is setted incorrect!');
@@ -99,16 +109,17 @@ export class AppService {
       })),
       'white',
     );
-    const user = await this.prisma.user.findUnique({
-      where: { username: whitePlayerUsername },
+    const creator = await this.prisma.user.findUnique({
+      where: { username: creatorUserName },
     });
-    if (!user) throw new Error('user didnt exist');
+    if (!creator) throw new Error('user didnt exist');
     const inviteCode = generateInviteCode();
     return this.prisma.game.create({
       data: {
         fen: fen,
         currentPlayer: 'white',
-        whitePlayerId: user?.id,
+        gameCreatorId: creator.id,
+        whitePlayerId: creator.id, // To change in the future
         initialTime,
         additionalTime,
         whiteTimeLeft: initialTime,

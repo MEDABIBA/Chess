@@ -35,6 +35,12 @@ export class GameGateway {
   ) {
     console.log('=== CREATE GAME CALLED ===');
     try {
+      const existingGame = await this.appService.checkIfHasExistingGame(
+        createGameOptions.creatorUserName,
+      );
+      if (existingGame) {
+        throw new Error('You already have existing game!');
+      }
       const game = await this.appService.createGame({
         ...createGameOptions,
       });
@@ -45,7 +51,7 @@ export class GameGateway {
       client.emit('game-created-you', { id: game.id });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('game-created-you', { message: err.message });
+        client.emit('game-created-you', { error: err.message });
       } else {
         client.emit('game-created-you', { error: err });
       }

@@ -45,6 +45,7 @@ model Game {
   additionalTime Int
   inviteCode String @unique
  
+  gameCreatorId Int
   whitePlayerId Int //socketId or temporary ID
   blackPlayerId Int? //socketId or temporary ID
 

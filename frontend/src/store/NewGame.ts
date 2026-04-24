@@ -25,7 +25,7 @@ class NewGame {
     try {
       this.store.socket?.createGame({
         boardState: board,
-        whitePlayerUsername: nickname,
+        creatorUserName: nickname,
         initialTime,
         additionalTime,
       });

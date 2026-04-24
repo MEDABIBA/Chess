@@ -80,11 +80,16 @@ class WebSocketService {
       console.log('game-created, game id: ', data.id);
       this.store?.games.addGame(data);
     });
-    onSocket<{ id: number }>(this.socket, 'game-created-you', (data) => {
-      notify('game created successfully!', 'success');
-      new Audio(gameStart).play();
-      this.store?.navigate(`game/${data.id}`);
-    });
+    onSocket<{ id: number }>(
+      this.socket,
+      'game-created-you',
+      (data) => {
+        notify('game created successfully!', 'success');
+        new Audio(gameStart).play();
+        this.store?.navigate(`game/${data.id}`);
+      },
+      this.store,
+    );
     onSocket<{ gameId: number }>(this.socket, 'game-removed', (data) => {
       const { gameId } = data;
       console.log('game-removed', gameId);
@@ -227,10 +232,6 @@ class WebSocketService {
         }
         return;
       }
-      if (err.message.includes('user didnt exist')) {
-        localStorage.clear();
-        this.store?.navigate('registration-form');
-      }
       notify(err.message as string, 'error');
     });
 
@@ -318,7 +319,6 @@ class WebSocketService {
   public async refreshAccessToken() {
     try {
       const token = await apiService.refreshAccessToken();
-
       tokenService.setAccessToken(token);
       console.log('Token changed');
       runInAction(() => (this.accessToken = token));
@@ -326,7 +326,6 @@ class WebSocketService {
     } catch (err) {
       if (err instanceof Error) {
         if (err.message.includes('Invalid token')) {
-          console.error('Refresh token not found');
           localStorage.clear();
           this.store?.navigate('registration-form');
         }

@@ -53,6 +53,7 @@ type Nicknames = {
 };
 
 interface Game {
+  gameCreatorId: string | null;
   whitePlayerId: string | null;
   blackPlayerId: string | null;
   blackTimeLeft: number;

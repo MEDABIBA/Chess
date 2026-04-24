@@ -62,7 +62,10 @@ export class RootStore {
   }
 
   getNickname() {
-    if (!this.socket?.accessToken) {
+    if (
+      !this.socket?.accessToken ||
+      this.socket?.accessToken.split('.').length !== 3
+    ) {
       return null;
     }
     const decoded: MyJwtPayload = jwtDecode(this.socket.accessToken);

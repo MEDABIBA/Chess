@@ -4,6 +4,7 @@ import { useStore } from '../provider/context';
 import { ReactComponent as Bullet } from '../assets/icons/bullet.svg';
 import { ReactComponent as Blitz } from '../assets/icons/blitz.svg';
 import { ReactComponent as Rapid } from '../assets/icons/rapid.svg';
+import ColorSelector from '../components/ColorSelector';
 import { Color } from '../types/types';
 
 const CreateGame = () => {
@@ -57,10 +58,7 @@ const CreateGame = () => {
               </div>
             );
           })}
-          <div>
-            <button onClick={() => setColor('white')}>white</button>
-            <button onClick={() => setColor('black')}>black</button>
-          </div>
+          <ColorSelector color={color} setColor={setColor} />
           <button
             onClick={async () => await createNewGame(selectTime, color)}
             className="submit-button"

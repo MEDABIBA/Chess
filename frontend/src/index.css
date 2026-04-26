@@ -850,5 +850,45 @@ th {
   margin-right: 10px;
 }
 
+.color-selector {
+  margin-bottom: 25px;
+}
+.color-selector-item {
+  position: relative;
+  background: #4b4b4b;
+  overflow: hidden;
+  cursor: pointer;
+  height: 60px;
+  width: 60px;
+}
+.color-selector-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  transition: all 0.1s ease-in;
+}
+.color-selector-item:hover::after {
+  opacity: 0;
+  transform: scale(1.2);
+}
+
+.color-selector-white-img {
+  height: 100%;
+  width: 100%;
+  transform: translate(50%);
+}
+.color-selector-black-img {
+  height: 100%;
+  width: 100%;
+  transform: translate(-50%);
+}
+
+.color-selector-item-active {
+  position: relative;
+  z-index: 11;
+}
+
 @media (max-width: 768px) {
 }

@@ -613,6 +613,9 @@ p {
   width: 80%;
   margin-bottom: 20px;
 }
+.input:focus {
+  background-color: #444;
+}
 .input-error {
   color: rgb(220, 38, 38);
 }

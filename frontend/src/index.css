@@ -21,32 +21,45 @@ button {
   -moz-appearance: none;
   appearance: none;
   padding: 0;
+  cursor: url('./assets/cursor/arrow.cur'), auto !important;
 }
 
 body {
   color: #eee;
   background-color: #333;
   height: 100%;
+  cursor: url('./assets/cursor/main.cur'), auto;
 }
 p {
   margin-bottom: 0;
 }
 .app {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
+.container {
+  display: flex;
+  height: 90vh;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  padding: 0 0 30px 0;
+}
+
 .backgound-image {
   position: relative;
   z-index: 0;
   background-image: url(./assets/chess-pieces-black-5120x2880-16661.png);
+  overflow: auto;
   background-size: cover;
   background-position: center;
   display: flex;
+  flex-direction: column;
   height: 100%;
   width: 100%;
   align-items: center;
@@ -64,10 +77,9 @@ p {
   z-index: 1;
   color: #f5f5f5;
   display: flex;
-  position: absolute;
   top: 0;
   width: 100%;
-  max-height: 5rem;
+  max-height: 10vh;
   padding: 1.5rem 4rem;
   justify-content: space-between;
   align-items: center;
@@ -77,23 +89,7 @@ p {
   width: 40px;
 }
 .header-icon:hover {
-  cursor: pointer;
-}
-@media (max-width: 768px) {
-  .header {
-    padding: 18px 36px;
-  }
-  .nickname {
-    display: none;
-  }
-  .home {
-    width: 85% !important;
-    overflow: hidden;
-  }
-  .home-buttons {
-    flex-direction: column;
-    gap: 15px;
-  }
+  cursor: url('./assets/cursor/arrow.cur'), auto;
 }
 
 .main-content {
@@ -109,7 +105,7 @@ p {
   flex-direction: column;
   align-items: center;
   margin-right: 15px;
-  flex-grow: 0.5;
+  flex: 0 0 60%;
 }
 
 .board-container {
@@ -124,8 +120,8 @@ p {
   display: flex;
   flex-wrap: wrap;
   position: relative;
-
-  min-height: 50vh;
+  min-width: 45vw;
+  min-height: 45vh;
 }
 
 .btn-lg {
@@ -144,10 +140,10 @@ p {
 }
 
 .game-btn {
-  padding: 15px;
+  padding: 12px;
   background-color: #555;
-  border-radius: 13px;
-  cursor: pointer;
+  border-radius: 8px;
+  cursor: url('./assets/cursor/arrow.cur'), auto;
   transition: all 0.1s ease-in-out;
   width: max-content;
   user-select: none;
@@ -166,7 +162,6 @@ p {
   justify-content: center;
   width: 44px;
   height: 44px;
-  cursor: pointer;
   transition:
     all 0.15s,
     color 0.15s,
@@ -267,6 +262,7 @@ p {
   height: 100%;
   width: 100%;
   border: 3px solid #444;
+  cursor: url('./assets/cursor/grab.cur'), grabbing;
 }
 
 .black {
@@ -333,14 +329,22 @@ p {
   margin: auto;
   width: 100%;
   height: 100%;
-  cursor: grab;
+  cursor: grab !important;
   transition: opacity 0.4s ease;
 }
 
 .piece-img:active {
-  cursor: grabbing;
+  /* cursor: grabbing !important; */
+  cursor: url('./assets/cursor/grab.cur'), grabbing;
 }
 
+body.dragging {
+  cursor: url('./assets/cursor/grab.cur'), grabbing;
+}
+
+body.dragging .piece-img {
+  cursor: url('./assets/cursor/grab.cur'), grabbing;
+}
 .king-hightlight {
   background: radial-gradient(
     circle,
@@ -526,54 +530,29 @@ p {
 .modal-window {
   display: flex;
   flex-direction: column;
-  height: 60%;
-  width: 420px;
-  min-height: min-content;
-  min-width: min-content;
-  max-height: 90vh;
-  max-width: 90vw;
+  height: 80%;
+  width: 45%;
   background-color: #1e1e1e;
   border-radius: 3%;
-  padding: 2%;
+  padding: 3%;
   color: #e0e0e0;
   align-items: center;
   text-align: center;
+  overflow: auto;
 }
 @media (max-width: 768px) {
   .modal-window {
     width: 90vw;
-    padding: 24px;
+    padding: 8%;
     margin: 10px;
   }
-}
-
-.timer-button {
-  cursor: pointer;
-  width: 80%;
-  height: 14%;
-  border-radius: 12px;
-  background: #555;
-  color: #e0e0e0;
-  font-size: 24px;
-  font-weight: 600;
-  border: none;
-  outline: none !important;
-  margin-bottom: 20px;
-}
-.timer-button:hover,
-.timer-button:hover {
-  border: none;
-  background: #666;
-}
-.timer-button:focus {
-  outline: none !important;
 }
 
 .timer-list {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: left;
+  justify-content: center;
   list-style: none;
   gap: 4%;
   padding: 1% 0%;
@@ -586,7 +565,7 @@ p {
 
 .timer-element {
   min-width: 100px;
-  cursor: pointer;
+  cursor: url('./assets/cursor/arrow.cur'), auto;
   padding: 5px;
   border-radius: 8px;
   width: 30%;
@@ -601,13 +580,12 @@ p {
   color: #000;
 }
 .timer-element-button {
-  cursor: pointer;
   background-color: inherit;
 }
 
 .input {
   color: #fff;
-  padding: 5px 10px;
+  padding: 10px 15px;
   border-radius: 12px;
   background-color: #333;
   width: 80%;
@@ -625,13 +603,12 @@ p {
   margin-top: auto;
   height: 14%;
   width: 80%;
+  padding: 10px 0;
   border-radius: 15px;
-  cursor: pointer;
   color: #e0e0e0;
   font-weight: 800;
   font-size: large;
   margin-bottom: 1rem;
-  padding: 20px 15px;
   transition: all 0.4s ease-in-out;
 }
 .submit-button:hover {
@@ -647,7 +624,8 @@ p {
   justify-content: center;
   align-items: center;
   gap: 1vw;
-  flex-grow: 0.3;
+  flex: 0 0 65%;
+  overflow: auto;
 }
 .game-info-window-main {
   background-color: #444;
@@ -658,7 +636,7 @@ p {
 
 .game-info-window-main-info {
   padding: 25px 15px;
-  font-size: 24px;
+  font-size: 1.5em;
   font-weight: 600;
 }
 
@@ -679,14 +657,18 @@ p {
 
 .auth-title {
   width: 100%;
-  margin-bottom: 15%;
+  margin-bottom: 10%;
 }
 .auth-elem {
   width: 100%;
   list-style: none;
+  margin-bottom: 10px;
 }
 .auth-elem-input {
   width: 100%;
+}
+.auth-elem-title {
+  margin-bottom: 15px;
 }
 .auth-button {
   background: inherit;
@@ -694,12 +676,15 @@ p {
 }
 .auth-button:hover {
   text-decoration: underline;
-  cursor: pointer;
   color: royalblue !important;
 }
 .home {
-  width: 60%;
-  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 85%;
+  overflow: auto;
 }
 .home-buttons {
   display: flex;
@@ -715,10 +700,12 @@ p {
   color: #fff;
   background-color: #444;
   border-radius: 4px;
+  cursor: initial !important;
 }
 .home-input:focus {
   background-color: #555;
 }
+
 .button {
   padding: 5px 15px;
   background: #444;
@@ -727,7 +714,6 @@ p {
 }
 .button:hover {
   background-color: #555;
-  cursor: pointer;
 }
 
 .home-button {
@@ -739,7 +725,6 @@ p {
   border-radius: 32px;
   transition: all 0.2s ease-in-out;
   max-width: max-content;
-  cursor: pointer;
 }
 .home-button:hover {
   color: #fff !important;
@@ -764,9 +749,9 @@ p {
   border-radius: 13px;
   background-color: #222;
   transition: all 0.2s ease-out;
+  width: max-content;
 }
 .filter-btn:hover {
-  cursor: pointer;
   font-size: 15px;
   color: #fff;
   background-color: #333;
@@ -776,6 +761,7 @@ p {
   padding: 5px 10px;
   border-radius: 13px;
   background-color: #444;
+  width: max-content;
 }
 
 .home-table {
@@ -835,7 +821,6 @@ th {
   transition: all 0.4s;
 }
 .connect-game-btn:hover {
-  cursor: pointer;
   background: #777 !important;
 }
 
@@ -849,7 +834,6 @@ th {
 
 .popup-text {
   color: #fff;
-  cursor: pointer;
   margin-right: 10px;
 }
 
@@ -860,7 +844,6 @@ th {
   position: relative;
   background: #4b4b4b;
   overflow: hidden;
-  cursor: pointer;
   height: 60px;
   width: 60px;
 }
@@ -894,4 +877,42 @@ th {
 }
 
 @media (max-width: 768px) {
+  .filter {
+    flex-direction: column;
+    align-items: center;
+  }
+  .home-input-wrapper {
+    flex-direction: column;
+  }
+  .filter-btn,
+  .filter-btn-active {
+    width: 100%;
+  }
+  .timer {
+    font-size: 1em !important;
+  }
+  .header {
+    padding: 18px 36px;
+  }
+  .home {
+    width: 85% !important;
+    overflow: auto;
+  }
+  .home-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  .game-info-window-main-info {
+    font-size: 1em;
+  }
+  .game-info {
+    flex: 0 0 65%;
+  }
+  .game-info-window {
+    flex: 0 0 30%;
+  }
+  .player-name {
+    font-size: 1em;
+  }
 }

@@ -156,8 +156,7 @@ const SquareComponent: React.FC<SquareProps> = ({
     const shiftY = e.clientY - rect.top;
 
     img.style.opacity = '0.3';
-    document.body.style.cursor = 'grabbing';
-
+    document.body.classList.add('dragging');
     const clone = document.createElement('img');
     clone.src = img.src;
     clone.style.width = `${rect.width}px`;
@@ -184,7 +183,7 @@ const SquareComponent: React.FC<SquareProps> = ({
     };
     const handleMouseUp = (event: MouseEvent) => {
       setGrab(null);
-      document.body.style.cursor = 'default';
+      document.body.classList.remove('dragging');
       img.style.opacity = '1';
       clone.remove();
       document.removeEventListener('mousemove', handleMouseMove);
@@ -331,7 +330,7 @@ const SquareComponent: React.FC<SquareProps> = ({
           src={piece.getPiece()}
           alt="#"
           draggable={false}
-          style={{ cursor: 'grab', userSelect: 'none' }}
+          style={{ userSelect: 'none' }}
         />
       )}
     </div>

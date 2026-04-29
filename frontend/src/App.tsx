@@ -4,7 +4,6 @@ import Board from './pages/Board';
 import CreateGame from './pages/CreateGame';
 import AuthForm from './pages/AuthForm';
 import Home from './pages/Home';
-import Header from './components/Header';
 import { useStore } from './provider/context';
 import { useEffect } from 'react';
 
@@ -21,7 +20,6 @@ const App = observer(() => {
 
   return (
     <div className="app">
-      <Header />
       <Routes>
         <Route path="/" element={<Navigate to="home" />} />
         <Route path="/game/:id" element={<Board />} />

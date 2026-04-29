@@ -20,8 +20,8 @@ const MainInfoModalWindow = ({
     <div className="game-info-window-main-info">
       <img
         src={info}
-        height={40}
-        width={40}
+        height={window.innerWidth > 768 ? 40 : 28}
+        width={window.innerWidth > 768 ? 40 : 28}
         style={{ marginRight: '10px' }}
         alt="info"
       />

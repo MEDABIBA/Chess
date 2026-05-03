@@ -47,7 +47,8 @@ class WebSocketService {
       console.log('Token unregistered');
       notify('Invalid access token', 'error');
     }
-    this.socket = io('http://localhost:3030', {
+    this.socket = io('/', {
+      path: '/socket.io/',
       auth: {
         token: this.accessToken,
       },

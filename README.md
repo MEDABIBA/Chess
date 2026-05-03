@@ -1,4 +1,4 @@
-# docker compose up -f compose.prod.yml up // run a production version
+# docker compose -f compose.prod.yml up --build // run a production version
 
 # docker compose up -f compose.dev.yml up // run a dev version
 

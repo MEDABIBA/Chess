@@ -6,6 +6,8 @@ services:
       dockerfile: dockerfile
     ports:
       - 3000:80
+    depends_on:
+      - backend
 
   backend:
     container_name: chess-backend

@@ -85,7 +85,7 @@ export class RootStore {
         console.error('Socket unucialized!');
         return;
       }
-      const res = await fetch(`http://localhost:3030/auth/${auth}`, {
+      const res = await fetch(`/auth/${auth}`, {
         method: 'POST',
         credentials: 'include',
         headers: {

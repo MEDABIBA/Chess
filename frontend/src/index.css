@@ -48,7 +48,7 @@ p {
   width: 100%;
   justify-content: center;
   align-items: center;
-  padding: 0 0 30px 0;
+  padding: 20px 0 30px 0;
 }
 
 .backgound-image {
@@ -77,6 +77,7 @@ p {
   z-index: 1;
   color: #f5f5f5;
   display: flex;
+  gap: 20px;
   top: 0;
   width: 100%;
   max-height: 10vh;
@@ -530,7 +531,8 @@ body.dragging .piece-img {
 .modal-window {
   display: flex;
   flex-direction: column;
-  height: 80%;
+  min-height: 75%;
+  max-height: 95%;
   width: 45%;
   background-color: #1e1e1e;
   border-radius: 3%;
@@ -539,13 +541,6 @@ body.dragging .piece-img {
   align-items: center;
   text-align: center;
   overflow: auto;
-}
-@media (max-width: 768px) {
-  .modal-window {
-    width: 90vw;
-    padding: 8%;
-    margin: 10px;
-  }
 }
 
 .timer-list {
@@ -602,12 +597,13 @@ body.dragging .piece-img {
   background-color: #555;
   margin-top: auto;
   height: 14%;
+  min-height: 50px;
   width: 80%;
-  padding: 10px 0;
+  padding: 15px 6px;
   border-radius: 15px;
   color: #e0e0e0;
   font-weight: 800;
-  font-size: large;
+  font-size: x-large;
   margin-bottom: 1rem;
   transition: all 0.4s ease-in-out;
 }
@@ -737,6 +733,7 @@ body.dragging .piece-img {
   display: flex;
   gap: 15px;
   margin-bottom: 10px;
+  min-height: 36px;
 }
 .filter-title {
   padding: 5px 10px 5px 0;
@@ -746,7 +743,7 @@ body.dragging .piece-img {
   font-weight: 600;
   color: #eee;
   padding: 5px 10px;
-  border-radius: 13px;
+  border-radius: 24px;
   background-color: #222;
   transition: all 0.2s ease-out;
   width: max-content;
@@ -759,7 +756,7 @@ body.dragging .piece-img {
 .filter-btn-active {
   color: #eee;
   padding: 5px 10px;
-  border-radius: 13px;
+  border-radius: 24px;
   background-color: #444;
   width: max-content;
 }
@@ -877,42 +874,86 @@ th {
 }
 
 @media (max-width: 768px) {
-  .filter {
-    flex-direction: column;
-    align-items: center;
+  .header-info {
+    font-size: 14px;
   }
+
+  .filter {
+    align-items: center;
+    overflow: auto;
+  }
+
   .home-input-wrapper {
     flex-direction: column;
   }
+
+  .submit-button {
+    font-size: medium;
+  }
+
   .filter-btn,
   .filter-btn-active {
     width: 100%;
   }
+
   .timer {
-    font-size: 1em !important;
+    font-size: 2em !important;
   }
+
   .header {
     padding: 18px 36px;
   }
+
   .home {
     width: 85% !important;
     overflow: auto;
   }
+
   .home-buttons {
     flex-direction: column;
     align-items: center;
+    max-width: min-content;
     gap: 15px;
   }
+
   .game-info-window-main-info {
     font-size: 1em;
+    padding: 10px 5px;
   }
+
   .game-info {
     flex: 0 0 65%;
   }
+
   .game-info-window {
-    flex: 0 0 30%;
+    display: none;
   }
+
   .player-name {
     font-size: 1em;
+  }
+
+  .auth-title-text {
+    font-size: 1.5em;
+  }
+
+  .auth-elem-title {
+    font-size: 1.2em;
+  }
+
+  .modal-window {
+    width: 90vw;
+    padding: 8%;
+    margin: 10px;
+  }
+  .connect-game-btn {
+    padding: 5px 10px;
+  }
+  .main-content {
+    width: 100%;
+    display: block;
+  }
+  .game-container {
+    margin-right: 0;
   }
 }

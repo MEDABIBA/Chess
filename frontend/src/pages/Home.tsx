@@ -98,19 +98,19 @@ const Home = () => {
               ))}
             </div>
             <div style={{ overflow: 'auto' }}>
-              <table key={filter} className={`home-table ${animClass}`}>
-                <thead>
-                  <tr>
-                    <th>Created</th>
-                    <th>Timer</th>
-                    <th>Nicknames</th>
-                    <th>Game status</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginated?.length ? (
-                    paginated.map((game, key) => {
+              {paginated?.length ? (
+                <table key={filter} className={`home-table ${animClass}`}>
+                  <thead>
+                    <tr>
+                      <th>Created</th>
+                      <th>Timer</th>
+                      <th>Nicknames</th>
+                      <th>Game status</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginated.map((game, key) => {
                       const isParticipant = games.isParticipant(game);
                       const date =
                         Date.now() - new Date(game.createdAt).getTime();
@@ -177,17 +177,12 @@ const Home = () => {
                           </td>
                         </tr>
                       );
-                    })
-                  ) : (
-                    <tr>
-                      <td>There is no games yet</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    })}
+                  </tbody>
+                </table>
+              ) : (
+                <h2>There is no games:"</h2>
+              )}
             </div>
             <div className="pagination">
               {totalPages > 1 && (

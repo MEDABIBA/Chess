@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 import notify from '../components/ui/notify';
 import PlayersWindow from '../components/PlayersWidow';
 import Header from '../components/Header';
+import PlayerWindow from '../components/PlayerWindow';
 
 const Board = () => {
   const { id } = useParams();
@@ -60,6 +61,17 @@ const Board = () => {
   if (currentGame === null) return;
   const isModalActive = currentGame.getModalActive();
 
+  const topColor = !currentGame.isParticipant()
+    ? 'black'
+    : currentGame.yourColor === 'white'
+      ? 'black'
+      : 'white';
+  const bottomColor = !currentGame.isParticipant()
+    ? 'white'
+    : currentGame.yourColor === 'white'
+      ? 'white'
+      : 'black';
+
   return (
     <>
       <Header />
@@ -103,13 +115,23 @@ const Board = () => {
           />
         )}
         <div className="main-content">
+          <PlayerWindow
+            additionalTime={currentGame.additionalTime}
+            color={topColor}
+          />
           <div className="game-container">
             <BoardComponent />
           </div>
+          <PlayerWindow
+            additionalTime={currentGame.additionalTime}
+            color={topColor}
+          />
           <PlayersWindow
             setDrawModal={setDrawModal}
             setRemoveGameModal={setRemoveGameModal}
             setResignModal={setResignModal}
+            bottomColor={bottomColor}
+            topColor={topColor}
           />
         </div>
       </div>

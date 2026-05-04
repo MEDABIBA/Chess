@@ -26,10 +26,8 @@ const Header = observer(() => {
           }
         }}
       />
-      <div>
-        <div className="nickname">
-          Nickname: {store.getNickname() ?? 'Not set'}
-        </div>
+      <div className="header-info">
+        <div>Nickname: {store.getNickname() ?? 'Not set'}</div>
         {showInviteCode && (
           <div>Invite your friend by this code: {game.inviteCode}</div>
         )}

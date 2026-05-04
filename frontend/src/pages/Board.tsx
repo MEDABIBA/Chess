@@ -13,6 +13,12 @@ import PlayerWindow from '../components/PlayerWindow';
 const Board = () => {
   const { id } = useParams();
   const store = useStore();
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const { socket, games, timer, navigate } = store;
   useEffect(() => {
     games.setCurrentGame(Number(id));
@@ -115,17 +121,22 @@ const Board = () => {
           />
         )}
         <div className="main-content">
-          <PlayerWindow
-            additionalTime={currentGame.additionalTime}
-            color={topColor}
-          />
+          {width < 768 && (
+            <PlayerWindow
+              additionalTime={currentGame.additionalTime}
+              color={topColor}
+            />
+          )}
           <div className="game-container">
             <BoardComponent />
           </div>
-          <PlayerWindow
-            additionalTime={currentGame.additionalTime}
-            color={topColor}
-          />
+          {width < 768 && (
+            <PlayerWindow
+              additionalTime={currentGame.additionalTime}
+              color={topColor}
+            />
+          )}
+
           <PlayersWindow
             setDrawModal={setDrawModal}
             setRemoveGameModal={setRemoveGameModal}

@@ -37,7 +37,6 @@ export const userAnnotationPreview = () => {
       }
     };
     const handleMouseUp = () => {
-      console.log(previewCircleRef.current);
       const previewCircle = previewCircleRef.current;
       const previewArrow = previewArrowRef.current;
       if (previewArrow) {

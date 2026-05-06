@@ -129,7 +129,6 @@ class Game {
 
   setWinner(winner: string) {
     this.winner = winner;
-    console.log(this.winner);
   }
 
   setStatus(status: GameStatus) {
@@ -269,7 +268,6 @@ class Game {
         this.pendingPremove?.promotionPiece ??
         this.pendingPromotionPiece?.piece?.pieceType,
     };
-    console.log(MakeMoveDto);
     if (animation) {
       this.isAnimateMove = true;
     }

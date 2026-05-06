@@ -12,7 +12,7 @@ export function StoreInitializer() {
       store.initNavigate(navigate);
       await store.initWs();
       if (!store.isAuthorized()) {
-        console.log('navigate user');
+        // console.log('navigate user');
 
         store.navigate('registration-form');
       }

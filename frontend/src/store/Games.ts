@@ -36,7 +36,7 @@ class Games {
   }
 
   addGame(game: GameInterface) {
-    console.log('addGame', game);
+    // console.log('addGame', game);
     this.gamesList?.push(new Game(this.appStore, game));
   }
 

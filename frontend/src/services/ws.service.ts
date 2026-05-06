@@ -44,7 +44,7 @@ class WebSocketService {
     }
 
     if (!this.accessToken) {
-      console.log('Token unregistered');
+      // console.log('Token unregistered');
       notify('Invalid access token', 'error');
     }
     this.socket = io('/', {
@@ -78,7 +78,7 @@ class WebSocketService {
     });
 
     onSocket<GameInterface>(this.socket, 'game-created', (data) => {
-      console.log('game-created, game id: ', data.id);
+      // console.log('game-created, game id: ', data.id);
       this.store?.games.addGame(data);
     });
     onSocket<{ id: number }>(
@@ -93,7 +93,7 @@ class WebSocketService {
     );
     onSocket<{ gameId: number }>(this.socket, 'game-removed', (data) => {
       const { gameId } = data;
-      console.log('game-removed', gameId);
+      // console.log('game-removed', gameId);
       this.store.games.removeGame(gameId);
     });
     onSocket<{ gameId: number }>(this.socket, 'game-removed-lobby', (data) => {
@@ -105,7 +105,7 @@ class WebSocketService {
       if (data.blackPlayer === this.store.getNickname()) {
         notify('Joined game successfully!', 'success');
       }
-      console.log('guest-joined', data);
+      // console.log('guest-joined', data);
       this.store?.games.updateGame(data);
     });
     onSocket<{ id: number }>(this.socket, 'game-joined-by-code-you', (data) => {
@@ -115,18 +115,18 @@ class WebSocketService {
     });
     onSocket<GameInterface[]>(this.socket, 'get-games', (data) => {
       this.store?.games.setAllGames(data);
-      console.log('get-games', data);
+      // console.log('get-games', data);
     });
 
     onSocket<GameInterface>(this.socket, 'game-state', (data) => {
       this.store?.games?.currentGame?.setBoard(data);
-      console.log('game-state', data);
+      // console.log('game-state', data);
     });
     onSocket<ITimeout>(this.socket, 'timeout', (data) => {
       this.store?.games?.currentGame?.setWinner(data.winner);
       this.store?.games?.currentGame?.setStatus(data.gameStatus);
       this.store?.games?.currentGame?.setModalActive(true);
-      console.log('timeout', data);
+      // console.log('timeout', data);
     });
     onSocket<IExtraTime>(this.socket, 'add-extra-time', (data) => {
       const { fromUserId, blackTimeLeft, whiteTimeLeft } = data;
@@ -136,12 +136,12 @@ class WebSocketService {
         `Player ${currGame?.whitePlayerId === fromUserId ? currGame?.blackPlayerNickname : currGame?.whitePlayerNickname} was gifted an extra time `,
         'success',
       );
-      console.log('add-extra-time', data);
+      // console.log('add-extra-time', data);
     });
     onSocket<IDrawOffer>(this.socket, 'draw-offer', (data) => {
       const { drawOfferedBy } = data;
       this.store.games.currentGame?.setDrawOfferedBy(drawOfferedBy);
-      console.log('draw-offer', data);
+      // console.log('draw-offer', data);
     });
     onSocket<GameInterface>(this.socket, 'draw-response', (data) => {
       this.store?.games?.currentGame?.setBoard(data);
@@ -149,7 +149,7 @@ class WebSocketService {
         this.store?.games?.currentGame?.setModalActive(true);
         new Audio(endGame).play();
       }
-      console.log('draw-response', data);
+      // console.log('draw-response', data);
     });
     onSocket<{ id: number; gameStatus: GameStatus; winner: string }>(
       this.socket,
@@ -168,7 +168,7 @@ class WebSocketService {
             return;
           notify('Opponent resigned!', 'default');
         }
-        console.log('update-game-status', data);
+        // console.log('update-game-status', data);
       },
     );
     onSocket<{
@@ -179,7 +179,7 @@ class WebSocketService {
       whiteTimeLeft: number;
       blackTimeLeft: number;
     }>(this.socket, 'state', (data) => {
-      console.log('state called');
+      // console.log('state called');
       if (!data.success) return;
       const { piece, from, to, whiteTimeLeft, blackTimeLeft } = data;
       if (
@@ -187,7 +187,7 @@ class WebSocketService {
         this.store?.games.currentGame === null
       )
         return;
-      console.log(piece);
+      // console.log(piece);
       const hydratedPiece = new Piece(
         piece.pieceType,
         piece.position,
@@ -214,8 +214,6 @@ class WebSocketService {
         this.store.games.currentGame.finalizePremove();
       }
       this.store.games.currentGame.annotations.clearAnnoations();
-
-      console.log(data);
     });
 
     this.socket.on('error', async (err) => {
@@ -225,10 +223,9 @@ class WebSocketService {
       });
       if (err.message.includes('Unauthorized')) {
         const token = await this.refreshAccessToken();
-        console.log('refreshed');
         if (token && this.socket) {
           this.socket.auth = { token };
-          console.log('reconnecting..');
+          // console.log('reconnecting..');
           this.connect();
         }
         return;
@@ -255,7 +252,6 @@ class WebSocketService {
     this.socket.emit('remove-game', data);
   }
   public joinRoom(data: IJoinRoom) {
-    console.log('joinRoom func');
     this.pendingEvent = { event: 'join-room', data };
     if (!this.socket?.connected) return;
     this.socket.emit('join-room', data);
@@ -286,32 +282,27 @@ class WebSocketService {
   public makeMove(data: IMakeMove) {
     this.pendingEvent = { event: 'make-move', data };
     if (!this.socket?.connected) return;
-    console.log('called makeMove');
     this.socket.emit('make-move', data);
   }
   public addExtraTime(data: { gameId: number }) {
     this.pendingEvent = { event: 'add-extra-time', data };
     if (!this.socket?.connected) return;
-    console.log('called add extra time');
     this.socket?.emit('add-extra-time', data);
   }
 
   public drawOffer(data: { gameId: number }) {
     this.pendingEvent = { event: 'draw-offer', data };
     if (!this.socket?.connected) return;
-    console.log('called draw offer');
     this.socket?.emit('draw-offer', data);
   }
   public drawResponse(data: { gameId: number; response: boolean }) {
     this.pendingEvent = { event: 'draw-response', data };
     if (!this.socket?.connected) return;
-    console.log('called draw response');
     this.socket?.emit('draw-response', data);
   }
   public resign(data: { id: number }) {
     this.pendingEvent = { event: 'resign', data };
     if (!this.socket?.connected) return;
-    console.log('called resign');
     this.socket?.emit('resign', data);
   }
 
@@ -321,7 +312,6 @@ class WebSocketService {
     try {
       const token = await apiService.refreshAccessToken();
       tokenService.setAccessToken(token);
-      console.log('Token changed');
       runInAction(() => (this.accessToken = token));
       return token;
     } catch (err) {

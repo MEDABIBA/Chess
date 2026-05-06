@@ -99,7 +99,7 @@ const SquareComponent: React.FC<SquareProps> = ({
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    console.log('row', row, ', col', col);
+    // console.log('row', row, ', col', col);
     game.setPendingPremove(null);
 
     if (e.button === 0) {
@@ -212,7 +212,7 @@ const SquareComponent: React.FC<SquareProps> = ({
   };
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    console.log('row', row, ', col', col);
+    // console.log('row', row, ', col', col);
     game.setPendingPremove(null);
 
     if (

@@ -42,7 +42,6 @@ const PromotionPiece = ({
               to,
               promotionPiece: piece.pieceType,
             });
-            console.log(store.games.currentGame?.pendingPremove);
 
             store.games.currentGame.setPendingPromotionPiece(null);
           } else {

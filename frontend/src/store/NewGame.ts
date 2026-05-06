@@ -33,10 +33,8 @@ class NewGame {
       });
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.log(error.message);
         notify(error.message, 'error');
       } else {
-        console.log(error);
         notify(String(error), 'error');
       }
     }

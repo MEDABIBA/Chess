@@ -38,6 +38,7 @@ const SquareComponent: React.FC<SquareProps> = ({
 }) => {
   const { row, col } = position;
   const imgRef = useRef<HTMLImageElement | null>(null);
+  const touchSetPremoveRef = useRef(false);
   const store = useStore();
   const { games } = store;
   const { currentGame: game } = games;
@@ -100,6 +101,10 @@ const SquareComponent: React.FC<SquareProps> = ({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     // console.log('row', row, ', col', col);
+    if (touchSetPremoveRef.current) {
+      touchSetPremoveRef.current = false;
+      return;
+    }
     game.setPendingPremove(null);
 
     if (e.button === 0) {
@@ -243,6 +248,7 @@ const SquareComponent: React.FC<SquareProps> = ({
       ) {
         game.setPendingPremove({ from: activePiece.position, to: position });
         setAvailableMoves(null);
+        touchSetPremoveRef.current = true;
       } else {
         setAvailableMoves(null);
         setAvailablePremoves(null);
@@ -340,92 +346,6 @@ const SquareComponent: React.FC<SquareProps> = ({
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     document.addEventListener('touchend', handleTouchEnd, { passive: false });
   };
-
-  // const handleTouchStart = (e: React.TouchEvent<HTMLImageElement>) => {
-  //   if (
-  //     game.pendingPromotionPiece &&
-  //     (!piece || piece.color === game.pendingPromotionPiece.color)
-  //   ) {
-  //     games?.currentGame?.setPendingPromotionPiece(null);
-  //   }
-  //   if (activePiece?.position) {
-  //     if (!e.changedTouches[0]?.clientX || !e.changedTouches[0]?.clientY)
-  //       return null;
-  //     const dropTarget = document.elementFromPoint(
-  //       e.changedTouches[0]?.clientX,
-  //       e.changedTouches[0]?.clientY,
-  //     ) as HTMLElement | null;
-  //     const square = dropTarget?.closest('.square') as HTMLElement | null;
-  //     if (!square) return;
-  //     tryMove(square, game, activePiece, handleMoveToSquare);
-  //     setActivePiece(null);
-  //     setAvailableMoves(null);
-  //     if (!piece) return;
-  //   }
-  //   if (!piece || !imgRef.current) return;
-  //   if (!game.moveAvailableForPiece(piece)) return;
-
-  //   setAvailableMoves([piece, position]);
-  //   setActivePiece(piece);
-
-  //   const img = imgRef.current;
-  //   const rect = img.getBoundingClientRect();
-  //   const touch = e.touches[0];
-  //   if (!touch) {
-  //     return;
-  //   }
-  //   const shiftX = touch.clientX - rect.left;
-  //   const shiftY = touch.clientY - rect.top;
-
-  //   img.style.opacity = '0.3';
-
-  //   const clone = document.createElement('img');
-  //   clone.src = img.src;
-  //   clone.style.width = `${rect.width}px`;
-  //   clone.style.height = `${rect.height}px`;
-  //   clone.style.position = 'fixed';
-  //   clone.style.left = '0';
-  //   clone.style.top = '0';
-  //   clone.style.zIndex = '9999';
-  //   clone.style.pointerEvents = 'none';
-  //   clone.style.transform = `translate3d(${touch.clientX - shiftX}px, ${
-  //     touch.clientY - shiftY
-  //   }px, 0)`;
-  //   document.body.appendChild(clone);
-
-  //   const handleTouchMove = (event: TouchEvent) => {
-  //     event.preventDefault();
-  //     const t = event.touches[0];
-  //     if (!t) {
-  //       return;
-  //     }
-  //     clone.style.transform = `translate3d(${t.clientX - shiftX}px, ${t.clientY - shiftY}px, 0)`;
-  //   };
-
-  //   const handleTouchEnd = (event: TouchEvent) => {
-  //     img.style.opacity = '1';
-  //     const t = event.changedTouches[0];
-  //     if (!t) {
-  //       return;
-  //     }
-  //     const dropTarget = document.elementFromPoint(
-  //       t.clientX,
-  //       t.clientY,
-  //     ) as HTMLElement | null;
-  //     const square = dropTarget?.closest('.square') as HTMLElement | null;
-  //     if (square) {
-  //       const toRow = Number(square.dataset.row);
-  //       const toCol = Number(square.dataset.col);
-  //       handleMoveToSquare(game, piece, { row: toRow, col: toCol });
-  //     }
-
-  //     clone.remove();
-  //     document.removeEventListener('touchmove', handleTouchMove);
-  //     document.removeEventListener('touchend', handleTouchEnd);
-  //   };
-  //   document.addEventListener('touchmove', handleTouchMove, { passive: false });
-  //   document.addEventListener('touchend', handleTouchEnd, { passive: false });
-  // };
 
   return (
     <div

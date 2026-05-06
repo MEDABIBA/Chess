@@ -211,7 +211,10 @@ const SquareComponent: React.FC<SquareProps> = ({
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const handleTouchStart = (e: React.TouchEvent<HTMLImageElement>) => {
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    console.log('row', row, ', col', col);
+    game.setPendingPremove(null);
+
     if (
       game.pendingPromotionPiece &&
       (!piece || piece.color === game.pendingPromotionPiece.color)
@@ -229,13 +232,33 @@ const SquareComponent: React.FC<SquareProps> = ({
       if (!square) return;
       tryMove(square, game, activePiece, handleMoveToSquare);
       setActivePiece(null);
-      setAvailableMoves(null);
-      if (!piece) return;
+
+      if (game.pendingPromotionPiece) return;
+
+      if (
+        !game.moveAvailableForPiece(activePiece) &&
+        !game.isPromotion(activePiece, position) &&
+        (activePiece.position.col !== position.col ||
+          activePiece.position.row !== position.row)
+      ) {
+        game.setPendingPremove({ from: activePiece.position, to: position });
+        setAvailableMoves(null);
+      } else {
+        setAvailableMoves(null);
+        setAvailablePremoves(null);
+      }
     }
     if (!piece || !imgRef.current) return;
-    if (!game.moveAvailableForPiece(piece)) return;
+    if (piece && piece?.color !== game.yourColor) {
+      return;
+    }
 
-    setAvailableMoves([piece, position]);
+    e.preventDefault();
+    if (game.moveAvailableForPiece(piece)) {
+      setAvailableMoves([piece, position]);
+    } else if (!premove) {
+      game.setAvailablePremoves([piece, position]);
+    }
     setActivePiece(piece);
 
     const img = imgRef.current;
@@ -248,7 +271,7 @@ const SquareComponent: React.FC<SquareProps> = ({
     const shiftY = touch.clientY - rect.top;
 
     img.style.opacity = '0.3';
-
+    document.body.classList.add('dragging');
     const clone = document.createElement('img');
     clone.src = img.src;
     clone.style.width = `${rect.width}px`;
@@ -258,9 +281,8 @@ const SquareComponent: React.FC<SquareProps> = ({
     clone.style.top = '0';
     clone.style.zIndex = '9999';
     clone.style.pointerEvents = 'none';
-    clone.style.transform = `translate3d(${touch.clientX - shiftX}px, ${
-      touch.clientY - shiftY
-    }px, 0)`;
+    clone.style.transform = `translate3d(${touch.clientX - shiftX}px, ${touch.clientY - shiftY}px, 0)`;
+
     document.body.appendChild(clone);
 
     const handleTouchMove = (event: TouchEvent) => {
@@ -269,33 +291,141 @@ const SquareComponent: React.FC<SquareProps> = ({
       if (!t) {
         return;
       }
-      clone.style.transform = `translate3d(${t.clientX - shiftX}px, ${t.clientY - shiftY}px, 0)`;
-    };
-
-    const handleTouchEnd = (event: TouchEvent) => {
-      img.style.opacity = '1';
-      const t = event.changedTouches[0];
-      if (!t) {
-        return;
-      }
-      const dropTarget = document.elementFromPoint(
+      if (!t.clientX || !t.clientY) return null;
+      const target = document.elementFromPoint(
         t.clientX,
         t.clientY,
       ) as HTMLElement | null;
-      const square = dropTarget?.closest('.square') as HTMLElement | null;
-      if (square) {
-        const toRow = Number(square.dataset.row);
-        const toCol = Number(square.dataset.col);
-        handleMoveToSquare(game, piece, { row: toRow, col: toCol });
+      const dropTarget = target?.closest('.square') as HTMLElement | null;
+      if (dropTarget) {
+        const toRow = Number(dropTarget.dataset.row);
+        const toCol = Number(dropTarget.dataset.col);
+        setGrab({ row: toRow, col: toCol });
+        clone.style.transform = `translate3d(${t.clientX - shiftX}px, ${t.clientY - shiftY}px, 0)`;
       }
-
+    };
+    const handleTouchEnd = (e: TouchEvent) => {
+      setGrab(null);
+      document.body.classList.remove('dragging');
+      img.style.opacity = '1';
       clone.remove();
       document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('touchend', handleTouchEnd);
+      if (!e.changedTouches[0]?.clientX || !e.changedTouches[0]?.clientY)
+        return null;
+
+      const dropTarget = document.elementFromPoint(
+        e.changedTouches[0]?.clientX,
+        e.changedTouches[0]?.clientY,
+      ) as HTMLElement | null;
+      const square = dropTarget?.closest('.square') as HTMLElement | null;
+      if (!square) return;
+      const toRow = Number(square.dataset.row);
+      const toCol = Number(square.dataset.col);
+      if (
+        !game.moveAvailableForPiece(piece) &&
+        !game.isPromotion(piece, { row: toRow, col: toCol }) &&
+        (piece.position.col !== toCol || piece.position.row !== toRow)
+      ) {
+        game.setPendingPremove({
+          from: piece.position,
+          to: { row: toRow, col: toCol },
+        });
+        setActivePiece(null);
+        setAvailableMoves(null);
+      }
+      handleMoveToSquare(game, piece, { row: toRow, col: toCol });
     };
+
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     document.addEventListener('touchend', handleTouchEnd, { passive: false });
   };
+
+  // const handleTouchStart = (e: React.TouchEvent<HTMLImageElement>) => {
+  //   if (
+  //     game.pendingPromotionPiece &&
+  //     (!piece || piece.color === game.pendingPromotionPiece.color)
+  //   ) {
+  //     games?.currentGame?.setPendingPromotionPiece(null);
+  //   }
+  //   if (activePiece?.position) {
+  //     if (!e.changedTouches[0]?.clientX || !e.changedTouches[0]?.clientY)
+  //       return null;
+  //     const dropTarget = document.elementFromPoint(
+  //       e.changedTouches[0]?.clientX,
+  //       e.changedTouches[0]?.clientY,
+  //     ) as HTMLElement | null;
+  //     const square = dropTarget?.closest('.square') as HTMLElement | null;
+  //     if (!square) return;
+  //     tryMove(square, game, activePiece, handleMoveToSquare);
+  //     setActivePiece(null);
+  //     setAvailableMoves(null);
+  //     if (!piece) return;
+  //   }
+  //   if (!piece || !imgRef.current) return;
+  //   if (!game.moveAvailableForPiece(piece)) return;
+
+  //   setAvailableMoves([piece, position]);
+  //   setActivePiece(piece);
+
+  //   const img = imgRef.current;
+  //   const rect = img.getBoundingClientRect();
+  //   const touch = e.touches[0];
+  //   if (!touch) {
+  //     return;
+  //   }
+  //   const shiftX = touch.clientX - rect.left;
+  //   const shiftY = touch.clientY - rect.top;
+
+  //   img.style.opacity = '0.3';
+
+  //   const clone = document.createElement('img');
+  //   clone.src = img.src;
+  //   clone.style.width = `${rect.width}px`;
+  //   clone.style.height = `${rect.height}px`;
+  //   clone.style.position = 'fixed';
+  //   clone.style.left = '0';
+  //   clone.style.top = '0';
+  //   clone.style.zIndex = '9999';
+  //   clone.style.pointerEvents = 'none';
+  //   clone.style.transform = `translate3d(${touch.clientX - shiftX}px, ${
+  //     touch.clientY - shiftY
+  //   }px, 0)`;
+  //   document.body.appendChild(clone);
+
+  //   const handleTouchMove = (event: TouchEvent) => {
+  //     event.preventDefault();
+  //     const t = event.touches[0];
+  //     if (!t) {
+  //       return;
+  //     }
+  //     clone.style.transform = `translate3d(${t.clientX - shiftX}px, ${t.clientY - shiftY}px, 0)`;
+  //   };
+
+  //   const handleTouchEnd = (event: TouchEvent) => {
+  //     img.style.opacity = '1';
+  //     const t = event.changedTouches[0];
+  //     if (!t) {
+  //       return;
+  //     }
+  //     const dropTarget = document.elementFromPoint(
+  //       t.clientX,
+  //       t.clientY,
+  //     ) as HTMLElement | null;
+  //     const square = dropTarget?.closest('.square') as HTMLElement | null;
+  //     if (square) {
+  //       const toRow = Number(square.dataset.row);
+  //       const toCol = Number(square.dataset.col);
+  //       handleMoveToSquare(game, piece, { row: toRow, col: toCol });
+  //     }
+
+  //     clone.remove();
+  //     document.removeEventListener('touchmove', handleTouchMove);
+  //     document.removeEventListener('touchend', handleTouchEnd);
+  //   };
+  //   document.addEventListener('touchmove', handleTouchMove, { passive: false });
+  //   document.addEventListener('touchend', handleTouchEnd, { passive: false });
+  // };
 
   return (
     <div

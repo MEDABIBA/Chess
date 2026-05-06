@@ -416,6 +416,7 @@ body.dragging .piece-img {
 }
 
 .animation-mate-icon {
+  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -955,5 +956,10 @@ th {
   }
   .game-container {
     margin-right: 0;
+  }
+  .animation-mate-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 0.8em;
   }
 }

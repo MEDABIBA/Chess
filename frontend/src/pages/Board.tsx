@@ -133,7 +133,7 @@ const Board = () => {
           {width < 768 && (
             <PlayerWindow
               additionalTime={currentGame.additionalTime}
-              color={topColor}
+              color={bottomColor}
             />
           )}
 

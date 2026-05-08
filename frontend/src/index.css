@@ -28,8 +28,13 @@ body {
   color: #eee;
   background-color: #333;
   height: 100%;
-  cursor: url('./assets/cursor/main.cur'), auto;
 }
+html,
+body,
+* {
+  cursor: url('./assets/cursor/main.cur'), auto !important;
+}
+
 p {
   margin-bottom: 0;
 }
@@ -90,7 +95,7 @@ p {
   width: 40px;
 }
 .header-icon:hover {
-  cursor: url('./assets/cursor/arrow.cur'), auto;
+  cursor: url('./assets/cursor/arrow.cur'), auto !important;
 }
 
 .main-content {
@@ -144,7 +149,7 @@ p {
   padding: 12px;
   background-color: #555;
   border-radius: 8px;
-  cursor: url('./assets/cursor/arrow.cur'), auto;
+  cursor: url('./assets/cursor/arrow.cur'), auto !important;
   transition: all 0.1s ease-in-out;
   width: max-content;
   user-select: none;
@@ -561,7 +566,7 @@ body.dragging .piece-img {
 
 .timer-element {
   min-width: 100px;
-  cursor: url('./assets/cursor/arrow.cur'), auto;
+  cursor: url('./assets/cursor/arrow.cur'), auto !important;
   padding: 5px;
   border-radius: 8px;
   width: 30%;
@@ -665,6 +670,7 @@ body.dragging .piece-img {
   width: 100%;
 }
 .auth-elem-title {
+  cursor: url('./assets/cursor/main.cur'), auto !important;
   margin-bottom: 15px;
 }
 .auth-button {
@@ -872,6 +878,77 @@ th {
 .color-selector-item-active {
   position: relative;
   z-index: 11;
+}
+
+@keyframes appearanceAnimation {
+  0% {
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.05;
+  }
+  10% {
+    opacity: 0.1;
+  }
+  15% {
+    opacity: 0.15;
+  }
+  20% {
+    opacity: 0.2;
+  }
+  25% {
+    opacity: 0.25;
+  }
+  30% {
+    opacity: 0.3;
+  }
+  35% {
+    opacity: 0.35;
+  }
+  40% {
+    opacity: 0.4;
+  }
+  45% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  55% {
+    opacity: 0.55;
+  }
+  60% {
+    opacity: 0.6;
+  }
+  65% {
+    opacity: 0.65;
+  }
+  70% {
+    opacity: 0.7;
+  }
+  75% {
+    opacity: 0.75;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  85% {
+    opacity: 0.85;
+  }
+  90% {
+    opacity: 0.9;
+  }
+  95% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.appearance-animation {
+  width: 100%;
+  animation: appearanceAnimation 0.8s;
 }
 
 @media (max-width: 768px) {

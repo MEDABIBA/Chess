@@ -948,7 +948,7 @@ th {
 
 .appearance-animation {
   width: 100%;
-  animation: appearanceAnimation 0.8s;
+  animation: appearanceAnimation 0.5s;
 }
 
 @media (max-width: 768px) {

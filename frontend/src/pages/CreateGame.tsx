@@ -26,7 +26,7 @@ const CreateGame = () => {
   const [color, setColor] = useState<Color>('white');
   const selectTime = timerValue.replace('min', '').trim();
   return (
-    <>
+    <div className="appearance-animation">
       <div className="backgound-image">
         <Header />
         <div className="container">
@@ -71,7 +71,7 @@ const CreateGame = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 export default CreateGame;

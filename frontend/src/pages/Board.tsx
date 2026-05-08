@@ -79,7 +79,7 @@ const Board = () => {
       : 'black';
 
   return (
-    <>
+    <div className="appearance-animation">
       <Header />
       <div className="container">
         {currentGame.isFinished() && isModalActive && (
@@ -146,7 +146,7 @@ const Board = () => {
           />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 export default observer(Board);

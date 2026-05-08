@@ -34,7 +34,7 @@ const Home = () => {
       : [];
   const totalPages = Math.ceil((filteredGames.length ?? 0) / ITEMS_PER_PAGE);
   return (
-    <>
+    <div className="appearance-animation">
       <div className="backgound-image">
         <Header />
         <div className="container">
@@ -214,7 +214,7 @@ const Home = () => {
           </section>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 export default observer(Home);

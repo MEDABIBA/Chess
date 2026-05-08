@@ -16,6 +16,7 @@ import castle from '../assets/sounds/castle.mp3';
 import check from '../assets/sounds/check.mp3';
 import endGame from '../assets/sounds/end-game.mp3';
 import promote from '../assets/sounds/promote.mp3';
+import notify from '../components/ui/notify';
 
 class Game {
   private store: RootStore;
@@ -65,6 +66,7 @@ class Game {
       this.annotations.circles = [];
     },
   };
+  additionalTimeCallLimit: number = 0;
   constructor(store: RootStore, game: GameInterface) {
     this.store = store;
     makeAutoObservable(this);
@@ -136,6 +138,11 @@ class Game {
   }
 
   addExtraTimeToOpponent() {
+    if (this.additionalTimeCallLimit > 4) {
+      notify('You are hitting your limits!', 'error');
+      return;
+    }
+    this.additionalTimeCallLimit += 1;
     this.store.socket.addExtraTime({ gameId: this.id });
   }
 

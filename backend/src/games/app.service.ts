@@ -471,6 +471,12 @@ export class AppService {
 
   async resign(id: number, loserId: number) {
     const game = await this.prisma.game.findUnique({ where: { id } });
+    if (game?.whitePlayerId !== loserId && game?.blackPlayerId !== loserId) {
+      throw new Error('Only participants in this game can give up!');
+    }
+    if (game.gameStatus !== 'playing') {
+      throw new Error('Game is already finished!');
+    }
     const winnerId =
       loserId === game?.whitePlayerId
         ? game.blackPlayerId

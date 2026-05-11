@@ -327,9 +327,9 @@ export class GameGateway {
       });
     } catch (err) {
       if (err instanceof Error) {
-        client.emit('update-game-status', { message: err.message });
+        client.emit('update-game-status', { error: err.message });
       } else {
-        client.emit('update-game-status', { message: err });
+        client.emit('update-game-status', { error: err });
       }
     }
   }

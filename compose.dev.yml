@@ -1,41 +1,50 @@
-# services:
-#   frontend:
-#     container_name: chess-frontend
-#     build:
-#       context: ./frontend
-#       dockerfile: dockerfile
-#     ports:
-#       - 3000:80
+services:
+  frontend:
+    container_name: chess-frontend
+    build:
+      context: ./frontend
+      dockerfile: dockerfile.dev
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    restart: unless-stopped
 
-#   backend:
-#     container_name: chess-backend
-#     build:
-#       context: ./backend
-#       dockerfile: dockerfile
-#     ports:
-#       - 3030:3030
-#     env_file:
-#       - ./backend/.env
+  backend:
+    container_name: chess-backend
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    ports:
+      - 3030:3030
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+    depends_on:
+      postgresql:
+        condition: service_healthy
 
-#     depends_on:
-#       postgresql:
-#         condition: service_healthy
+  postgresql:
+    image: postgres:16.0
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: chess
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-#   postgresql:
-#     image: postgres:16.0
-#     environment:
-#       POSTGRES_USER: postgres
-#       POSTGRES_PASSWORD: postgres
-#       POSTGRES_DB: chess
-#     ports:
-#       - '5432:5432'
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/data
-#     healthcheck:
-#       test: ['CMD-SHELL', 'pg_isready -U postgres']
-#       interval: 5s
-#       timeout: 5s
-#       retries: 5
-
-# volumes:
-#   postgres_data:
+volumes:
+  postgres_data:
+  frontend:

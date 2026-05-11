@@ -1,6 +1,6 @@
 # docker compose -f compose.prod.yml up --build // run a production version
 
-# docker compose up -f compose.dev.yml up // run a dev version
+# docker compose -f compose.dev.yml up --build // run a developer version
 
 # docker build -t chess-backend .
 

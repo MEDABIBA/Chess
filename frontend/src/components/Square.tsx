@@ -150,7 +150,7 @@ const SquareComponent: React.FC<SquareProps> = ({
     e.preventDefault();
     if (game.moveAvailableForPiece(piece)) {
       setAvailableMoves([piece, position]);
-    } else if (!premove) {
+    } else if (!premove && !isActiveField) {
       game.setAvailablePremoves([piece, position]);
     }
     setActivePiece(piece);

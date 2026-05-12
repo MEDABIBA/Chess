@@ -93,7 +93,6 @@ class Game {
     this.blackPlayerId = Number(game.blackPlayerId);
     this.whitePlayerNickname = game.whitePlayer?.username ?? null;
     this.blackPlayerNickname = game?.blackPlayer?.username ?? null;
-    this.store.timer.setTimes(game.whiteTimeLeft, game.blackTimeLeft);
     this.createdAt = game.createdAt;
 
     this.modalActive = this.isFinished() ? true : false;

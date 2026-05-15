@@ -1,5 +1,9 @@
 {
   "editor.quickSuggestionsDelay": 5000,
   "editor.suggest.selectionMode": "always",
-  "prettier.printWidth": 100
+  "prettier.printWidth": 100,
+  "javascript.suggest.enabled": true,
+  "typescript.suggest.enabled": true,
+  "typescript.suggest.classMemberSnippets.enabled": true,
+  "typescript.suggest.objectLiteralMethodSnippets.enabled": true
 }

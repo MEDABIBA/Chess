@@ -1,0 +1,18 @@
+name: Docker Build & Push
+
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+on:
+  push:
+    branches: [main, multiplayer]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build images
+        run: docker compose build

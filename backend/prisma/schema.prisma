@@ -1,0 +1,73 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+  // output = "../generated/prisma"
+  // moduleFormat  = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PlayerColor {
+  white
+  black
+}
+enum gameStatus {
+  waiting
+  playing
+  checkmate
+  timeout
+  draw
+  resign
+  stalemate
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  username String @unique
+  password String
+  refreshTokensHash String[] // Refresh tokens hash array
+  createdAt DateTime @default(now())
+
+  whiteGames Game[] @relation("whitePlayer")
+  blackGames Game[] @relation("blackPlayer")
+}
+
+model Game {
+  id Int @id @default(autoincrement())
+
+  fen String
+  currentPlayer PlayerColor @default(white)
+  gameStatus gameStatus @default(waiting)
+  initialTime Int
+  additionalTime Int
+  inviteCode String @unique
+ 
+  gameCreatorId Int
+  whitePlayerId Int? //socketId or temporary ID
+  blackPlayerId Int? //socketId or temporary ID
+
+  whitePlayer User?  @relation("whitePlayer", fields: [whitePlayerId], references: [id])
+  blackPlayer User? @relation("blackPlayer", fields: [blackPlayerId], references: [id])
+
+  whiteTimeLeft Int @default(180)
+  whiteTurnStarterAt DateTime?
+  blackTimeLeft Int @default(180)
+  blackTurnStarterAt DateTime?
+  drawOfferedBy Int?
+
+  lastDoubleStepPawn Json?
+
+  // Hightligt last move
+  fromX Int?
+  fromY Int?
+
+  toX   Int?
+  toY   Int?
+  winner String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

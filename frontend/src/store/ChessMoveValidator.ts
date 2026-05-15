@@ -1,0 +1,446 @@
+import { action, makeAutoObservable } from 'mobx';
+import Piece from '../models/Piece';
+import { Position, Color, SquareData } from '../types/types';
+import { RootStore } from './RootStore';
+import { simulateValidMove } from '../helpers/simulateMove';
+
+class ChessMoveValidator {
+  private store: RootStore;
+
+  constructor(store: RootStore) {
+    this.store = store;
+    makeAutoObservable(this);
+  }
+
+  @action
+  isValidMove = (piece: Piece, from: Position, to: Position) => {
+    if (piece.color !== this.store.games.currentGame?.currentPlayer)
+      return false;
+    if (piece.color === this.store.games.currentGame?.getPiece(to)?.color)
+      return false;
+    if (from.col === to.col && from.row === to.row) return false;
+
+    let valid = false;
+    switch (piece.pieceType) {
+      case 'pawn':
+        valid = this.isValidPawnMove(piece, from, to);
+        break;
+      case 'rook':
+        valid = this.isValidRookMove(from, to);
+        break;
+      case 'knight':
+        valid = this.isValidKnightMove(from, to);
+        break;
+      case 'bishop':
+        valid = this.isValidBishopMove(from, to);
+        break;
+      case 'queen':
+        valid = this.isValidQueenMove(from, to);
+        break;
+      case 'king':
+        valid = this.isValidKingMove(piece, from, to);
+        break;
+      default:
+        return false;
+    }
+    if (valid) {
+      return simulateValidMove(
+        piece,
+        from,
+        to,
+        this.store.games.currentGame.getPiece,
+        this.store.games.currentGame.setPiece,
+        this.isKingUnderAttack,
+      );
+    }
+  };
+
+  @action
+  isValidPremove = (piece: Piece, from: Position, to: Position) => {
+    if (from.col === to.col && from.row === to.row) return false;
+
+    let valid = false;
+    switch (piece.pieceType) {
+      case 'pawn':
+        valid = this.isValidPawnPremove(piece, from, to);
+        break;
+      case 'rook':
+        valid = this.isValidRookPremove(from, to);
+        break;
+      case 'knight':
+        valid = this.isValidKnightMove(from, to);
+        break;
+      case 'bishop':
+        valid = this.isValidBishopPremove(from, to);
+        break;
+      case 'queen':
+        valid = this.isValidQueenPremove(from, to);
+        break;
+      case 'king':
+        valid = this.isValidKingPremove(piece, from, to);
+        break;
+      default:
+        return false;
+    }
+    return valid;
+  };
+
+  private isAttackedField = (position: Position, byColor: Color) => {
+    if (this.store.games.currentGame === null) return false;
+    for (const square of this.store.games.currentGame.board) {
+      if (square.piece === null || square.piece.color === byColor) continue;
+      const piece = square.piece;
+      if (this.canPieceAttack(piece, piece?.position, position)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  isPathClear = (from: Position, to: Position) => {
+    // row vertical ||
+    if (from.row === to.row) {
+      const start = Math.min(from.col, to.col) + 1;
+      const end = Math.max(from.col, to.col);
+      for (let r = start; r < end; r++) {
+        if (this.store.games.currentGame?.getPiece({ row: from.row, col: r }))
+          return false;
+      }
+      return true;
+      // col horizontal --
+    } else if (from.col === to.col) {
+      const start = Math.min(from.row, to.row) + 1;
+      const end = Math.max(from.row, to.row);
+      for (let r = start; r < end; r++) {
+        if (this.store.games.currentGame?.getPiece({ row: r, col: from.col }))
+          return false;
+      }
+      return true;
+    }
+    // diagonal
+    else if (Math.abs(from.row - to.row) === Math.abs(from.col - to.col)) {
+      const steps = Math.abs(from.row - to.row);
+      const rowDir = from.row < to.row ? 1 : -1;
+      const colDir = from.col < to.col ? 1 : -1;
+      for (let i = 1; i < steps; i++) {
+        if (
+          this.store.games.currentGame?.getPiece({
+            row: from.row + i * rowDir,
+            col: from.col + i * colDir,
+          })
+        ) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return true;
+  };
+
+  private isValidPawnMove = (figure: Piece, from: Position, to: Position) => {
+    const dir = figure.color === 'white' ? 1 : -1;
+    const startingPos = figure.color === 'white' ? 2 : 7;
+    const attackedPiece = this.store.games.currentGame?.getPiece(to);
+    const isEnPassant = this.store.games.currentGame?.getPiece({
+      row: to.row - dir,
+      col: to.col,
+    });
+    const lastDoubleStepPawn = this.store.games.currentGame?.lastDoubleStepPawn;
+    if (from.col === to.col) {
+      if (to.row === from.row + dir) {
+        return !attackedPiece;
+      } else if (from.row === startingPos && to.row === from.row + 2 * dir) {
+        const middlePos = { row: from.row + dir, col: from.col };
+        return (
+          !this.store.games.currentGame?.getPiece(middlePos) && !attackedPiece
+        );
+      } else return false;
+    } else if (
+      to.row === from.row + dir &&
+      (from.col === to.col + 1 || from.col === to.col - 1)
+    ) {
+      if (!!attackedPiece?.color && attackedPiece?.color !== figure.color) {
+        return true;
+      } else if (
+        lastDoubleStepPawn &&
+        isEnPassant?.position.col === lastDoubleStepPawn.position.col &&
+        isEnPassant?.position.row === lastDoubleStepPawn.position.row &&
+        isEnPassant?.color !== figure.color
+      ) {
+        return true;
+      }
+      return false;
+    } else return false;
+  };
+
+  private isValidRookMove = (from: Position, to: Position) => {
+    return from.row === to.row || from.col === to.col
+      ? this.isPathClear(from, to)
+      : false;
+  };
+
+  private isValidKnightMove = (from: Position, to: Position) => {
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
+    return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+  };
+
+  private isValidBishopMove = (from: Position, to: Position) => {
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
+    return this.isPathClear(from, to) && rowDiff === colDiff;
+  };
+
+  private isValidQueenMove = (from: Position, to: Position) => {
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
+    return (
+      this.isPathClear(from, to) &&
+      (rowDiff === colDiff || from.row === to.row || from.col === to.col)
+    );
+  };
+
+  private isValidKingMove = (piece: Piece, from: Position, to: Position) => {
+    const side = from.col < to.col ? 'right' : 'left';
+    if (this.isCastlingAvailable(side, piece, from, to)) return true;
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
+    const originalToPiece = this.store.games.currentGame?.getPiece(to);
+    const originalPosition = piece.position;
+    piece.position = to;
+    this.store.games.currentGame?.setPiece(to, piece);
+    this.store.games.currentGame?.setPiece(from, null);
+
+    const stillUnderAttack = this.isAttackedField(
+      to,
+      this.store.games.currentGame!.currentPlayer,
+    );
+
+    this.store.games.currentGame?.setPiece(from, piece);
+    this.store.games.currentGame?.setPiece(to, originalToPiece ?? null);
+    piece.position = originalPosition;
+    return rowDiff <= 1 && colDiff <= 1 && !stillUnderAttack;
+  };
+  private isValidPawnPremove = (
+    figure: Piece,
+    from: Position,
+    to: Position,
+  ) => {
+    const dir = figure.color === 'white' ? 1 : -1;
+    const startingPos = figure.color === 'white' ? 2 : 7;
+    if (from.col === to.col) {
+      if (to.row === from.row + dir) {
+        return true;
+      } else if (from.row === startingPos && to.row === from.row + 2 * dir) {
+        return true;
+      } else return false;
+    } else if (
+      to.row === from.row + dir &&
+      (from.col === to.col + 1 || from.col === to.col - 1)
+    ) {
+      return true;
+    } else return false;
+  };
+
+  private isValidRookPremove = (from: Position, to: Position) => {
+    return from.row === to.row || from.col === to.col;
+  };
+
+  private isValidBishopPremove = (from: Position, to: Position) => {
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
+    return rowDiff === colDiff;
+  };
+
+  private isValidQueenPremove = (from: Position, to: Position) => {
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
+    return rowDiff === colDiff || from.row === to.row || from.col === to.col;
+  };
+
+  private isValidKingPremove = (piece: Piece, from: Position, to: Position) => {
+    const side = from.col < to.col ? 'right' : 'left';
+    if (this.isCastlingAvailable(side, piece, from, to)) return true;
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
+    return rowDiff <= 1 && colDiff <= 1;
+  };
+
+  isCastlingAvailable = (
+    side: 'right' | 'left',
+    piece: Piece,
+    from: Position,
+    to: Position,
+  ) => {
+    const diff = Math.abs(from.col - to.col);
+    const rookColPos = side === 'left' ? 1 : 8;
+    const rook = this.store.games.currentGame?.board.find(
+      (el) => el.position.col === rookColPos && el.position.row === from.row,
+    )?.piece;
+    if (
+      from.row !== to.row ||
+      piece.hasMoved ||
+      !rook ||
+      rook.hasMoved ||
+      diff !== 2 ||
+      !this.isPathClear(from, { row: to.row, col: rookColPos })
+    )
+      return false;
+    if (side === 'right' && rook.hasMoved ? false : true) {
+      for (let i = from.col; i < to.col + 1; i++) {
+        if (this.isAttackedField({ row: from.row, col: i }, piece.color)) {
+          return false;
+        } else continue;
+      }
+    } else if (side === 'left' && rook.hasMoved ? false : true) {
+      for (let i = from.col; i < to.col + 1; i++) {
+        if (this.isAttackedField({ row: from.row, col: i }, piece.color)) {
+          return false;
+        } else continue;
+      }
+    } else return false;
+    return true;
+  };
+
+  executeCastling = async (from: Position, to: Position): Promise<void> => {
+    const rookFromCol = from.col > to.col ? 1 : 8;
+    const rookToCol = from.col > to.col ? to.col + 1 : to.col - 1;
+    const rook = this.store.games.currentGame?.getPiece({
+      row: from.row,
+      col: rookFromCol,
+    });
+    if (!rook) return;
+    if (this.store.games.currentGame) {
+      this.store.games.currentGame.isAnimateMove = true;
+    }
+
+    setTimeout(() => {
+      rook.position = { row: to.row, col: rookToCol };
+      this.store.games.currentGame?.setPiece(
+        { row: to.row, col: rookToCol },
+        rook,
+      );
+      this.store.games.currentGame?.setPiece(
+        { row: from.row, col: rookFromCol },
+        null,
+      );
+    }, 200);
+  };
+
+  private canPieceAttack = (piece: Piece, from: Position, to: Position) => {
+    if (from.col === to.col && from.row === to.row) return false;
+
+    switch (piece.pieceType) {
+      case 'pawn':
+        return this.canPawnAttack(piece, from, to);
+      case 'rook':
+        return this.isValidRookMove(from, to);
+      case 'knight':
+        return this.isValidKnightMove(from, to);
+      case 'bishop':
+        return this.isValidBishopMove(from, to);
+      case 'queen':
+        return this.isValidQueenMove(from, to);
+      case 'king':
+        return this.canKingAttack(from, to);
+      default:
+        return false;
+    }
+  };
+
+  private canPawnAttack = (pawn: Piece, from: Position, to: Position) => {
+    const direction = pawn.color === 'white' ? 1 : -1;
+    const rowDiff = to.row - from.row;
+    const colDiff = Math.abs(to.col - from.col);
+
+    return rowDiff === direction && colDiff === 1;
+  };
+
+  private canKingAttack = (from: Position, to: Position) => {
+    const rowDiff = Math.abs(to.row - from.row);
+    const colDiff = Math.abs(to.col - from.col);
+    return rowDiff <= 1 && colDiff <= 1;
+  };
+
+  isKingUnderAttack = (currColPlayer: Color) => {
+    const king: SquareData | undefined =
+      this.store.games.currentGame?.board.find(
+        (e: SquareData) =>
+          e.piece?.pieceType === 'king' && e.piece?.color === currColPlayer,
+      );
+    if (!king) return false;
+    return this.isAttackedField(king.position, currColPlayer);
+  };
+
+  isCheckmate = (currColPlayer: Color) => {
+    if (this.store.games.currentGame === null) return false;
+    const allPieces = this.store.games.currentGame.getAllPieces(currColPlayer);
+    for (let i = 0; i < allPieces.length; i++) {
+      const piece = allPieces[i];
+      if (piece === undefined) continue;
+      for (let i = 1; i <= 8; i++) {
+        for (let j = 1; j <= 8; j++) {
+          if (this.canMakeMove(piece, piece?.position, { row: i, col: j })) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  };
+
+  private canMakeMove = (piece: Piece, from: Position, to: Position) => {
+    if (piece.color !== this.store.games.currentGame?.currentPlayer)
+      return false;
+    if (piece.color === this.store.games.currentGame.getPiece(to)?.color)
+      return false;
+    if (from.col === to.col && from.row === to.row) return false;
+    let valid = false;
+
+    switch (piece.pieceType) {
+      case 'pawn':
+        valid = this.isValidPawnMove(piece, from, to);
+        break;
+      case 'rook':
+        valid = this.isValidRookMove(from, to);
+        break;
+      case 'knight':
+        valid = this.isValidKnightMove(from, to);
+        break;
+      case 'bishop':
+        valid = this.isValidBishopMove(from, to);
+        break;
+      case 'queen':
+        valid = this.isValidQueenMove(from, to);
+        break;
+      case 'king':
+        valid = this.isValidKingMove(piece, from, to);
+        break;
+      default:
+        return false;
+    }
+    if (!valid) return false;
+
+    return simulateValidMove(
+      piece,
+      from,
+      to,
+      this.store.games.currentGame.getPiece,
+      this.store.games.currentGame.setPiece,
+      this.isKingUnderAttack,
+    );
+  };
+  isLastRow = (piece: Piece, position: Position) => {
+    const row = piece.color === 'white' ? 8 : 1;
+    const secondToLastRow = piece.color === 'white' ? 7 : 2;
+    if (
+      position.row === row &&
+      piece.pieceType === 'pawn' &&
+      piece.position.row === secondToLastRow
+    )
+      return true;
+    return false;
+  };
+}
+
+export default ChessMoveValidator;

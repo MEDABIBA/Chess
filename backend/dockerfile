@@ -1,0 +1,13 @@
+FROM node:lts-alpine
+
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+
+RUN yarn install --frozen-lockfile --network-timeout 300000
+
+COPY . .
+
+EXPOSE 3030
+
+CMD ["sh", "-c", "npx prisma generate && yarn start:dev"]

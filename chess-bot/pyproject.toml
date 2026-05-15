@@ -5,5 +5,5 @@ description = "Chess bot"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "fastapi>=0.136.1",
+    "fastapi[standard]>=0.136.1",
 ]

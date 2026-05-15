@@ -30,6 +30,18 @@ services:
       postgresql:
         condition: service_healthy
 
+  chess-bot:
+    container_name: chess-bot
+    build:
+      context: ./chess-bot
+      dockerfile: dockerfile
+    ports:
+      - 8000:8000
+    volumes:
+      - ./chess-bot/src:/app/src
+    restart: unless-stopped
+    command: uv run fastapi dev src/main.py --host 0.0.0.0
+
   postgresql:
     image: postgres:16.0
     environment:

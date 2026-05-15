@@ -8,6 +8,7 @@ services:
       - 80:80
     depends_on:
       - backend
+    restart: unless-stopped
 
   backend:
     container_name: chess-backend
@@ -22,6 +23,15 @@ services:
     depends_on:
       postgresql:
         condition: service_healthy
+  chess-bot:
+    container_name: chess-bot
+    build:
+      context: ./chess-bot
+      dockerfile: dockerfile
+    ports:
+      - 8000:8000
+    restart: unless-stopped
+    command: uv run fastapi run src/main.py
 
   postgresql:
     image: postgres:16.0

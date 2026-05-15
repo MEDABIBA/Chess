@@ -8,6 +8,9 @@ generated
 migrate
 /.pnp
 .pnp.js
+__pycache__
+venv
+uv
 
 # testing
 /coverage

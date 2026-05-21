@@ -1,25 +1,51 @@
 from schemas.schemas import GameInfo, GameId
 from session import Session
+from datetime import datetime
 import asyncio
 import os
 import httpx
+import base64, json
 
 class Manager:
     def __init__(self):
         self.username: str = os.environ["BOT_USERNAME"]
         self.password: str = os.environ["BOT_PASSWORD"]
-        self.accessToken: str = ""
+        self.access_token: str = ""
+        self.refresh_token: str = ""
         self.sessions: dict[int, asyncio.Task] = {}
         self.http = httpx.AsyncClient()
+        self.lock = asyncio.Lock()
 
-    async def get_access_token(self):
+    async def login(self):
         res = await self.http.post("/auth/login", json={"username": self.username, "password": self.password})
-        data = res.json()["accessToken"]
-        self.accessToken = data
+        self.access_token: str = res.json()["accessToken"]
+        self.refresh_token = res.cookies["refreshToken"]
+
+    def _is_token_valid(self) -> bool:
+        if not self.access_token:
+            return False
+        payload = self.access_token.split(".")[1]
+        payload += "=" * (4 - len(payload) % 4)  # base64 padding
+        data = json.loads(base64.b64decode(payload))
+        return datetime.fromtimestamp(data["exp"]) > datetime.now()
+
+    async def get_token(self):
+        if self._is_token_valid():
+            return self.access_token
+        async with self.lock:
+            if self._is_token_valid():
+                return self.access_token
+            if self.refresh_token:
+                res = await self.http.post("/auth/refresh", cookies={"refreshToken": self.refresh_token})
+                data: str = res.json()["accessToken"]
+                self.access_token = data
+                return data
+            else:
+                await self.login()
+                return self.access_token
     
     async def start_game(self, body: GameInfo):
-        await self.get_access_token()
-        session = Session(body, self.accessToken)
+        session = Session(body, self.get_token)
         self.sessions[body.gameId] = asyncio.create_task(session.run())
 
     def stop_game(self, gameId: GameId):

@@ -10,8 +10,8 @@ def read_root():
 
 
 @app.post("/start-bot-game")
-def start_bot_game(body: GameInfo):
-    manager.start_game(body=body)
+async def start_bot_game(body: GameInfo):
+    await manager.start_game(body=body)
 
 @app.post("/stop-bot-game")
 def stop_bot_game(gameId: GameId):

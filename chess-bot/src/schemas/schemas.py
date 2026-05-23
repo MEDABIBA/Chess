@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 Color = Literal['white', 'black']
 PieceType = Literal['pawn','rook', 'knight', 'bishop', 'queen', 'king']
-class Position:
+class Position(BaseModel):
   row: int
   col: int
 
@@ -13,7 +13,7 @@ class Piece(BaseModel):
   position: Position
   hasMoved: bool
 
-class Move(BaseModel):
+class SquareData(BaseModel):
     color: Color
     position: Position
     piece: Piece | None

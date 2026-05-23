@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI
 from bot.manager import manager
 from schemas.schemas import GameInfo, GameId

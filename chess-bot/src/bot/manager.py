@@ -1,10 +1,13 @@
 from schemas.schemas import GameInfo, GameId
-from session import Session
+from bot.session import Session
 from datetime import datetime
 import asyncio
 import os
 import httpx
 import base64, json
+from chess import Board
+
+
 
 class Manager:
     def __init__(self):

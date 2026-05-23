@@ -1,9 +1,12 @@
 import socketio
 from schemas.schemas import GameInfo
 from typing import Callable, Awaitable
+from chess import Board
 
 
 class Session:
+    board = Board()
+    
     def __init__(self, body: GameInfo, get_token: Callable[[], Awaitable[str]]):
       self.sio = socketio.AsyncClient()
       self.gameId = body.gameId

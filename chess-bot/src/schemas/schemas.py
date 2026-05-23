@@ -26,4 +26,7 @@ class GameInfo(BaseModel):
 class GameId(BaseModel):
    gameId: int
 
-
+class On_state(BaseModel):
+  from_: Position = Field(alias="from")
+  to: Position
+  piece: Piece

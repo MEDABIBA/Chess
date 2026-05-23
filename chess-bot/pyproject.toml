@@ -5,6 +5,7 @@ description = "Chess bot"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "chess>=1.11.2",
     "fastapi[standard]>=0.136.1",
     "python-socketio[client]>=5.16.1",
 ]

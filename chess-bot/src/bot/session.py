@@ -1,5 +1,6 @@
 import socketio
 from schemas.schemas import GameInfo, On_state
+from engine.index import generate_best_move
 from typing import Callable, Awaitable
 import chess
 
@@ -13,10 +14,15 @@ class Session:
       self.level = body.level
       self.get_token = get_token
       self._should_reconnect = False
+      self._connected_once = False
       
     async def reconnect(self):
          self._should_reconnect = True
          await self.sio.disconnect()
+
+    async def make_move(self):
+       res = generate_best_move(self.board, self.level)
+        # socket emit to backend
 
     def handleListeners(self):
       async def on_state(data: On_state):
@@ -29,22 +35,31 @@ class Session:
               parsed.piece.pieceType != "pawn"):
              promo = {"queen": chess.QUEEN, "rook": chess.ROOK,
                  "bishop": chess.BISHOP, "knight": chess.KNIGHT}[parsed.piece.pieceType]
-          self.board.push(chess.Move(from_square, to_square, promo))          
+          self.board.push(chess.Move(from_square, to_square, promo))
+          if parsed.piece.color != self.color:
+             await self.make_move()  
       
       async def on_resign(data):
           pass
       
+      async def on_connect():
+        if not self._connected_once:
+          self._connected_once = True
+          if self.color == "white":
+             await self.make_move()
+
       async def on_error(err: dict):
           if "Unauthorized" in err.get("message", ""):
              await self.reconnect()
              
       self.sio.on("state", on_state)
       self.sio.on("resign", on_resign)
+      self.sio.on("connect", on_connect)
       self.sio.on("error", on_error)
       
     async def run(self):
-      await self.sio.connect("http://backend:3030", auth={"token": await self.get_token()})
       self.handleListeners()
+      await self.sio.connect("http://backend:3030", auth={"token": await self.get_token()})
       while True:
         await self.sio.wait()
         if not self._should_reconnect:

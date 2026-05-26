@@ -1,5 +1,5 @@
 import socketio
-from schemas.schemas import GameInfo, On_state
+from schemas.schemas import GameInfo, On_state, Color
 from engine.index import generate_best_move
 from typing import Callable, Awaitable
 import chess
@@ -10,8 +10,8 @@ class Session:
       self.board = chess.Board()
       self.sio = socketio.AsyncClient()
       self.gameId = body.gameId
-      self.color = body.color
-      self.level = body.level
+      self.color: Color = body.color
+      self.depth = body.depth
       self.get_token = get_token
       self._should_reconnect = False
       self._connected_once = False
@@ -21,7 +21,7 @@ class Session:
          await self.sio.disconnect()
 
     async def make_move(self):
-       res = generate_best_move(self.board, self.level)
+       res = generate_best_move(self.board, self.depth, self.color)
         # socket emit to backend
 
     def handleListeners(self):

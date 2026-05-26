@@ -21,7 +21,7 @@ class SquareData(BaseModel):
 class GameInfo(BaseModel):
     gameId: int
     color: Color
-    level: int = Field(ge=1, le=5)
+    depth: int = Field(ge=1, le=5)
 
 class GameId(BaseModel):
    gameId: int

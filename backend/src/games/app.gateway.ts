@@ -44,6 +44,15 @@ export class GameGateway {
       const game = await this.appService.createGame({
         ...createGameOptions,
       });
+      if (createGameOptions.isBotGame) {
+        const botColor = game.whitePlayerId ? 'black' : 'white';
+        this.appService.inviteBotToGame(
+          game.id,
+          botColor,
+          createGameOptions.depth,
+        );
+      }
+
       const gameWithNicknames = await this.appService.getGame(game.id);
       const boardState = fenToBoard(gameWithNicknames.fen);
       client.join(`game/${game.id}`);

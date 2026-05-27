@@ -44,6 +44,7 @@ model Game {
   initialTime Int
   additionalTime Int
   inviteCode String @unique
+  isBotGame Boolean
  
   gameCreatorId Int
   whitePlayerId Int? //socketId or temporary ID

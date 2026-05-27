@@ -103,6 +103,7 @@ export class AppService {
       selectedColor,
       initialTime,
       additionalTime,
+      isBotGame,
     } = dto;
     if (!initialTime || additionalTime < 0 || additionalTime > 15)
       // set additional time limit to 15 sec
@@ -129,6 +130,7 @@ export class AppService {
         blackPlayerId: selectedColor === 'black' ? creator.id : undefined,
         initialTime,
         additionalTime,
+        isBotGame: isBotGame,
         whiteTimeLeft: initialTime,
         blackTimeLeft: initialTime,
         inviteCode,
@@ -494,6 +496,21 @@ export class AppService {
         winner: winner?.username,
         gameStatus: 'resign',
       },
+    });
+  }
+
+  async inviteBotToGame(
+    gameId: number,
+    botColor: 'white' | 'black',
+    depth: number,
+  ) {
+    await fetch('/chess-bot/start-bot-game', {
+      method: 'post',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ gameId: gameId, color: botColor, depth }),
     });
   }
 }

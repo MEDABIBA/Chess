@@ -53,8 +53,8 @@ export class CreateGameDto {
   @Type(() => SquareDto)
   boardState!: SquareDto[];
 
-  // @IsEnum(["white", "black"])
-  // currentPlayer: "white" | "black";
+  @IsBoolean()
+  isBotGame!: boolean;
 
   @IsString()
   creatorUserName!: string;
@@ -62,6 +62,7 @@ export class CreateGameDto {
 
   @IsInt()
   @Min(0)
+  depth!: number;
   initialTime!: number;
   additionalTime!: number;
 }

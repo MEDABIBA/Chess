@@ -2,8 +2,10 @@ import { Position, SquareData, GameStatus, Color } from './types';
 
 export interface ICreateGame {
   boardState: SquareData[];
+  isBotGame: boolean;
   creatorUserName: string;
   selectedColor: Color;
+  depth: number;
   initialTime: number;
   additionalTime: number;
 }

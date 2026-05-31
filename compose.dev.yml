@@ -25,6 +25,8 @@ services:
       - 3030:3030
     env_file:
       - ./backend/.env
+    environment:
+      BOT_USERNAME: ${BOT_USERNAME}
     restart: unless-stopped
     depends_on:
       postgresql:
@@ -37,6 +39,9 @@ services:
       dockerfile: dockerfile
     ports:
       - 8000:8000
+    environment:
+      BOT_USERNAME: ${BOT_USERNAME}
+      BOT_PASSWORD: ${BOT_PASSWORD}
     volumes:
       - ./chess-bot/src:/app/src
     restart: unless-stopped

@@ -20,6 +20,8 @@ services:
     env_file:
       - ./backend/.env
     restart: unless-stopped
+    environment:
+      BOT_USERNAME: ${BOT_USERNAME}
     depends_on:
       postgresql:
         condition: service_healthy
@@ -30,6 +32,9 @@ services:
       dockerfile: dockerfile
     ports:
       - 8000:8000
+    environment:
+      BOT_USERNAME: ${BOT_USERNAME}
+      BOT_PASSWORD: ${BOT_PASSWORD}
     restart: unless-stopped
     command: uv run fastapi run src/main.py
 

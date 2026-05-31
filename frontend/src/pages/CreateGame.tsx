@@ -7,6 +7,7 @@ import { ReactComponent as Rapid } from '../assets/icons/rapid.svg';
 import ColorSelector from '../components/ColorSelector';
 import { Color } from '../types/types';
 import Header from '../components/Header';
+import BotSelector from '../components/ui/BotSelect';
 
 const CreateGame = () => {
   const { newGame } = useStore();
@@ -24,6 +25,7 @@ const CreateGame = () => {
   type TimerValue = (typeof timerValues)[keyof typeof timerValues][number];
   const [timerValue, setTimerValue] = useState<TimerValue>('15+10');
   const [color, setColor] = useState<Color>('white');
+  const [bot, setBot] = useState<boolean>(true);
   const selectTime = timerValue.replace('min', '').trim();
   return (
     <div className="appearance-animation">
@@ -62,8 +64,9 @@ const CreateGame = () => {
               );
             })}
             <ColorSelector color={color} setColor={setColor} />
+            <BotSelector bot={bot} setBot={setBot} />
             <button
-              onClick={async () => await createNewGame(selectTime, color)}
+              onClick={async () => await createNewGame(selectTime, color, true)}
               className="submit-button"
             >
               Create game

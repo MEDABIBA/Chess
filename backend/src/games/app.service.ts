@@ -116,6 +116,7 @@ export class AppService {
       })),
       'white',
     );
+    console.log('IS BOT GAME:', isBotGame);
     const creator = await this.prisma.user.findUnique({
       where: { username: creatorUserName },
     });
@@ -504,13 +505,31 @@ export class AppService {
     botColor: 'white' | 'black',
     depth: number,
   ) {
-    await fetch('/chess-bot/start-bot-game', {
+    const botUsername = process.env.BOT_USERNAME;
+    const game = await this.prisma.game.findUnique({ where: { id: gameId } });
+    const bot = await this.prisma.user.findUnique({
+      where: { username: botUsername },
+    });
+    if (!game) {
+      throw new Error(`Game with id ${gameId} is not found!`);
+    }
+    if (!bot) {
+      throw new Error(`Bot with username ${botUsername} is not found`);
+    }
+    await this.prisma.game.update({
+      where: { id: gameId },
+      data: { [`${botColor}PlayerId`]: bot.id },
+      include: { whitePlayer: true, blackPlayer: true },
+    });
+    const res = await fetch('http://chess-bot:8000/start-bot-game', {
       method: 'post',
-      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ gameId: gameId, color: botColor, depth }),
     });
+    if (res.status !== 200) {
+      throw new Error(`Error to call the bot with status ${res.status}`);
+    }
   }
 }

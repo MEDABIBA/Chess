@@ -115,7 +115,7 @@ class WebSocketService {
     });
     onSocket<GameInterface[]>(this.socket, 'get-games', (data) => {
       this.store?.games.setAllGames(data);
-      // console.log('get-games', data);
+      console.log('get-games', data);
     });
 
     onSocket<GameInterface>(this.socket, 'game-state', (data) => {
@@ -179,7 +179,7 @@ class WebSocketService {
       whiteTimeLeft: number;
       blackTimeLeft: number;
     }>(this.socket, 'state', (data) => {
-      // console.log('state called');
+      console.log('state called');
       if (!data.success) return;
       const { piece, from, to, whiteTimeLeft, blackTimeLeft } = data;
       if (

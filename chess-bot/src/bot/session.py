@@ -26,6 +26,7 @@ class Session:
 
     def handleListeners(self):
       async def on_state(data: On_state):
+          print("hello world")
           parsed = On_state.model_validate(data)
           from_square = chess.square(parsed.from_.col, parsed.from_.row)
           to_square = chess.square(parsed.to.col, parsed.to.row)
@@ -43,22 +44,28 @@ class Session:
           pass
       
       async def on_connect():
+        print("Connected")
+        await self.sio.emit("join-room", {"gameId": self.gameId})
         if not self._connected_once:
           self._connected_once = True
+          print(f"Joined to room with id {self.gameId}")
           if self.color == "white":
              await self.make_move()
 
       async def on_error(err: dict):
+          print("error: ", err)
           if "Unauthorized" in err.get("message", ""):
              await self.reconnect()
              
       self.sio.on("state", on_state)
-      self.sio.on("resign", on_resign)
+      self.sio.on("resign", on_resign) # Unsupported
       self.sio.on("connect", on_connect)
       self.sio.on("error", on_error)
       
     async def run(self):
+      print("Try to handle listeners...")
       self.handleListeners()
+      print("Try connecting to socket...")
       await self.sio.connect("http://backend:3030", auth={"token": await self.get_token()})
       while True:
         await self.sio.wait()

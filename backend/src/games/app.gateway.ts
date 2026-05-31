@@ -45,12 +45,20 @@ export class GameGateway {
         ...createGameOptions,
       });
       if (createGameOptions.isBotGame) {
-        const botColor = game.whitePlayerId ? 'black' : 'white';
-        this.appService.inviteBotToGame(
-          game.id,
-          botColor,
-          createGameOptions.depth,
-        );
+        try {
+          const botColor = game.whitePlayerId ? 'black' : 'white';
+          await this.appService.inviteBotToGame(
+            game.id,
+            botColor,
+            createGameOptions.depth,
+          );
+        } catch (err) {
+          await this.appService.removeGame({
+            gameId: game.id,
+            userId: game.gameCreatorId,
+          });
+          throw err;
+        }
       }
 
       const gameWithNicknames = await this.appService.getGame(game.id);

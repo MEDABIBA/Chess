@@ -14,7 +14,12 @@ class NewGame {
   }
 
   @action
-  createNewGame = async (time: string, selectedColor: Color) => {
+  createNewGame = async (
+    time: string,
+    selectedColor: Color,
+    isBotGame: boolean,
+    depth: number = 1,
+  ) => {
     const nickname = this.store.getNickname();
     if (!nickname) {
       notify('You are not logged in', 'error');
@@ -26,8 +31,10 @@ class NewGame {
     try {
       this.store.socket?.createGame({
         boardState: board,
+        isBotGame: isBotGame,
         creatorUserName: nickname,
         selectedColor,
+        depth,
         initialTime,
         additionalTime,
       });

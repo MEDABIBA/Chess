@@ -20,9 +20,15 @@ class Manager:
         self.lock = asyncio.Lock()
 
     async def login(self):
-        res = await self.http.post("/auth/login", json={"username": self.username, "password": self.password})
-        self.access_token: str = res.json()["accessToken"]
-        self.refresh_token = res.cookies["refreshToken"]
+        try:
+            print("login into system")
+            res = await self.http.post("http://backend:3030/auth/login", json={"username": self.username, "password": self.password})
+            self.access_token: str = res.json()["accessToken"]
+            self.refresh_token = res.cookies["refreshToken"]
+
+        except Exception as e:
+            print("Error while loggining system:", e)
+            raise 
 
     def _is_token_valid(self) -> bool:
         if not self.access_token:
@@ -33,6 +39,7 @@ class Manager:
         return datetime.fromtimestamp(data["exp"]) > datetime.now()
 
     async def get_token(self):
+        print("get token func")
         if self._is_token_valid():
             return self.access_token
         async with self.lock:
@@ -49,7 +56,13 @@ class Manager:
     
     async def start_game(self, body: GameInfo):
         session = Session(body, self.get_token)
-        self.sessions[body.gameId] = asyncio.create_task(session.run())
+        print("start new session", body.gameId)
+        try:
+            self.sessions[body.gameId] = asyncio.create_task(session.run())
+            print("Task created successfully")
+        except Exception as e:
+            print("Error creating task", e)
+            raise
 
     def stop_game(self, gameId: GameId):
         task = self.sessions.pop(gameId.gameId, None)

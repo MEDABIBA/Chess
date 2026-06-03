@@ -21,21 +21,44 @@ class Session:
          await self.sio.disconnect()
 
     async def make_move(self):
-       res = generate_best_move(self.board, self.depth, self.color)
-        # socket emit to backend
+      res = generate_best_move(self.board, self.depth, self.color)
+      if res is None:
+         return
+      await self.sio.emit("make-move", {"id": self.gameId, "moveData": self.move_to_payload(res)})
 
+    def move_to_payload(self, move: chess.Move):
+       from_pos = {
+             "row": chess.square_rank(move.from_square) + 1,
+             "col": chess.square_file(move.from_square) + 1
+          }
+       to_pos = {
+             "row": chess.square_rank(move.to_square) + 1,
+             "col": chess.square_file(move.to_square) + 1
+          }
+       promotionPiece = None
+       if move.promotion:
+          promotionPiece = {
+            chess.QUEEN: "queen", chess.ROOK: "rook",
+            chess.BISHOP: "bishop", chess.KNIGHT: "knight",
+        }[move.promotion]
+       return {
+          "from": from_pos,
+          "to": to_pos,
+          "highlightLastMove": {"from": from_pos, "to": to_pos},
+          "promotionPiece": promotionPiece
+       }
+       
     def handleListeners(self):
       async def on_state(data: On_state):
-          print("hello world")
           parsed = On_state.model_validate(data)
-          from_square = chess.square(parsed.from_.col, parsed.from_.row)
-          to_square = chess.square(parsed.to.col, parsed.to.row)
+          from_square = chess.square(parsed.from_.col - 1, parsed.from_.row - 1)
+          to_square = chess.square(parsed.to.col - 1, parsed.to.row - 1)
           promo = None
           moving_piece = self.board.piece_at(from_square)
           if (moving_piece and moving_piece.piece_type == chess.PAWN and 
               parsed.piece.pieceType != "pawn"):
              promo = {"queen": chess.QUEEN, "rook": chess.ROOK,
-                 "bishop": chess.BISHOP, "knight": chess.KNIGHT}[parsed.piece.pieceType]
+                 "bishop": chess.BISHOP, "knight": chess.KNIGHT}[parsed.piece.pieceType]  
           self.board.push(chess.Move(from_square, to_square, promo))
           if parsed.piece.color != self.color:
              await self.make_move()  

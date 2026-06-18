@@ -96,7 +96,7 @@ def minmax(board: Board, depth: int, bot_color: Color, alpha, beta) -> float:
         if board.turn == bot_color:
             return -MATE_SCORE - depth
         else:
-            return MATE_SCORE -+ depth
+            return MATE_SCORE + depth
     if board.is_stalemate() or board.is_insufficient_material():
         return 0
     if depth == 0:

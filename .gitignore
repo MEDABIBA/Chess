@@ -31,3 +31,7 @@ yarn-error.log*.vscode/
 
 # personal
 /frontend/README.md
+
+#graphify
+graphify-out/*
+!graphify-out/graph.html

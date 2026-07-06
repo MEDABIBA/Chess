@@ -66,7 +66,9 @@ const CreateGame = () => {
             <ColorSelector color={color} setColor={setColor} />
             <BotSelector bot={bot} setBot={setBot} />
             <button
-              onClick={async () => await createNewGame(selectTime, color, true)}
+              onClick={async () =>
+                await createNewGame(selectTime, color, true, 3)
+              }
               className="submit-button"
             >
               Create game

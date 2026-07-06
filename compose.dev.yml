@@ -28,6 +28,9 @@ services:
     environment:
       BOT_USERNAME: ${BOT_USERNAME}
     restart: unless-stopped
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/prisma:/app/prisma
     depends_on:
       postgresql:
         condition: service_healthy
@@ -42,6 +45,7 @@ services:
     environment:
       BOT_USERNAME: ${BOT_USERNAME}
       BOT_PASSWORD: ${BOT_PASSWORD}
+      WATCHPACK_POLLING: 'true'
     volumes:
       - ./chess-bot/src:/app/src
     restart: unless-stopped
@@ -64,4 +68,3 @@ services:
 
 volumes:
   postgres_data:
-  frontend:

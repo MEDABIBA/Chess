@@ -30,3 +30,7 @@ class On_state(BaseModel):
   from_: Position = Field(alias="from")
   to: Position
   piece: Piece
+
+
+class On_fetch_board(BaseModel):
+   fen: str

@@ -46,7 +46,7 @@ class Manager:
             if self._is_token_valid():
                 return self.access_token
             if self.refresh_token:
-                res = await self.http.post("/auth/refresh", cookies={"refreshToken": self.refresh_token})
+                res = await self.http.post("http://backend:3030/auth/refresh", cookies={"refreshToken": self.refresh_token})
                 data: str = res.json()["accessToken"]
                 self.access_token = data
                 return data

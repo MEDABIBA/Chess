@@ -14,7 +14,7 @@ class Games {
     makeAutoObservable(this);
     this.appStore = appStore;
     reaction(
-      () => [this.appStore?.socket.socket, this.appStore?.socket?.isConnected],
+      () => [this.appStore?.socket?.socket, this.appStore?.socket?.isConnected],
       ([socket, connected]) => {
         if (socket && connected) {
           appStore.socket?.getAllGames();

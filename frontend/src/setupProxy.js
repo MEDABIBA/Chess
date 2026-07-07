@@ -3,8 +3,7 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = function (app) {
   app.use(
-    '/socket.io',
-    createProxyMiddleware({
+    createProxyMiddleware('/socket.io', {
       target: 'http://backend:3030',
       changeOrigin: true,
       ws: true,
@@ -12,8 +11,7 @@ module.exports = function (app) {
   );
 
   app.use(
-    '/auth',
-    createProxyMiddleware({
+    createProxyMiddleware('/auth', {
       target: 'http://backend:3030',
       changeOrigin: true,
     }),

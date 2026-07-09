@@ -26,6 +26,7 @@ class Session:
    async def make_move(self):
      res = generate_best_move(self.board, self.depth, self.color)
      if res is None:
+        print("Make move result is null")
         return
      await self.sio.emit("make-move", {"id": self.gameId, "moveData": self.move_to_payload(res)})
    def move_to_payload(self, move: chess.Move):

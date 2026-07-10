@@ -3,7 +3,7 @@ from schemas.schemas import GameInfo, On_state, On_fetch_board, Color
 from engine.index import generate_best_move
 from typing import Callable, Awaitable
 import chess
-
+import asyncio
 
 class Session:    
    def __init__(self, body: GameInfo, get_token: Callable[[], Awaitable[str]]):
@@ -24,7 +24,10 @@ class Session:
          await self.sio.emit("get-game", {"id": self.gameId})
 
    async def make_move(self):
-     res = generate_best_move(self.board, self.depth, self.color)
+     print("generate best move func")
+     res = await asyncio.to_thread(generate_best_move, self.board, self.depth, self.color)
+     print("result of this function: ", res)
+
      if res is None:
         print("Make move result is null")
         return

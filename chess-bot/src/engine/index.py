@@ -103,6 +103,41 @@ def mvv_lva(board: Board, move: Move) -> int:
 def sorted_moves(board: Board):
     return sorted(board.legal_moves, key=lambda m: mvv_lva(board, m), reverse=True)
 
+def quiescence_search(board: Board, bot_color: Color, alpha, beta) -> int:
+    if board.is_checkmate():
+        if board.turn == bot_color:
+            return -MATE_SCORE
+        else:
+            return MATE_SCORE
+    if board.is_stalemate() or board.is_insufficient_material():
+        return 0
+
+    stand_pat = evaluate(board, bot_color)
+    best = stand_pat
+    for move in sorted_moves(board):
+        if board.is_capture(move):
+            if bot_color == board.turn:
+                board.push(move)
+                score = quiescence_search(board, bot_color, alpha, beta)
+                board.pop()
+                if score >= best:
+                    best = score
+                    alpha = max(alpha, best)
+                if alpha >= beta:
+                    break
+            else:
+                if stand_pat <= alpha:
+                    return stand_pat
+                board.push(move)
+                score = quiescence_search(board, bot_color, alpha, beta)
+                board.pop()
+                if score < best:
+                    best = score
+                beta = min(beta, best)
+                if alpha >= beta:
+                    return best
+    return best
+
 def minmax(board: Board, depth: int, bot_color: Color, alpha, beta) -> Tuple[float | int, Move | None]:
     if board.is_checkmate():
         if board.turn == bot_color:
@@ -112,7 +147,7 @@ def minmax(board: Board, depth: int, bot_color: Color, alpha, beta) -> Tuple[flo
     if board.is_stalemate() or board.is_insufficient_material():
         return (0, None)
     if depth == 0:
-        return (evaluate(board, bot_color), None)
+        return (quiescence_search(board, bot_color, alpha, beta), None)
     if bot_color == board.turn:
         best_score = -inf
         best_move = None

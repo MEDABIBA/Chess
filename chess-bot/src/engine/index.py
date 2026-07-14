@@ -11,6 +11,15 @@ KING_PTS = [0, 0,  0,  0,   0,  0,  0, 0,
             0, 0,  0, -5,  -5, -5,  0, 0,
             0, 0, 10, -5,  -5, -5, 10, 0]
 
+KING_END_PST  = [-50,-40,-30,-20,-20,-30,-40,-50,
+                -30,-20,-10,  0,  0,-10,-20,-30,
+                -30,-10, 20, 30, 30, 20,-10,-30,
+                -30,-10, 30, 40, 40, 30,-10,-30,
+                -30,-10, 30, 40, 40, 30,-10,-30,
+                -30,-10, 20, 30, 30, 20,-10,-30,
+                -30,-30,  0,  0,  0,  0,-30,-30,
+                -50,-30,-30,-30,-30,-30,-30,-50]
+
 QUEEN_PTS = [-20, -10, -10, -5, -5, -10, -10, -20,
              -10,   0,   0,  0,  0,   0,   0, -10,
              -10,   0,   5,  5,  5,   5,   0, -10,
@@ -56,9 +65,6 @@ PAWN_PTS = [ 0,   0,   0,   0,   0,   0,   0,   0,
              5,   5,   5, -10, -10,   5,   5,   5,
              0,   0,   0,   0,   0,   0,   0,   0]
 
-# KING_MIDDLE_PST
-# KING_END_PST 
-
 MATE_SCORE = 100_000_000
 
 PIECE_VALUES = {
@@ -78,6 +84,9 @@ PIECE_PTS = {
     QUEEN: QUEEN_PTS,
     KING: KING_PTS,
 }
+
+PHASE_WEIGHT = { KNIGHT: 1, BISHOP: 1, ROOK: 2, QUEEN: 4} 
+TOTAL_PHASE = 24 
 
 def generate_best_move(board: Board, depth: int, bot_color):
     bot_chess_color = WHITE if bot_color == "white" else BLACK
@@ -182,18 +191,29 @@ def minmax(board: Board, depth: int, bot_color: Color, alpha, beta) -> Tuple[flo
             if alpha >= beta:
                 break
         return (best_score, best_move)
+    
+def game_phase(board: Board):
+    current_phase = sum(w * len(board.pieces(piece_type, True )) + w * len(board.pieces(piece_type, False )) for piece_type, w in PHASE_WEIGHT.items())
+    return min(TOTAL_PHASE, current_phase)
+
+def king_pst_score(idx, mg, eg):
+    return int(KING_PTS[idx] * mg + KING_END_PST[idx] * eg)
 
 def evaluate(board: Board, color: Color) -> int:
     opponent_chess_notation_color = not color
     score = 0
+    phase = game_phase(board)
+    mg = phase / TOTAL_PHASE
+    eg = 1 - mg
+
     for piece_type, value in PIECE_VALUES.items():
         pst = PIECE_PTS[piece_type]
         for square in board.pieces(piece_type, color):
             idx = square_mirror(square) if color else square
-            score += pst[idx]
+            score += pst[idx] if piece_type != KING else king_pst_score(idx, mg ,eg)
         for square in board.pieces(piece_type, opponent_chess_notation_color):
             idx = square_mirror(square) if opponent_chess_notation_color else square
-            score -= pst[idx]
+            score -= pst[idx] if piece_type != KING else king_pst_score(idx, mg ,eg)
 
         score += len(board.pieces(piece_type, color)) * value
         score -= len(board.pieces(piece_type, opponent_chess_notation_color)) * value

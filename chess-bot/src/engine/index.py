@@ -114,28 +114,32 @@ def quiescence_search(board: Board, bot_color: Color, alpha, beta) -> int:
 
     stand_pat = evaluate(board, bot_color)
     best = stand_pat
-    for move in sorted_moves(board):
-        if board.is_capture(move):
-            if bot_color == board.turn:
-                board.push(move)
-                score = quiescence_search(board, bot_color, alpha, beta)
-                board.pop()
-                if score >= best:
-                    best = score
-                    alpha = max(alpha, best)
-                if alpha >= beta:
-                    break
-            else:
-                if stand_pat <= alpha:
-                    return stand_pat
-                board.push(move)
-                score = quiescence_search(board, bot_color, alpha, beta)
-                board.pop()
-                if score < best:
-                    best = score
-                beta = min(beta, best)
-                if alpha >= beta:
-                    return best
+
+    if stand_pat >= beta: 
+        return beta
+
+    # for move in sorted_moves(board):
+    for move in board.generate_legal_captures():
+         if bot_color == board.turn:
+             board.push(move)
+             score = quiescence_search(board, bot_color, alpha, beta)
+             board.pop()
+             if score >= best:
+                 best = score
+                 alpha = max(alpha, best)
+             if alpha >= beta:
+                 break
+         else:
+             if stand_pat <= alpha:
+                 return stand_pat
+             board.push(move)
+             score = quiescence_search(board, bot_color, alpha, beta)
+             board.pop()
+             if score < best:
+                 best = score
+             beta = min(beta, best)
+             if alpha >= beta:
+                 return best
     return best
 
 def minmax(board: Board, depth: int, bot_color: Color, alpha, beta) -> Tuple[float | int, Move | None]:
@@ -146,6 +150,8 @@ def minmax(board: Board, depth: int, bot_color: Color, alpha, beta) -> Tuple[flo
             return (MATE_SCORE + depth, None)
     if board.is_stalemate() or board.is_insufficient_material():
         return (0, None)
+    if depth == 0 and board.is_check():
+        depth = 1
     if depth == 0:
         return (quiescence_search(board, bot_color, alpha, beta), None)
     if bot_color == board.turn:

@@ -22,7 +22,7 @@ const CreateGame = () => {
     Blitz: Blitz,
     Rapid: Rapid,
   };
-  const botDepth = 3;
+  const botDepth = 4;
   type TimerValue = (typeof timerValues)[keyof typeof timerValues][number];
   const [timerValue, setTimerValue] = useState<TimerValue>('15+10');
   const [color, setColor] = useState<Color>('white');

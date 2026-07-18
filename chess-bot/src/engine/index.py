@@ -1,6 +1,7 @@
 from chess import Board, PAWN, KNIGHT, BISHOP, ROOK, KING, QUEEN, WHITE, BLACK, Color, square_mirror, Move
 from math import inf
 from typing import Tuple
+import random
 
 KING_PTS = [0, 0,  0,  0,   0,  0,  0, 0,
             0, 0,  0,  0,   0,  0,  0, 0,
@@ -88,10 +89,20 @@ PIECE_PTS = {
 PHASE_WEIGHT = { KNIGHT: 1, BISHOP: 1, ROOK: 2, QUEEN: 4} 
 TOTAL_PHASE = 24 
 
-def generate_best_move(board: Board, depth: int, bot_color):
+def generate_best_move(board: Board, depth: int, bot_color, margin = 15):
     bot_chess_color = WHITE if bot_color == "white" else BLACK
-    _, best_move = minmax(board, depth, bot_chess_color, -inf, inf)
-    return best_move
+    scored: list[tuple[int, Move]] = []
+    best_score = -inf
+    for move in sorted_moves(board):
+        board.push(move)
+        score, _ = minmax(board, depth - 1, bot_chess_color, -inf, inf)
+        board.pop()
+        if score > best_score:
+            best_score = score
+        scored.append((int(score), move))
+    print("Score is: ", score)
+    candidate: list[Move] = [m for s, m in scored if s >= best_score - margin]
+    return random.choice(candidate)
 
 def mvv_lva(board: Board, move: Move) -> int:
     score = 0

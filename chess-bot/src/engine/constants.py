@@ -1,0 +1,25 @@
+from pst_data import *
+from chess import PAWN, KNIGHT, BISHOP, ROOK, KING, QUEEN
+
+MATE_SCORE = 100_000_000
+
+PIECE_VALUES = {
+    PAWN: 100,
+    KNIGHT: 300,
+    BISHOP: 300,
+    ROOK: 500,
+    QUEEN: 900,
+    KING: 0
+}
+
+PIECE_PTS = {
+    PAWN: PAWN_PTS,
+    ROOK: ROOK_PTS,
+    KNIGHT: KNIGHT_PTS,
+    BISHOP: BISHOP_PTS,
+    QUEEN: QUEEN_PTS,
+    KING: KING_PTS,
+}
+
+PHASE_WEIGHT = { KNIGHT: 1, BISHOP: 1, ROOK: 2, QUEEN: 4} 
+TOTAL_PHASE = 24 

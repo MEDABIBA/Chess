@@ -45,7 +45,11 @@ export class AppService {
 
   async checkIsCurrentPlayer(id: number, clientId: number) {
     const game = await this.prisma.game.findUnique({ where: { id: id } });
-    if (!game) throw new Error('Cannot find game');
+    if (
+      !game ||
+      (game.gameStatus !== 'playing' && game.gameStatus !== 'waiting')
+    )
+      return false;
     if (game.currentPlayer === 'white') {
       return game.whitePlayerId === clientId;
     } else if (game.currentPlayer === 'black') {

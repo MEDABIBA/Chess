@@ -572,7 +572,7 @@ body.dragging .piece-img {
   width: 30%;
   background-color: #2f2f2f;
   color: #fff;
-  margin: 5% 0;
+  margin: 4% 0;
   transition: all 0.4s ease-in-out;
 }
 .timer-element-active,
@@ -600,10 +600,13 @@ body.dragging .piece-img {
 }
 
 .submit-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: #555;
   margin-top: auto;
   height: 14%;
-  min-height: 50px;
+  min-height: 60px;
   width: 80%;
   padding: 15px 6px;
   border-radius: 15px;
@@ -841,17 +844,17 @@ th {
   margin-right: 10px;
 }
 
-.color-selector {
+.selector {
   margin-bottom: 25px;
 }
-.color-selector-item {
+.selector-item {
   position: relative;
   background: #4b4b4b;
   overflow: hidden;
   height: 60px;
   width: 60px;
 }
-.color-selector-item::after {
+.selector-item::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -859,25 +862,24 @@ th {
   z-index: 10;
   transition: all 0.1s ease-in;
 }
-.color-selector-item:hover::after {
+.selector-item:hover::after {
   opacity: 0;
   transform: scale(1.2);
 }
 
-.color-selector-white-img {
+.selector-left-img {
   height: 100%;
   width: 100%;
   transform: translate(50%);
 }
-.color-selector-black-img {
+.selector-right-img {
   height: 100%;
   width: 100%;
   transform: translate(-50%);
 }
 
-.color-selector-item-active {
+.selector-item-active::after {
   position: relative;
-  z-index: 11;
 }
 
 @keyframes appearanceAnimation {

@@ -211,7 +211,7 @@ export class GameGateway {
   ) {
     try {
       const userId = await client.data.user.userId;
-      if (!this.appService.checkIsCurrentPlayer(dto.id, userId)) {
+      if (!(await this.appService.checkIsCurrentPlayer(dto.id, userId))) {
         throw new Error('You are not allowed to make move!');
       }
       const { from, to } = dto.moveData;

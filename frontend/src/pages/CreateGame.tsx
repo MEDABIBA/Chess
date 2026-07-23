@@ -4,7 +4,7 @@ import { useStore } from '../provider/context';
 import { ReactComponent as Bullet } from '../assets/icons/bullet.svg';
 import { ReactComponent as Blitz } from '../assets/icons/blitz.svg';
 import { ReactComponent as Rapid } from '../assets/icons/rapid.svg';
-import ColorSelector from '../components/ColorSelector';
+import ColorSelector from '../components/ui/ColorSelector';
 import { Color } from '../types/types';
 import Header from '../components/Header';
 import BotSelector from '../components/ui/BotSelect';

@@ -1,5 +1,5 @@
 from chess import Board, Move
-from constants import *
+from engine.constants import *
 
 def mvv_lva(board: Board, move: Move) -> int:
     score = 0

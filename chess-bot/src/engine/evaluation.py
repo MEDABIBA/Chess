@@ -1,6 +1,6 @@
 from chess import Board, Color, square_mirror
-from constants import *
-from pst_data import *
+from engine.constants import *
+from engine.pst_data import *
 
 def game_phase(board: Board):
     current_phase = sum(w * len(board.pieces(piece_type, True )) + w * len(board.pieces(piece_type, False )) for piece_type, w in PHASE_WEIGHT.items())

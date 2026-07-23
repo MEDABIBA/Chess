@@ -1,6 +1,6 @@
 import socketio
 from schemas.schemas import GameInfo, On_state, On_fetch_board, Color
-from engine.index import generate_best_move
+from engine.root import generate_best_move
 from typing import Callable, Awaitable
 import chess
 import asyncio

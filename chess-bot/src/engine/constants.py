@@ -1,4 +1,4 @@
-from pst_data import *
+from engine.pst_data import *
 from chess import PAWN, KNIGHT, BISHOP, ROOK, KING, QUEEN
 
 MATE_SCORE = 100_000_000

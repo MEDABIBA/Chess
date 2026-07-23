@@ -1,13 +1,9 @@
-from ordering import sorted_moves
-from search import minmax
+from engine.ordering import sorted_moves
+from engine.search import minmax
 
 from chess import Board, WHITE, BLACK, Move
 from math import inf
 import random
-
-
-
-
 
 def generate_best_move(board: Board, depth: int, bot_color, margin = 15):
     bot_chess_color = WHITE if bot_color == "white" else BLACK

@@ -1,6 +1,7 @@
-from constants import *
-from evaluation import evaluate
-from ordering import sorted_moves
+from engine.constants import *
+from engine.evaluation import evaluate
+from engine.ordering import sorted_moves
+
 from chess import Board, Color, Move
 from math import inf
 from typing import Tuple

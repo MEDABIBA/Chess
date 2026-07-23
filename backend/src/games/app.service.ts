@@ -60,6 +60,7 @@ export class AppService {
       include: { whitePlayer: true, blackPlayer: true },
     });
     if (!game) throw new Error('Game not found');
+    if (game.isBotGame) return null;
 
     let timeLeft: number;
     let turnStartedAt: Date | null;
@@ -256,6 +257,7 @@ export class AppService {
     let nextTimeLeft: number | null = null;
     let nextTimeoutWinner: string = '';
     let isActiveGame: boolean = false;
+    let isBotGame: boolean = false;
 
     const result = await this.prisma.$transaction(async (prisma) => {
       const game = await prisma.game.findUnique({
@@ -323,6 +325,7 @@ export class AppService {
           ? game.whitePlayer!.username
           : game.blackPlayer!.username;
       isActiveGame = game.gameStatus === 'playing';
+      isBotGame = game.isBotGame;
 
       return await prisma.game.update({
         where: { id: id },
@@ -350,7 +353,12 @@ export class AppService {
         },
       });
     });
-    if (nextTimeLeft !== null && nextTimeoutWinner && isActiveGame)
+    if (
+      nextTimeLeft !== null &&
+      nextTimeoutWinner &&
+      isActiveGame &&
+      !isBotGame
+    )
       this.scheduleTimeout(id, nextTimeLeft * 1000, nextTimeoutWinner, server);
     else {
       clearTimeout(this.gameTimers.get(id));

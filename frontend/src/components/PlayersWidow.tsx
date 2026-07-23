@@ -28,6 +28,7 @@ const PlayersWindow = ({
         <PlayerWindow
           additionalTime={currentGame.additionalTime}
           color={topColor}
+          isBotGame={currentGame.isBotGame}
         />
         <div className="game-info-window-main">
           <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
@@ -35,7 +36,8 @@ const PlayersWindow = ({
               {topColor === 'white' ? whitePlayerNickname : blackPlayerNickname}
             </div>
             {currentGame.isParticipant() &&
-              currentGame.gameStatus === 'playing' && (
+              currentGame.gameStatus === 'playing' &&
+              !currentGame.isBotGame && (
                 <button
                   className="exta-time-btn"
                   title="Add 15s to your opponent"
@@ -60,6 +62,7 @@ const PlayersWindow = ({
         <PlayerWindow
           additionalTime={currentGame.additionalTime}
           color={bottomColor}
+          isBotGame={currentGame.isBotGame}
         />
       </div>
     </>

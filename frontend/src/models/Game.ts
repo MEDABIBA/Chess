@@ -28,6 +28,7 @@ class Game {
   whitePlayerNickname: string | null = null;
   blackPlayerNickname: string | null = null;
   currentPlayer: Color = 'white';
+  isBotGame: boolean;
   winner: string | null = null;
   gameStatus: GameStatus = 'waiting';
   inviteCode: string | null = null;
@@ -94,6 +95,7 @@ class Game {
     this.whitePlayerNickname = game.whitePlayer?.username ?? null;
     this.blackPlayerNickname = game?.blackPlayer?.username ?? null;
     this.createdAt = game.createdAt;
+    this.isBotGame = game.isBotGame;
 
     this.modalActive = this.isFinished() ? true : false;
   }

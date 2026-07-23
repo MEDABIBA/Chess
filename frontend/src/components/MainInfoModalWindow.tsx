@@ -62,6 +62,7 @@ const MainInfoModalWindow = ({
             />
           )}
           {currentGame.gameStatus === 'playing' &&
+            !currentGame.isBotGame &&
             currentGame.drawOfferedBy === null && (
               <GameButton img={draw} text="draw" setModal={setDrawModal} />
             )}

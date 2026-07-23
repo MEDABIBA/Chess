@@ -57,6 +57,7 @@ interface Game {
   whitePlayerId: string | null;
   blackPlayerId: string | null;
   blackTimeLeft: number;
+  isBotGame: boolean;
   boardState: SquareData[][];
   createdAt: Date;
   currentPlayer: 'white' | 'black';

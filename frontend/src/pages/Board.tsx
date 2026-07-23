@@ -125,6 +125,7 @@ const Board = () => {
             <PlayerWindow
               additionalTime={currentGame.additionalTime}
               color={topColor}
+              isBotGame={currentGame.isBotGame}
             />
           )}
           <div className="game-container">
@@ -134,6 +135,7 @@ const Board = () => {
             <PlayerWindow
               additionalTime={currentGame.additionalTime}
               color={bottomColor}
+              isBotGame={currentGame.isBotGame}
             />
           )}
 

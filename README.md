@@ -1,6 +1,6 @@
-# **Chess**
-
 <div align="center">
+
+# **Chess**
 
 [![Yarn](https://img.shields.io/badge/Yarn-Package%20Manager-3e3e3e?style=for-the-badge&logo=yarn)](https://yarnpkg.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Language-3e3e3e?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
@@ -143,6 +143,8 @@ Click to expand
 #### Gameplay
 
 ![Chessboard](screenshots/Chessboard.png)
+
+![Chessboard](screenshots/Timer-pulse.png)
 
 #### Game Over
 
